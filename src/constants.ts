@@ -15,8 +15,7 @@ export const AUTO_DICTIONARY: PartCategory[] = [
       "Filtro de Ar",
       "Pistão",
       "Válvula de Admissão",
-      "Cárter",
-      "Radiador"
+      "Cárter"
     ]
   },
   {
@@ -67,6 +66,16 @@ export const AUTO_DICTIONARY: PartCategory[] = [
       "Semieixo",
       "Homocinética",
       "Tulipa"
+    ]
+  },
+  {
+    name: "Sistema de Arrefecimento",
+    parts: [
+      "Radiador",
+      "Mangueira Superior",
+      "Mangueira Inferior",
+      "Válvula Termostática",
+      "Aditivo do Radiador"
     ]
   }
 ];

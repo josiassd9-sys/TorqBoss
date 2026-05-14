@@ -37,7 +37,12 @@ import {
   Globe,
   Link,
   Clipboard,
-  Wand2
+  ClipboardCheck,
+  Wand2,
+  Layout,
+  ExternalLink,
+  MapPin,
+  Phone
 } from 'lucide-react';
 
 const ICON_OPTIONS = {
@@ -142,6 +147,15 @@ export default function App() {
   const [plateSearchStatus, setPlateSearchStatus] = useState('');
   const [rawPastedData, setRawPastedData] = useState('');
   const [isProcessingAssisted, setIsProcessingAssisted] = useState(false);
+  const [showInternalBrowser, setShowInternalBrowser] = useState(false);
+  const [internalBrowserUrl, setInternalBrowserUrl] = useState('');
+
+  const searchPortals = [
+    { name: 'Busca Sim', url: 'https://buscasim.com.br/', icon: '🌐' },
+    { name: 'Placa i', url: 'https://www.placai.com/', icon: '🔍' },
+    { name: 'Detetive Veicular', url: 'https://detetiveveicular.com/', icon: '🕵️' },
+    { name: 'Lupa Veicular', url: 'https://www.lupaveicular.com/', icon: '🔎' }
+  ];
   const [isWebSearchOpen, setIsWebSearchOpen] = useState(false);
   const [webSearchMode, setWebSearchMode] = useState<'auto' | 'manual'>('auto');
   const [isCapturingFromWeb, setIsCapturingFromWeb] = useState(false);
@@ -204,6 +218,7 @@ export default function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const vehicleImageInputRef = useRef<HTMLInputElement>(null);
   const brandLogoInputRef = useRef<HTMLInputElement>(null);
+  const pasteTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -625,29 +640,25 @@ export default function App() {
     setIsSearchingPlate(true);
     setPlateSearchStatus('🚀 Iniciando Robô Extrator...');
     
+    const statuses = [
+      '🤖 Robô: Acessando base de dados Alpha...',
+      '🖱️ Localizando registro da placa...',
+      '⌨️ Consultando bases de dados secundárias...',
+      '⏳ Aguardando retorno dos hubs públicos...',
+      '🔍 Extraindo dados técnicos (JSON Extraction)...',
+      '🕵️ Consolidando informações finais do veículo...'
+    ];
+
+    let step = 0;
+    const statusInterval = setInterval(() => {
+      if (step < statuses.length) {
+        setPlateSearchStatus(statuses[step]);
+        step++;
+      }
+    }, 2000);
+
     try {
-      const statuses = [
-        '🤖 Robô: Navegando para buscanosim.com.br...',
-        '🖱️ Localizando campo de placa no site...',
-        '⌨️ Inserindo placa e simulando clique em "Consultar"...',
-        '⏳ Aguardando processamento da base pública...',
-        '🔍 Extraindo dados técnicos do resultado (JSON Scan)...',
-        '🕵️ Validando no Placa i e Detetive Veicular...',
-        '✨ Consolidando informações finais do veículo...'
-      ];
-
-      // Simulação visual de passos para dar o "feeling" de envelope/scanner
-      let step = 0;
-      const statusInterval = setInterval(() => {
-        if (step < statuses.length) {
-          setPlateSearchStatus(statuses[step]);
-          step++;
-        } else {
-          clearInterval(statusInterval);
-        }
-      }, 2500);
-
-      console.log(`🔍 Iniciando busca profunda para placa: ${plate}`);
+      console.log(`🔍 Robô em ação para placa: ${plate}`);
       
       const result = await geminiService.searchVehicleByPlate(
         plate, 
@@ -662,31 +673,36 @@ export default function App() {
         setPlateSearchStatus('✅ Veículo Identificado!');
         setNewVehicle(prev => ({
           ...prev,
-          name: result.name || prev.name,
-          model: result.model || prev.model,
-          year: result.year || prev.year,
+          name: result.name || prev.name || '',
+          model: result.model || prev.model || '',
+          year: result.year || prev.year || '',
           color: result.color || prev.color || '',
           imageUrl: result.imageUrl || prev.imageUrl,
-          plate
+          plate: plate
         }));
 
+        if (showInternalBrowser) {
+          alert(`✨ O robô localizou: ${result.name} ${result.model}`);
+        }
+        
         setTimeout(() => setPlateSearchStatus(''), 3000);
       } else {
-        setPlateSearchStatus('❌ Não localizado automaticamente.');
-        alert(result.message || "Não foi possível extrair dados automaticamente. Use os atalhos de consulta manual abaixo.");
+        setPlateSearchStatus('❌ Falha na extração.');
+        const msg = result.message || "O robô não conseguiu ler os dados automaticamente.";
+        alert(msg);
         setTimeout(() => setPlateSearchStatus(''), 3000);
       }
     } catch (err: any) {
-      console.error('Erro geral na busca de placa:', err);
+      clearInterval(statusInterval);
+      console.error('Erro no robô:', err);
+      setPlateSearchStatus('⚠️ Erro no servidor.');
+      
       const errorStr = JSON.stringify(err);
-      let userMsg = 'Erro ao consultar placa. Verifique sua conexão e tente novamente.';
-      
-      if (errorStr.includes("429") || errorStr.includes("RESOURCE_EXHAUSTED") || errorStr.includes("quota")) {
-        userMsg = "⚠️ Limite de cota atingido (15 buscas/min). Aguarde 1 minuto ou use a 'Busca Assistida' logo abaixo copiando o texto do site.";
+      if (errorStr.includes('429') || errorStr.includes('quota')) {
+        alert('Cota de IA atingida. Aguarde 1 minuto ou use a captura manual (Plano B).');
+      } else {
+        alert('Ocorreu um erro ao acionar o robô de busca. Tente a busca manual.');
       }
-      
-      setPlateSearchStatus('⚠️ Cota atingida.');
-      alert(userMsg);
       setTimeout(() => setPlateSearchStatus(''), 3000);
     } finally {
       setIsSearchingPlate(false);
@@ -760,12 +776,13 @@ export default function App() {
     }
   };
 
-  const handleAssistedProcess = async () => {
-    if (!rawPastedData.trim()) return;
+  const handleAssistedProcess = async (textOverride?: string) => {
+    const dataToProcess = textOverride || rawPastedData;
+    if (!dataToProcess.trim()) return;
     
     setIsProcessingAssisted(true);
     try {
-      const result = await geminiService.parseRawVehicleData(rawPastedData);
+      const result = await geminiService.parseRawVehicleData(dataToProcess);
       if (result && result.success !== false) {
         setNewVehicle(prev => ({
           ...prev,
@@ -791,6 +808,46 @@ export default function App() {
       }
     } finally {
       setIsProcessingAssisted(false);
+    }
+  };
+
+
+  const handleCaptureFromClipboard = async () => {
+    try {
+      // Tentar verificar permissão primeiro (opcional mas bom)
+      try {
+        const queryOpts = { name: 'clipboard-read' as PermissionName };
+        const permissionStatus = await navigator.permissions.query(queryOpts);
+        console.log('Clipboard permission state:', permissionStatus.state);
+      } catch (e) {
+        console.warn('Navigator permission query not supported or failed');
+      }
+
+      const text = await navigator.clipboard.readText();
+      if (!text || !text.trim()) {
+        alert('Área de transferência vazia. Copie os dados do site primeiro (Ctrl+A, Ctrl+C).');
+        return;
+      }
+      
+      setRawPastedData(text);
+      if (text.length > 20) {
+        handleAssistedProcess(text);
+      } else {
+        alert('Conteúdo muito curto na área de transferência. Certifique-se de copiar os dados do veículo.');
+      }
+    } catch (err) {
+      console.error('Erro ao ler clipboard:', err);
+      
+      // Fallback para quando a API está bloqueada por política ou permissão
+      alert('Seu navegador bloqueou o acesso direto à área de transferência neste ambiente (IFrame). \n\nPor favor, clique no campo de texto "Ou cole o texto aqui..." e use Ctrl+V manualmente.');
+      
+      // Focar na área de texto para facilitar a vida do usuário
+      setTimeout(() => {
+        if (pasteTextAreaRef.current) {
+          pasteTextAreaRef.current.focus();
+          pasteTextAreaRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
     }
   };
 
@@ -1081,7 +1138,8 @@ ESTADO ATUAL:
 - Modelo: ${selectedVehicle.model} (${selectedVehicle.year})
 
 ÚLTIMOS SERVIÇOS:
-${selectedVehicle.services.slice(0, 5).map(s => `- ${s.date}: ${s.description} (${s.mileage}km)`).join('\n')}
+${selectedVehicle.services.slice(0, 5).map(s => `- ${s.date}: ${s.description} (${s.mileage}km)
+  Oficina: ${s.workshopName}${s.workshopAddress ? ` - ${s.workshopAddress}` : ''}${s.workshopPhone ? ` (Fone: ${s.workshopPhone})` : ''}`).join('\n')}
 
 PEÇAS INSTALADAS:
 ${selectedVehicle.parts.map(p => `- ${p.name}: ${p.brand || 'N/A'}`).join('\n')}
@@ -1692,11 +1750,29 @@ ${selectedVehicle.parts.map(p => `- ${p.name}: ${p.brand || 'N/A'}`).join('\n')}
                               </div>
                               <h4 className="text-xl font-black text-brand-primary mb-1 leading-none">{service.description}</h4>
                               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
-                                <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-brand-primary"></div>
-                                  <span className="text-[11px] font-bold text-gray-600 uppercase italic tracking-tight">
-                                    {service.workshopName}
-                                  </span>
+                                <div className="flex flex-col gap-1 px-3 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-brand-primary"></div>
+                                    <span className="text-[11px] font-bold text-gray-700 uppercase tracking-tight">
+                                      {service.workshopName}
+                                    </span>
+                                  </div>
+                                  {(service.workshopAddress || service.workshopPhone) && (
+                                    <div className="flex flex-col gap-0.5 ml-4">
+                                      {service.workshopAddress && (
+                                        <div className="flex items-center gap-1 text-[10px] text-gray-400">
+                                          <MapPin size={10} className="text-gray-300" />
+                                          <span className="line-clamp-1">{service.workshopAddress}</span>
+                                        </div>
+                                      )}
+                                      {service.workshopPhone && (
+                                        <div className="flex items-center gap-1 text-[10px] text-gray-400">
+                                          <Phone size={10} className="text-gray-300" />
+                                          <span>{service.workshopPhone}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                                 {service.mechanicName && (
                                   <span className="text-[10px] text-gray-400 font-bold uppercase">Mec: {service.mechanicName}</span>
@@ -2214,11 +2290,113 @@ ${selectedVehicle.parts.map(p => `- ${p.name}: ${p.brand || 'N/A'}`).join('\n')}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="relative bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl overflow-y-auto max-h-[95vh]"
+        className={`relative bg-white rounded-3xl p-6 sm:p-8 w-full ${showInternalBrowser ? 'max-w-5xl' : 'max-w-lg'} shadow-2xl overflow-y-auto max-h-[95vh] transition-all duration-500`}
       >
-        <h2 className="text-2xl font-bold mb-6 tracking-tighter uppercase italic">
-          {isEditingVehicle ? 'Editar Veículo' : 'Novo Veículo'}
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold tracking-tighter uppercase italic">
+            {isEditingVehicle ? 'Editar Veículo' : 'Novo Veículo'}
+          </h2>
+          {showInternalBrowser && (
+            <button 
+              onClick={() => setShowInternalBrowser(false)}
+              className="bg-gray-100 text-gray-500 px-3 py-1.5 rounded-xl text-[10px] font-black hover:bg-gray-200 transition-all uppercase"
+            >
+              Fechar Navegador
+            </button>
+          )}
+        </div>
+
+        {showInternalBrowser ? (
+          <div className="flex flex-col md:flex-row md:h-[600px] h-auto gap-6 overflow-y-auto md:overflow-hidden pb-6 md:pb-0">
+            {/* Navegador à esquerda */}
+            <div className="flex-[2] flex flex-col gap-3 h-[350px] md:h-full shrink-0">
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+                {searchPortals.map(portal => (
+                  <button
+                    key={portal.url}
+                    onClick={() => setInternalBrowserUrl(portal.url.replace('{placa}', newVehicle.plate || ''))}
+                    className={`px-3 py-2 text-[10px] font-bold rounded-xl whitespace-nowrap transition-all border ${internalBrowserUrl === portal.url.replace('{placa}', newVehicle.plate || '') ? 'bg-brand-primary text-white border-brand-primary' : 'bg-white text-gray-600 border-gray-100 hover:border-gray-300'}`}
+                  >
+                    {portal.icon} {portal.name}
+                  </button>
+                ))}
+              </div>
+              <div className="flex-1 bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden relative shadow-inner">
+                <iframe 
+                  src={internalBrowserUrl} 
+                  className="w-full h-full border-none"
+                  title="Navegador de Consulta"
+                />
+                <div className="absolute top-2 right-2 flex gap-1">
+                  <a href={internalBrowserUrl} target="_blank" rel="noreferrer" className="bg-black/60 text-white p-2 rounded-lg backdrop-blur-md hover:bg-black/80 transition-all">
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Captura à direita */}
+            <div className="flex-1 flex flex-col gap-4 md:overflow-y-auto md:pr-1 custom-scrollbar">
+              <div className="bg-brand-primary p-5 rounded-3xl text-white shadow-xl relative overflow-hidden group">
+                <div className="absolute top-[-50px] right-[-50px] w-[150px] h-[150px] bg-brand-accent/10 rounded-full blur-3xl group-hover:bg-brand-accent/20 transition-all duration-700" />
+                
+                <h4 className="text-[11px] font-black uppercase tracking-[2px] mb-2 flex items-center gap-2 text-white">
+                  <Wand2 size={14} className="text-brand-accent animate-pulse" /> Captura via IA (Turbo)
+                </h4>
+                <p className="text-[10px] text-white/70 mb-5 leading-relaxed">
+                  O robô tentará ler e preencher os dados dessa placa automaticamente.
+                </p>
+                
+                <button
+                  onClick={searchVehicleByPlate}
+                  disabled={isSearchingPlate}
+                  className="w-full bg-brand-accent text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[1px] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-brand-accent/20 flex items-center justify-center gap-2 mb-4 relative z-10"
+                >
+                  {isSearchingPlate ? <RefreshCw className="animate-spin" size={16} /> : <Zap size={16} />}
+                  Acionar Robô de Busca ⚡
+                </button>
+
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-[1px] flex-1 bg-white/10"></div>
+                  <span className="text-[9px] font-bold text-white/30 uppercase">Plano B (Captura Manual)</span>
+                  <div className="h-[1px] flex-1 bg-white/10"></div>
+                </div>
+
+                <p className="text-[9px] text-white/50 mb-3 leading-tight italic">
+                  Se o robô falhar ou der erro de cota, dê <kbd className="bg-white/10 px-1 rounded mx-0.5">Ctrl+A/Selecionar Tudo</kbd> e <kbd className="bg-white/10 px-1 rounded mx-0.5">Ctrl+C/Copiar</kbd> no site e use o botão abaixo:
+                </p>
+
+                <button
+                  onClick={handleCaptureFromClipboard}
+                  disabled={isProcessingAssisted}
+                  className="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 mb-4"
+                >
+                  {isProcessingAssisted ? <RefreshCw className="animate-spin" size={12} /> : <ClipboardCheck size={12} />}
+                  Sincronizar Clipboard (Plano B)
+                </button>
+
+                <textarea 
+                  ref={pasteTextAreaRef}
+                  className="w-full h-24 bg-white/5 border border-white/10 rounded-2xl p-4 text-[11px] font-mono text-white placeholder:text-white/20 focus:ring-2 focus:ring-brand-accent focus:outline-none transition-all resize-none shadow-inner"
+                  placeholder="Ou cole o texto aqui..."
+                  value={rawPastedData}
+                  onChange={(e) => setRawPastedData(e.target.value)}
+                />
+              </div>
+
+              <div className="p-6 bg-gray-50 border-2 border-dashed border-gray-200 rounded-3xl flex-1 flex flex-col items-center justify-center text-center group hover:border-brand-primary/20 transition-colors">
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-4 group-hover:scale-110 transition-transform">
+                  <Activity size={24} className="text-brand-primary" />
+                </div>
+                <h5 className="text-xs font-bold text-gray-700 uppercase tracking-tight">Status do Processamento</h5>
+                <p className="text-[10px] text-gray-400 mt-2 max-w-[180px] leading-relaxed italic">
+                  Os dados extraídos serão preenchidos automaticamente na ficha do veículo assim que detectados.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
 
         {/* Imagem do Veículo */}
         <div className="flex flex-col items-center mb-6">
@@ -2311,12 +2489,19 @@ ${selectedVehicle.parts.map(p => `- ${p.name}: ${p.brand || 'N/A'}`).join('\n')}
                 <span className={`text-[10px] font-bold uppercase tracking-tighter flex items-center gap-1 ${isSearchingPlate && plateSearchStatus.includes('Cota') ? 'text-orange-600' : 'text-brand-primary'}`}>
                   <Clipboard size={12} /> Busca Assistida (Plano B)
                 </span>
-                {isSearchingPlate && plateSearchStatus.includes('Cota') && (
-                  <span className="text-[9px] font-black bg-orange-200 text-orange-700 px-2 py-0.5 rounded-full animate-pulse">PLANO B: COLE O TEXTO AQUI</span>
-                )}
+                <button
+                  onClick={() => {
+                    const firstUrl = searchPortals[0].url.replace('{placa}', newVehicle.plate || '');
+                    setInternalBrowserUrl(firstUrl);
+                    setShowInternalBrowser(true);
+                  }}
+                  className="bg-brand-primary text-white px-2 py-1 rounded-lg text-[9px] font-black hover:brightness-110 transition-all flex items-center gap-1 shadow-sm uppercase tracking-tighter"
+                >
+                  <Layout size={10} /> Navegador Integrado
+                </button>
               </div>
               <p className="text-[10px] text-gray-500 mb-2 leading-relaxed">
-                Se o robô der erro de limite (429), clique em um link acima para pesquisar, quando abrir o resultado dê <strong>Ctrl+A</strong> e <strong>Ctrl+C</strong> no site e cole o texto abaixo:
+                Se o robô der erro de limite (429), use o <strong>Navegador Integrado</strong> acima ou cole o texto do site aqui:
               </p>
               <textarea 
                 className="w-full h-20 bg-white border border-gray-200 rounded-xl p-3 text-[11px] font-mono focus:ring-2 focus:ring-brand-primary focus:outline-none transition-all resize-none shadow-inner"
@@ -2328,7 +2513,7 @@ ${selectedVehicle.parts.map(p => `- ${p.name}: ${p.brand || 'N/A'}`).join('\n')}
                 <motion.button 
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  onClick={handleAssistedProcess}
+                  onClick={() => handleAssistedProcess()}
                   disabled={isProcessingAssisted}
                   className="w-full mt-2 py-2.5 bg-brand-primary text-white text-xs font-black rounded-xl hover:bg-brand-accent transition-all flex items-center justify-center gap-2 shadow-md shadow-brand-primary/20"
                 >
@@ -2424,8 +2609,10 @@ ${selectedVehicle.parts.map(p => `- ${p.name}: ${p.brand || 'N/A'}`).join('\n')}
             {isEditingVehicle ? 'Salvar Alterações' : 'Adicionar Veículo'}
           </button>
         </div>
-      </motion.div>
-    </div>
+      </>
+    )}
+  </motion.div>
+</div>
   )}
 </AnimatePresence>
 
@@ -2455,6 +2642,10 @@ ${selectedVehicle.parts.map(p => `- ${p.name}: ${p.brand || 'N/A'}`).join('\n')}
                 <div>
                   <label className="text-xs font-bold text-gray-400 uppercase ml-1">Oficina / Estabelecimento*</label>
                   <input type="text" placeholder="Ex: Oficina do Zé" className="w-full bg-gray-50 border-0 rounded-xl p-4" value={newService.workshopName} onChange={e => setNewService({...newService, workshopName: e.target.value})} />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">Endereço da Oficina</label>
+                  <input type="text" placeholder="Rua, Número, Bairro, Cidade" className="w-full bg-gray-50 border-0 rounded-xl p-4 text-sm" value={newService.workshopAddress} onChange={e => setNewService({...newService, workshopAddress: e.target.value})} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                    <div>

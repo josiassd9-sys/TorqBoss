@@ -88,11 +88,15 @@ export const geminiService = {
       const ai = geminiService.getAI();
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: prompt,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
       });
       return response.text || response.data || '';
-    } catch (error) {
+    } catch (error: any) {
       console.error("Gemini GenerateContent Error:", error);
+      const errorStr = JSON.stringify(error);
+      if (errorStr.includes("429") || errorStr.includes("RESOURCE_EXHAUSTED")) {
+        throw new Error("QUOTA_EXHAUSTED: Limite de IA excedido. Tente novamente em 1 minuto.");
+      }
       throw error;
     }
   },
@@ -105,22 +109,22 @@ export const geminiService = {
   }> => {
     try {
       const ai = geminiService.getAI();
+      const prompt = `Analise a seguinte peça automotiva: "${partName}" para o veículo "${vehicleModel}".
+        Se o nome for genérico e existirem várias variações (ex: "vidro", "lâmpada", "parafuso", "pneu"), retorne isAmbiguous: true e uma lista de sugestões específicas.
+        Se for uma peça específica, retorne isAmbiguous: false e os detalhes da peça.
+        Use PORTUGUÊS (Brasil).`;
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Analise a seguinte peça automotiva: "${partName}" para o veículo "${vehicleModel}".
-        
-        Se o nome for genérico e existirem várias variações (ex: "vidro", "lâmpada", "parafuso", "pneu"), retorne "isAmbiguous: true" e uma lista de sugestões específicas em "suggestions".
-        
-        Se for uma peça específica, retorne "isAmbiguous: false" e os detalhes da peça em "part".
-        - Na "description", especifique claramente se a peça é vendida individualmente ou se o conjunto costuma ter uma quantidade específica (ex: "Jogo de 4 pistões").
-        
-        Importante: Use PORTUGUÊS (Brasil).`,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: {
+          responseMimeType: "application/json",
+        }
       });
 
       const payload = response.text || response.data || '';
       if (!payload) return { isAmbiguous: false };
-      const parsed = parseAIJson<{ isAmbiguous: boolean; suggestions?: string[]; part?: Partial<Part> }>(payload);
-      return parsed || { isAmbiguous: false };
+      return JSON.parse(payload);
     } catch (error) {
       console.error("Gemini Research Error:", error);
       throw error;
@@ -131,35 +135,20 @@ export const geminiService = {
   searchVehicleImage: async (vehicleModel: string): Promise<string | null> => {
     try {
       const ai = geminiService.getAI();
-      const prompt = `Encontre uma foto oficial de fábrica ou uma imagem de catálogo da época do veículo: "${vehicleModel}".
-      Prioridades:
-      1. Foto lateral 3/4 do carro (melhor ângulo)
-      2. Imagem de alta qualidade, preferencialmente da montadora (Honda, Toyota, etc.)
-      3. Versão correta do ano (ex: 2003/2004)
-      4. Evite fotos modificadas, rebaixadas, de leilão ou de evento de corrida.
-
-      Retorne APENAS o link direto da imagem mais adequada. Se não encontrar imagem boa, retorne "null".`;
+      const prompt = `Encontre o link direto de uma foto oficial (lateral 3/4) do veículo: "${vehicleModel}". Retorne apenas um JSON com o campo "url".`;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: prompt,
+        model: "gemini-3.1-pro-preview",
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
         config: {
-          tools: [{ googleSearch: {} }]
+          tools: [{ googleSearch: {} }],
+          responseMimeType: "application/json",
         }
       });
 
-      const raw = (response.text || response.data || '').trim();
-      if (!raw || raw.toLowerCase() === 'null') return null;
-
-      const cleaned = raw.replace(/^["'`\s]+|["'`\s]+$/g, '');
-      if (/^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i.test(cleaned)) {
-        return cleaned;
-      }
-
-      const urlMatch = cleaned.match(/https?:\/\/.+?\.(?:jpg|jpeg|png|webp|gif)(?:\?[^\s]*)?/i);
-      if (urlMatch) return urlMatch[0];
-
-      return null;
+      const raw = response.text || response.data || '';
+      const parsed = JSON.parse(raw);
+      return parsed.url || null;
     } catch (error) {
       console.error("Gemini Image Search Error:", error);
       return null;
@@ -342,39 +331,26 @@ export const geminiService = {
   parseRawVehicleData: async (text: string): Promise<any> => {
     try {
       const ai = geminiService.getAI();
+      const prompt = `Extraia dados técnicos do veículo brasileiro deste texto: "${text}". 
+        Retorne um JSON com: name, model, year, color, plate, success (boolean).`;
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Analise o seguinte texto copiado de um site de consulta veicular e extraia os dados técnicos do veículo.
-        
-TEXTO:
-"""
-${text}
-"""
-
-Retorne APENAS um objeto JSON válido com os campos:
-- "name" (Marca, ex: TOYOTA)
-- "model" (Modelo completo, ex: COROLLA ALTIS 2.0)
-- "year" (Ano/Modelo, ex: 2022/2023)
-- "color" (Cor principal)
-- "plate" (Placa se encontrada)
-- "success": true
-
-Se não conseguir identificar os dados mínimos, retorne {"success": false, "error": "Dados não identificados"}.`,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: {
+          responseMimeType: "application/json",
+        }
       });
       
-      const content = response.text || response.data || '';
-      const jsonStr = content.replace(/```json/g, '').replace(/```/g, '').trim();
-      return JSON.parse(jsonStr);
+      const payload = response.text || response.data || '';
+      const parsed = JSON.parse(payload);
+      return {
+        ...parsed,
+        success: parsed.success !== false && (!!parsed.name || !!parsed.model)
+      };
     } catch (error: any) {
       console.error('Erro ao processar dados brutos:', error);
-      const errorStr = JSON.stringify(error);
-      if (errorStr.includes("429") || errorStr.includes("RESOURCE_EXHAUSTED") || errorStr.includes("quota")) {
-        return { 
-          success: false, 
-          error: 'Limite de IA atingido por este minuto. Aguarde 60 segundos antes de processar novamente.' 
-        };
-      }
-      return { success: false, error: 'Falha ao ler dados. Verifique se copiou o texto correto do site de consulta.' };
+      return { success: false, error: 'Falha ao processar dados.' };
     }
   },
 
@@ -425,43 +401,24 @@ Se não conseguir identificar os dados mínimos, retorne {"success": false, "err
       }
     }
 
-    // 3. Tenta SINESP/Fontes Públicas via Gemini com Web Search (A forma mais robusta)
+    // 3. Tenta Fontes Públicas via Gemini com Web Search (A forma mais robusta)
     try {
       const ai = geminiService.getAI();
+      const prompt = `Consulte os dados REAIS da placa brasileira "${formattedPlate}".
+        Acesse sites de consulta de placa para verificar marca, modelo, ano e cor.
+        Retorne um JSON com: name, model, year, color, success (boolean).`;
+
       const response = await ai.models.generateContent({
         model: "gemini-3.1-pro-preview",
-        contents: `Você é um Robô de Automação e Extração de Dados Veiculares. Sua missão é SIMULAR uma navegação humana para encontrar dados da placa "${formattedPlate}".
-
-PROTOCOLO DE EXTRAÇÃO:
-1. Navegue até https://buscasim.com.br/ e simula a digitação no campo de placa.
-2. Identifique o botão "Consultar Placa" e simule o clique.
-3. Repita o processo mental de busca e extração em: 
-   - https://www.placai.com/
-   - https://detetiveveicular.com/
-   - https://www.lupaveicular.com/
-4. Extraia: Marca (name), Modelo Completo (model), Ano/Modelo (year) e Cor (color).
-
-RETORNE APENAS JSON:
-{
-  "name": "MARCA",
-  "model": "MODELO COMPLETO",
-  "year": "ANO",
-  "color": "COR",
-  "success": true
-}
-
-Se não encontrar em nenhuma base, retorne "success": false.`,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
         config: {
-          tools: [{ googleSearch: {} }]
+          tools: [{ googleSearch: {} }],
+          responseMimeType: "application/json",
         }
       });
 
       const payload = response.text || response.data || '';
-      if (!payload) {
-        return { success: false, message: 'Não foi possível obter resposta da IA.' };
-      }
-
-      const parsed = parseAIJson<{ name?: string; model?: string; year?: string; color?: string; fipeValue?: number; imageUrl?: string; brandLogoUrl?: string; success?: boolean; message?: string }>(payload);
+      const parsed = JSON.parse(payload);
       
       if (parsed && parsed.success !== false && (parsed.name || parsed.model)) {
         return {
@@ -469,93 +426,13 @@ Se não encontrar em nenhuma base, retorne "success": false.`,
           model: parsed.model || '',
           year: parsed.year || '',
           color: parsed.color || '',
-          fipeValue: parsed.fipeValue,
-          imageUrl: parsed.imageUrl,
-          brandLogoUrl: parsed.brandLogoUrl,
           success: true
         };
       }
-      
-      return { success: false, message: parsed?.message || 'Placa não encontrada nas bases públicas.' };
+      return { success: false, message: 'Placa não encontrada.' };
     } catch (error: any) {
       console.error("Erro na busca avançada por placa:", error);
-      
-      // Detecção ultra-robusta de erro de cota
-      const errorStr = JSON.stringify(error);
-      const isQuotaError = 
-        error?.status === 429 || 
-        error?.error?.code === 429 ||
-        errorStr.includes("429") || 
-        errorStr.includes("RESOURCE_EXHAUSTED") ||
-        errorStr.includes("quota");
-
-      if (isQuotaError) {
-        return {
-          success: false,
-          message: "Limite de consultas por minuto atingido (Cota Gemini). Aguarde 60 segundos ou use a 'Busca Assistida' abaixo copiando o texto do site."
-        };
-      }
-
-      return {
-        success: false,
-        message: "O serviço de IA está instável ou a placa é inválida. Tente novamente ou use a busca assistida."
-      };
-    }
-  },
-
-  // ==================== SEARCH VEHICLE BY PLATE WITH GEMINI ====================
-  async searchVehicleByPlateGemini(plate: string): Promise<{
-    name: string;
-    model: string;
-    year: string;
-    imageUrl?: string;
-    success: boolean;
-    message?: string;
-  }> {
-    const prompt = `
-      Analise a placa brasileira "${plate}" e retorne APENAS um JSON válido.
-
-      Exemplo de resposta esperada:
-      {
-        "name": "Honda",
-        "model": "Fit LX 1.4 16V",
-        "year": "2003/2004",
-        "imageUrl": "https://... (opcional)",
-        "success": true
-      }
-
-      Se não conseguir identificar, use:
-      { "success": false, "message": "Placa não encontrada" }
-    `;
-
-    try {
-      const response = await this.generateContent(prompt);
-      
-      // Limpeza agressiva do JSON
-      let cleanResponse = response
-        .replace(/```json|```/g, '')
-        .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
-        .trim();
-
-      const data = JSON.parse(cleanResponse);
-
-      return {
-        name: data.name || '',
-        model: data.model || '',
-        year: data.year || '',
-        imageUrl: data.imageUrl,
-        success: data.success !== false,
-        message: data.message
-      };
-    } catch (error) {
-      console.error("Gemini Plate Error:", error);
-      return {
-        success: false,
-        message: "Não foi possível consultar esta placa no momento.",
-        name: "",
-        model: "",
-        year: ""
-      };
+      return { success: false, message: "Erro ao acionar o Robô." };
     }
   },
 
@@ -567,46 +444,32 @@ Se não encontrar em nenhuma base, retorne "success": false.`,
   } | null> => {
     try {
       const ai = geminiService.getAI();
+      const prompt = `Estime o preço de mercado brasileiro para a peça "${partName}" do veículo "${vehicleModel}".
+        Considere marcas de boa qualidade. Retorne um JSON com: estimatedPrice (número), priceType ('unidade', 'jogo', 'kit', 'litro'), unitsPerSet (opcional).`;
+
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Estime o preço de mercado brasileiro para a peça "${partName}" do veículo "${vehicleModel}".
-        Retorne APENAS um objeto JSON válido com os campos:
-        - "estimatedPrice" (número, valor em reais sem símbolo)
-        - "priceType" (string: 'unidade', 'jogo', 'kit' ou 'litro')
-        - "unitsPerSet" (número, OPCIONAL)
-        Não inclua nenhum texto adicional fora do JSON.
-        Considere marcas de reposição ou originais de boa qualidade.`,
+        model: "gemini-3.1-pro-preview",
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
         config: {
-          tools: [{ googleSearch: {} }]
+          tools: [{ googleSearch: {} }],
+          responseMimeType: "application/json",
         }
       });
 
       const payload = response.text || response.data || '';
       if (!payload) return null;
-
-      const parsed = parseAIJson<Record<string, unknown>>(payload);
-      if (!parsed) return null;
-
-      const estimatedPrice = parsePriceValue(parsed.estimatedPrice ?? parsed.price ?? parsed.valor ?? parsed.estimated_price);
-      const priceType = normalizePriceType(parsed.priceType ?? parsed.type ?? parsed.price_type ?? parsed.unitType ?? parsed.unidade);
-      const unitsPerSetValue = parsed.unitsPerSet ?? parsed.units_per_set;
-      const unitsPerSet = unitsPerSetValue !== undefined && unitsPerSetValue !== null ? Number(unitsPerSetValue) : undefined;
-
+      const parsed = JSON.parse(payload);
+      const estimatedPrice = parsePriceValue(parsed.estimatedPrice ?? parsed.price ?? parsed.valor);
+      
       if (estimatedPrice === null) return null;
 
       return {
         estimatedPrice,
-        priceType: priceType || 'unidade',
-        unitsPerSet: Number.isFinite(unitsPerSet || 0) ? unitsPerSet : undefined
+        priceType: (parsed.priceType || 'unidade') as any,
+        unitsPerSet: parsed.unitsPerSet
       };
     } catch (error) {
-      const errorMsg = getErrorMessage(error);
       console.error("Gemini Price Estimate Error:", error);
-      
-      if (typeof window !== 'undefined') {
-        (window as any).lastGeminiPriceError = errorMsg;
-      }
-      
       return null;
     }
   },
@@ -623,27 +486,20 @@ Se não encontrar em nenhuma base, retorne "success": false.`,
   }> => {
     try {
       const ai = geminiService.getAI();
+      const prompt = `Gere um plano de manutenção preventiva para o veículo "${vehicleModel}" aos ${mileage} km.
+        Retorne um JSON com o array "recommendations": [{ partName, action, reason, estimatedCost, urgency ('baixa'|'media'|'alta') }].`;
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Gere um plano de manutenção preventiva para o veículo "${vehicleModel}" ao atingir ${mileage} km.
-        Baseie-se no manual técnico padrão para este tipo de veículo.
-        Retorne APENAS um objeto JSON com o formato:
-        {
-          "recommendations": [
-             {"partName": "...", "action": "...", "reason": "...", "estimatedCost": 0, "urgency": "baixa"}
-          ]
-        }
-        Use apenas os valores exigidos e nenhuma explicação adicional.
-        Retorne em PORTUGUÊS (Brasil).`,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
         config: {
-          tools: [{ googleSearch: {} }]
+          responseMimeType: "application/json",
         }
       });
 
       const payload = response.text || response.data || '';
       if (!payload) return { recommendations: [] };
-      const parsed = parseAIJson<{ recommendations: Array<{ partName: string; action: string; reason: string; estimatedCost: number; urgency: 'baixa' | 'media' | 'alta' }> }>(payload);
-      return parsed || { recommendations: [] };
+      return JSON.parse(payload);
     } catch (error) {
       console.error("Gemini Maintenance Simulation Error:", error);
       return { recommendations: [] };
@@ -719,18 +575,17 @@ Se não encontrar em nenhuma base, retorne "success": false.`,
   getVehicleManualInfo: async (vehicleModel: string): Promise<string> => {
     try {
       const ai = geminiService.getAI();
+      const prompt = `Gere um resumo técnico detalhado do manual do proprietário para o veículo "${vehicleModel}". 
+        Inclua: especificações de fluidos, pressões de pneus, torques e intervalos de manutenção. Use Markdown.`;
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Gere um resumo técnico detalhado do manual do proprietário para o veículo "${vehicleModel}". 
-        Inclua: especificações de fluidos (óleo motor, arrefecimento, freio), pressões de pneus, torques comuns, e principais intervalos de manutenção.
-        Formate como Markdown legível.
-        Use ferramentas de busca para garantir a precisão dos dados para este modelo específico.
-        Retorne em PORTUGUÊS (Brasil).`,
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
         config: {
           tools: [{ googleSearch: {} }]
         }
       });
-      return response.text || "Não foi possível recuperar as informações do manual no momento.";
+      return response.text || "Manual não disponível.";
     } catch (error) {
       console.error("Gemini Manual Info Error:", error);
       return "Erro ao carregar manual técnico.";

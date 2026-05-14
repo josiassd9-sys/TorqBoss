@@ -1,6 +1,6 @@
 {
   "name": "Meu Carro Top",
   "description": "Gestão inteligente de veículos e catálogo detalhado de peças com auxílio de IA.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["clipboard-read"],
   "majorCapabilities": []
 }
