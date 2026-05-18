@@ -24,7 +24,10 @@ import {
   Coins,
   BadgePercent,
   Calculator,
-  DollarSign
+  DollarSign,
+  Plus,
+  ShoppingCart,
+  Activity
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -39,6 +42,7 @@ interface VehicleDetailHeaderProps {
   onShareReport: () => void;
   onUpdateMileage: () => void;
   onSearchLogo: () => void;
+  isSearchingLogo: boolean;
   onLogoUpload: () => void;
   onRunHealthAnalysis: () => void;
   isAnalyzingHealth: boolean;
@@ -49,6 +53,7 @@ interface VehicleDetailHeaderProps {
   onMarketAnalysis: () => void;
   isAnalyzingMarket: boolean;
   marketAnalysis: string | null;
+  setMarketAnalysis: (val: string | null) => void;
   onTcoAnalysis: () => void;
   isAnalyzingTco: boolean;
   tcoAnalysis: string | null;
@@ -70,6 +75,10 @@ interface VehicleDetailHeaderProps {
   isUpdatingFipe: boolean;
   onUpdateFipe: () => void;
   marketRef: string;
+  onAddPart: () => void;
+  onOpenBudget: () => void;
+  budgetCount: number;
+  onSimulate: () => void;
 }
 
 const VehicleImage = ({ src, alt, className }: { src?: string; alt: string; className: string }) => {
@@ -104,6 +113,7 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
   onShareReport,
   onUpdateMileage,
   onSearchLogo,
+  isSearchingLogo,
   onLogoUpload,
   onRunHealthAnalysis,
   isAnalyzingHealth,
@@ -114,6 +124,7 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
   onMarketAnalysis,
   isAnalyzingMarket,
   marketAnalysis,
+  setMarketAnalysis,
   onTcoAnalysis,
   isAnalyzingTco,
   tcoAnalysis,
@@ -134,7 +145,11 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
   getMaintenanceScore,
   isUpdatingFipe,
   onUpdateFipe,
-  marketRef
+  marketRef,
+  onAddPart,
+  onOpenBudget,
+  budgetCount,
+  onSimulate,
 }) => {
   return (
     <div className="space-y-2">
@@ -226,10 +241,11 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
                 <div className="absolute -right-2 -bottom-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button 
                     onClick={onSearchLogo}
-                    className="bg-brand-primary text-white p-1.5 rounded-lg shadow-lg hover:bg-brand-accent transition-all"
+                    disabled={isSearchingLogo}
+                    className="bg-brand-primary text-white p-1.5 rounded-lg shadow-lg hover:bg-brand-accent transition-all disabled:opacity-50"
                     title="Pesquisar Logo Original"
                   >
-                    <Search size={10} />
+                    {isSearchingLogo ? <RefreshCw className="animate-spin" size={10} /> : <Search size={10} />}
                   </button>
                   <button 
                     onClick={onLogoUpload}
@@ -470,7 +486,7 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
                           <Markdown>{marketAnalysis}</Markdown>
                         </div>
                         <button 
-                          onClick={() => {}} // This should be handled by a local reset if needed
+                          onClick={() => setMarketAnalysis(null)}
                           className="text-[10px] font-black uppercase text-gray-500 hover:text-white transition-colors"
                         >
                           Ocultar Análise
@@ -693,6 +709,28 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
               style={{ boxShadow: '0 0 10px rgba(0,0,0,0.5)' }}
             />
           </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 mt-2 w-full max-w-2xl overflow-x-auto pb-2 scrollbar-hide mx-auto">
+          <button 
+            onClick={onAddPart}
+            className="flex-1 bg-brand-accent hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-brand-accent/20 whitespace-nowrap text-sm flex items-center justify-center gap-2"
+          >
+            <Plus size={18} /> Catalogar Peça
+          </button>
+          <button 
+            onClick={onOpenBudget}
+            className="flex-1 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-bold border border-white/10 transition-all whitespace-nowrap text-sm flex items-center justify-center gap-2"
+          >
+            <ShoppingCart size={18} /> Carrinho ({budgetCount})
+          </button>
+          <button 
+            onClick={onSimulate}
+            className="flex-1 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-bold border border-white/10 transition-all whitespace-nowrap text-sm flex items-center justify-center gap-2"
+          >
+            <Activity size={18} /> Simular
+          </button>
         </div>
       </div>
       

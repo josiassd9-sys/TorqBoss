@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { Car, Activity, Box, Shield, Download, Plus, DollarSign, Gauge, Trash2 } from 'lucide-react';
+import { Car, Activity, Box, Disc, Download, Plus, DollarSign, Gauge, Trash2, Pin } from 'lucide-react';
 import { AppData, Vehicle } from '../types';
 import { BrandLogo } from './BrandLogo';
 
@@ -39,6 +39,7 @@ interface DashboardHomeProps {
   onAddVehicle: () => void;
   onImportVehicle: () => void;
   onDeleteVehicle: (id: string, e: React.MouseEvent) => void;
+  onMoveVehicleToTop: (id: string) => void;
   formatDistance: (val: number) => string;
   formatCurrency: (val: number) => string;
 }
@@ -49,9 +50,16 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
   onAddVehicle,
   onImportVehicle,
   onDeleteVehicle,
+  onMoveVehicleToTop,
   formatDistance,
   formatCurrency
 }) => {
+  const firstVehicle = data.vehicles?.[0];
+  const hasUrgentReminder = firstVehicle?.reminders?.some(r => {
+    const diff = new Date(r.targetDate).getTime() - new Date().getTime();
+    return diff < 1000 * 60 * 60 * 24 * 7;
+  });
+
   return (
     <div className="space-y-4">
       {/* Compact Dashboard Status Ribbon */}
@@ -69,21 +77,25 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
         <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-50 shadow-sm min-w-[140px]">
           <Activity size={14} className="text-green-500" />
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-1">Saúde</span>
-          <span className="text-sm font-black text-green-600">Excelente</span>
+          <span className={`text-sm font-black ${hasUrgentReminder ? 'text-amber-500' : 'text-green-600'}`}>
+            {data.vehicles.length > 0 ? (hasUrgentReminder ? 'Atenção' : 'Excelente') : '--'}
+          </span>
         </div>
         
         <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-50 shadow-sm min-w-[140px]">
           <Box size={14} className="text-brand-accent" />
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-1">Peças</span>
           <span className="text-sm font-black text-brand-primary">
-            {(data.vehicles || []).reduce((acc, v) => acc + (v.parts?.length || 0), 0)}
+            {data.vehicles.length > 0 ? (firstVehicle?.parts?.length || 0) : 0}
           </span>
         </div>
 
         <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-50 shadow-sm min-w-[140px]">
-          <Shield size={14} className="text-blue-500" />
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-1">Dados</span>
-          <span className="text-sm font-black text-blue-600">Protegidos</span>
+          <Disc size={14} className="text-blue-500" />
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-1">Pneus</span>
+          <span className="text-sm font-black text-blue-600">
+            {data.vehicles.length > 0 ? (firstVehicle?.tireSets?.[0]?.brand || 'OK') : '--'}
+          </span>
         </div>
       </motion.div>
 
@@ -147,13 +159,25 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({
                       {formatCurrency(vehicle.fipeValue)}
                     </div>
                   )}
-                  <motion.button 
-                    whileHover={{ scale: 1.2, color: '#ef4444' }}
-                    onClick={(e) => onDeleteVehicle(vehicle.id, e)}
-                    className="absolute right-0 p-1 text-gray-300 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={16} />
-                  </motion.button>
+                  <div className="absolute right-0 flex items-center gap-1">
+                    {data.vehicles.indexOf(vehicle) !== 0 && (
+                      <motion.button
+                        whileHover={{ scale: 1.2, color: 'var(--color-brand-accent)' }}
+                        onClick={(e) => { e.stopPropagation(); onMoveVehicleToTop(vehicle.id); }}
+                        className="p-1 text-gray-300 hover:text-brand-accent transition-colors"
+                        title="Colocar como principal"
+                      >
+                        <Pin size={14} />
+                      </motion.button>
+                    )}
+                    <motion.button 
+                      whileHover={{ scale: 1.2, color: '#ef4444' }}
+                      onClick={(e) => onDeleteVehicle(vehicle.id, e)}
+                      className="p-1 text-gray-300 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </motion.button>
+                  </div>
                 </div>
               </div>
             </div>
