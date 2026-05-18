@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'motion/react';
 import {
   Plus, Settings, Box, Disc, Book, Bell, Wrench, Gauge,
-  Cpu, ShieldCheck, Activity
+  Cpu, ShieldCheck
 } from 'lucide-react';
 
 // Refatoração - Tabs
@@ -31,13 +31,6 @@ import { DashboardHome } from './components/DashboardHome';
 import { DictionaryModal } from './components/DictionaryModal';
 import { ServiceReportModal } from './components/ServiceReportModal';
 import { OnboardingModal } from './components/OnboardingModal';
-import {
-  CarFerrariTop,
-  CarMuscleTop,
-  CarSilhouette,
-  SteeringWheelCustom
-} from './components/CustomIcons';
-
 // Hooks
 import {
   useAppData,
@@ -101,8 +94,6 @@ export default function App() {
     addPart,
     deletePart,
     togglePartBudget,
-    estimatePrice,
-    isEstimatingPrice,
     updatePartPrice
   } = useVehicleItems(data, handleSave, selectedVehicle, updateSelectedVehicle);
 
@@ -193,7 +184,6 @@ export default function App() {
     manualChatResponse,
     manualChatQuery,
     setManualChatQuery,
-    setManualChatResponse,
     generateManualInfo,
     chatWithManual
   } = useVehicleManual(selectedVehicle, data, handleSave, setSelectedVehicle);
@@ -216,7 +206,6 @@ export default function App() {
     isSearchingImage,
     isSearchingLogo,
     isRemovingBackground,
-    isCapturingFromWeb,
     isProcessingAssisted,
     rawPastedData,
     setRawPastedData,
