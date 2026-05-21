@@ -199,5 +199,8 @@ export interface AppData {
     countryId?: string;
     marketReferenceName?: string;
     showInternalBrowser?: boolean;
+    aiCredits?: number;
+    isProMember?: boolean;
+    transactionHistory?: { id: string; date: string; amount: number; description: string; type: 'credit' | 'debit' }[];
   };
 }

@@ -24,12 +24,14 @@ import {
   Coins,
   BadgePercent,
   Calculator,
-  DollarSign
+  DollarSign,
+  Share2
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Vehicle } from '../types';
 import { BrandLogo } from './BrandLogo';
+import { VehicleImage } from './VehicleImage';
 
 interface VehicleDetailHeaderProps {
   selectedVehicle: Vehicle;
@@ -72,30 +74,6 @@ interface VehicleDetailHeaderProps {
   onUpdateFipe: () => void;
   marketRef: string;
 }
-
-const VehicleImage = ({ src, alt, className }: { src?: string; alt: string; className: string }) => {
-  const [error, setError] = React.useState(false);
-  
-  if (!src || error) {
-    return (
-      <div className={`${className} bg-gray-100 flex items-center justify-center text-gray-400`}>
-        <div className="flex flex-col items-center">
-            <span className="text-4xl">🚗</span>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <img 
-      src={src} 
-      alt={alt} 
-      className={`${className} object-cover`} 
-      referrerPolicy="no-referrer" 
-      onError={() => setError(true)}
-    />
-  );
-};
 
 export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
   selectedVehicle,
@@ -141,36 +119,58 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
   return (
     <div className="space-y-2">
       {/* Breadcrumbs / Back and Actions Area */}
-      <div className="flex items-center justify-between mb-4 px-2">
-        <button 
-          onClick={onBack}
-          className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-brand-accent transition-colors"
-          id="back-btn"
-        >
-          <ArrowLeft size={16} /> Voltar para Meus Veículos
-        </button>
+      <div className="flex flex-col gap-4 mb-6 px-2">
+        {/* Linha 1: Navegação e Gestão (Export/Settings) */}
+        <div className="flex items-center justify-between">
+          <button 
+            onClick={onBack}
+            className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-brand-accent transition-colors"
+            id="back-btn"
+          >
+            <ArrowLeft size={16} /> 
+            <span className="truncate sm:block">Voltar</span>
+            <span className="hidden sm:inline opacity-60">para Veículos</span>
+          </button>
+          
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={onExport}
+              className="p-2 hover:text-brand-accent hover:bg-white/10 transition-all text-gray-500 bg-white/5 rounded-xl border border-white/5 flex items-center justify-center"
+              title="Exportar Dados (.json)"
+            >
+              <Download size={18} />
+            </button>
+            <button 
+              onClick={onOpenSettings}
+              className="p-2 hover:text-brand-accent hover:bg-white/10 transition-all text-gray-500 bg-white/5 rounded-xl border border-white/5 flex items-center justify-center"
+              title="Configuração do Veículo"
+            >
+              <Settings size={18} />
+            </button>
+          </div>
+        </div>
 
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={onExport}
-            className="p-2 hover:text-brand-accent transition-colors text-gray-500 bg-white/5 rounded-xl border border-white/5"
-            title="Exportar Dados do Veículo (.json)"
-          >
-            <Download size={18} />
-          </button>
-          <button 
-            onClick={onOpenSettings}
-            className="p-2 hover:text-brand-accent transition-colors text-gray-500 bg-white/5 rounded-xl border border-white/5"
-            title="Configuração do Veículo"
-          >
-            <Settings size={18} />
-          </button>
+        {/* Linha 2: Ações Profissionais e Compartilhamento (50/50) */}
+        <div className="flex gap-2 w-full">
           <button 
             onClick={onShareReport}
-            className="flex items-center gap-2 px-4 py-2 bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-all rounded-xl text-[10px] font-black uppercase tracking-widest border border-green-500/20 shadow-sm"
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-all rounded-xl text-[10px] font-black uppercase tracking-widest border border-green-500/20 shadow-sm overflow-hidden"
             title="Gerar Relatório Técnico"
           >
-            <MessageSquare size={14} /> Relatório Técnico
+            <MessageSquare size={14} className="shrink-0" /> 
+            <span className="truncate">Relatório Técnico</span>
+          </button>
+          <button 
+            onClick={() => {
+               const text = encodeURIComponent(`Olá! Sou proprietário do ${selectedVehicle.name} (${selectedVehicle.plate}) e gostaria de compartilhar o histórico de manutenção do meu veículo com você para uma análise técnica.`);
+               window.open(`https://wa.me/?text=${text}`, '_blank');
+               // Instrução para anexar o arquivo .json
+               alert('O WhatsApp será aberto. Lembre-se de anexar o arquivo de backup (.json) que você exportou para que o mecânico possa importar no sistema dele!');
+            }}
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/20 transition-all rounded-xl text-[10px] font-black uppercase tracking-widest border border-brand-primary/20 shadow-sm overflow-hidden"
+          >
+            <Share2 size={14} className="shrink-0" /> 
+            <span className="truncate">Enviar Mecânico</span>
           </button>
         </div>
       </div>
@@ -183,12 +183,12 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
             <span className="text-gray-500 text-[10px] font-mono">VIN: {selectedVehicle.id.slice(0, 8).toUpperCase()}</span>
           </div>
 
-          <div className="w-full max-w-[540px] mb-2 relative">
+          <div className="w-full max-w-[540px] mb-2 relative overflow-hidden rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] ring-4 ring-white/20">
             {predictCurrentMileage(selectedVehicle) > selectedVehicle.mileage + 100 && (
               <motion.div 
                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                className="absolute -top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] sm:w-auto sm:min-w-[280px]"
+                className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] sm:w-auto sm:min-w-[280px]"
               >
                 <div className="bg-brand-primary text-white p-3 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-md flex items-center justify-between gap-4 overflow-hidden relative">
                   <div className="flex items-center gap-3">
@@ -209,11 +209,11 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
                 </div>
               </motion.div>
             )}
-
+            
             <VehicleImage 
               src={selectedVehicle.imageUrl} 
               alt={selectedVehicle.name} 
-              className="aspect-video w-full rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.2)] ring-4 ring-white/20 object-cover" 
+              className="aspect-video" 
             />
           </div>
 

@@ -63,7 +63,8 @@ import {
   VehicleImage, BrandLogo, HeaderLogo, SettingsModal, VehicleFormModal, AddServiceModal,
   AddFuelModal, AddReminderModal, AddPartModal, MaintenanceSimulationModal, DeleteConfirmationModal,
   BudgetModal, CarFerrariTop, CarMuscleTop, CarSilhouette, SteeringWheelCustom,
-  AppHeader, VehicleList, OnboardingModal, VehicleDetailHeader, VehicleTabs
+  AppHeader, VehicleList, OnboardingModal, VehicleDetailHeader, VehicleTabs,
+  DictionaryModal, ServiceReportModal
 } from './components';
 
 // Hooks
@@ -619,239 +620,20 @@ export default function App() {
         }}
       />
       {/* MODAL: Dictionary */}
-      <AnimatePresence>
-        {isDictionaryOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsDictionaryOpen(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-md"
-            />
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative bg-white rounded p-8 w-full max-w-4xl shadow-2xl h-[80vh] flex flex-col"
-            >
-              <div className="flex justify-between items-center mb-8 shrink-0">
-                <div className="flex items-center gap-3">
-                   <div className="bg-brand-accent p-2 rounded-xl text-white block">
-                     <Book size={24} />
-                   </div>
-                   <div>
-                     <h2 className="text-2xl font-black">Dicionário Técnico</h2>
-                     <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Catálogo de Componentes Comuns</p>
-                   </div>
-                </div>
-                <button 
-                  onClick={() => setIsDictionaryOpen(false)}
-                  className="bg-gray-100 hover:bg-gray-200 p-2 rounded-full transition-colors"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto pr-2 space-y-8 scrollbar-thin scrollbar-thumb-gray-200">
-                {AUTO_DICTIONARY.map((category) => (
-                  <div key={category.name}>
-                    <h3 className="text-sm font-black text-brand-accent uppercase tracking-tighter mb-4 flex items-center gap-2">
-                       <span className="w-8 h-[2px] bg-brand-accent/20"></span>
-                       {category.name}
-                    </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                        {category.parts.map((part) => (
-                           <button
-                             key={part.name}
-                             onClick={() => {
-                               setNewPartName(part.name);
-                               setIsAddingPart(true);
-                               setIsDictionaryOpen(false);
-                             }}
-                             className="text-left bg-gray-50 hover:bg-brand-accent hover:text-white border border-gray-100 rounded-xl p-4 transition-all group"
-                           >
-                              <p className="text-sm font-bold tracking-tight">{part.name}</p>
-                              <p className="text-[10px] opacity-60 font-mono mt-1 group-hover:opacity-100">Vida: {part.lifecycle.toLocaleString()} km</p>
-                           </button>
-                        ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-gray-100 text-center shrink-0">
-                 <p className="text-gray-400 text-xs italic">
-                  Este dicionário contém os componentes mais comuns. Você também pode digitar manualmente qualquer outra peça na tela anterior.
-                 </p>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <DictionaryModal 
+        isOpen={isDictionaryOpen}
+        onClose={() => setIsDictionaryOpen(false)}
+        onSelectPart={(name) => {
+          setNewPartName(name);
+          setIsAddingPart(true);
+        }}
+      />
       {/* Professional Service Report Modal */}
-      <AnimatePresence>
-        {selectedServiceForReport && selectedVehicle && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col my-8"
-            >
-              {/* Modal Header */}
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="bg-brand-primary text-white p-2 rounded-xl">
-                    <FileText size={20} />
-                  </div>
-                  <h2 className="text-xl font-black text-brand-primary tracking-tight">Relatório Técnico de Manutenção</h2>
-                </div>
-                <button onClick={() => setSelectedServiceForReport(null)} className="p-2 hover:bg-gray-200 rounded-full transition-colors font-bold">
-                  FECHAR
-                </button>
-              </div>
-
-              {/* Report Content (Printable Layout) */}
-              <div className="flex-1 p-8 bg-white" id="service-report-content">
-                {/* Workshop Header */}
-                <div className="flex justify-between items-start border-b-4 border-brand-primary pb-6 mb-8">
-                  <div>
-                    <h3 className="text-3xl font-black text-brand-primary uppercase tracking-tighter mb-1 leading-none">{selectedServiceForReport.workshopName}</h3>
-                    <p className="text-sm text-gray-500 font-bold mt-2">{selectedServiceForReport.workshopAddress || 'Endereço não informado'}</p>
-                    <p className="text-sm text-gray-500 font-bold">Fone: {selectedServiceForReport.workshopPhone || 'Não informado'}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Cód. Registro</p>
-                    <p className="text-sm font-mono font-bold bg-gray-100 p-1 px-3 rounded text-brand-primary">#{selectedServiceForReport.id.slice(0, 8).toUpperCase()}</p>
-                    <p className="text-[9px] text-gray-300 mt-2 font-bold uppercase tracking-widest leading-none">Original Digital</p>
-                  </div>
-                </div>
-
-                {/* Vehicle & Customer Info */}
-                <div className="grid grid-cols-2 gap-8 mb-8 pb-8 border-b border-gray-100">
-                  <div>
-                    <h4 className="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-3 border-l-2 border-brand-accent pl-2">Dados do Veículo</h4>
-                    <p className="text-xl font-black text-gray-800">{selectedVehicle.name}</p>
-                    <p className="text-sm text-gray-500 font-bold">{selectedVehicle.model} — {selectedVehicle.year}</p>
-                    <p className="text-xs font-mono font-bold mt-2 bg-gray-100 inline-block px-3 py-1 rounded text-gray-600">PLACA: {selectedVehicle.plate?.toUpperCase() || 'NÃO INF'}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-3 border-l-2 border-brand-accent pl-2">Informações da OS</h4>
-                    <p className="text-sm font-bold text-gray-600 mb-1">Execução: <span className="font-black text-brand-primary">{new Date(selectedServiceForReport.date).toLocaleDateString('pt-BR')}</span></p>
-                    <p className="text-sm font-bold text-gray-600 mb-1">Quilometragem: <span className="font-mono font-black">{selectedServiceForReport.mileage.toLocaleString()} KM</span></p>
-                    <p className="text-sm font-bold text-gray-600">Técnico: <span className="italic font-black opacity-70">{selectedServiceForReport.mechanicName || 'Equipe Técnica'}</span></p>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="mb-8">
-                  <h4 className="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-2">Descrição dos Serviços</h4>
-                  <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 text-gray-700 whitespace-pre-wrap text-sm leading-relaxed min-h-[80px]">
-                    {selectedServiceForReport.description}
-                  </div>
-                </div>
-
-                {/* Parts Table */}
-                {selectedServiceForReport.partsList && selectedServiceForReport.partsList.length > 0 && (
-                  <div className="mb-8">
-                    <h4 className="text-[10px] font-black text-brand-primary uppercase tracking-widest mb-3">Peças e Insumos</h4>
-                    <div className="border border-gray-100 rounded-2xl overflow-hidden">
-                      <table className="w-full text-left">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="py-3 px-4 text-[10px] font-black text-gray-400 uppercase">Item</th>
-                            <th className="py-3 px-4 text-[10px] font-black text-gray-400 uppercase text-center">Qtd</th>
-                            <th className="py-3 px-4 text-[10px] font-black text-gray-400 uppercase text-right">Unitário</th>
-                            <th className="py-3 px-4 text-[10px] font-black text-gray-400 uppercase text-right">Subtotal</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(selectedServiceForReport.partsList || []).map(item => (
-                            <tr key={item.id} className="border-t border-gray-50">
-                              <td className="py-4 px-4">
-                                <p className="text-sm font-bold text-gray-800">{item.name}</p>
-                                {item.observation && (
-                                  <p className="text-[10px] text-brand-accent italic font-bold mt-1 max-w-[250px]">
-                                    Nota: {item.observation}
-                                  </p>
-                                )}
-                              </td>
-                              <td className="py-4 px-4 text-sm font-mono text-center">{item.quantity}</td>
-                              <td className="py-4 px-4 text-sm font-mono text-right">R$ {item.unitPrice.toLocaleString()}</td>
-                              <td className="py-4 px-4 text-sm font-mono font-black text-right text-brand-primary">R$ {(item.quantity * item.unitPrice).toLocaleString()}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {/* Totals Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    {selectedServiceForReport.notes && (
-                      <div className="p-4 bg-yellow-50/50 rounded-2xl border border-yellow-100">
-                        <p className="text-[9px] font-black text-yellow-600 uppercase tracking-widest mb-1">Notas da Oficina</p>
-                        <p className="text-xs text-yellow-800 italic leading-snug">{selectedServiceForReport.notes}</p>
-                      </div>
-                    )}
-                    <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                       <div className="flex-1">
-                          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-1">Mão de Obra</p>
-                          <p className="text-sm font-mono font-black text-gray-700">R$ {selectedServiceForReport.laborCost.toLocaleString()}</p>
-                       </div>
-                       <div className="flex-1">
-                          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-1">Peças</p>
-                          <p className="text-sm font-mono font-black text-gray-700">R$ {(selectedServiceForReport.cost - selectedServiceForReport.laborCost).toLocaleString()}</p>
-                       </div>
-                    </div>
-                  </div>
-                  <div className="bg-brand-primary text-white p-6 rounded-3xl flex flex-col justify-center items-center md:items-end shadow-xl shadow-brand-primary/20">
-                    <p className="text-[11px] font-bold uppercase tracking-widest opacity-80 mb-2">Total Geral do Serviço</p>
-                    <p className="text-4xl font-mono font-black tracking-tighter">R$ {selectedServiceForReport.cost.toLocaleString()}</p>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 opacity-40 grayscale">
-                  <div className="flex items-center gap-3">
-                    <Activity size={24} />
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-tighter">Powered by AutoTech</p>
-                      <p className="text-[8px] font-bold uppercase tracking-widest">Gestão Inteligente de Veículos</p>
-                    </div>
-                  </div>
-                  <p className="text-[9px] font-mono font-bold italic">
-                    Assinado em: {new Date(selectedServiceForReport.createdAt).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="p-6 bg-gray-50 border-t border-gray-100 flex gap-4">
-                <button 
-                  onClick={() => window.print()}
-                  className="flex-1 bg-brand-primary text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-brand-accent transition-all shadow-lg"
-                >
-                  <Download size={20} /> Baixar PDF / Imprimir
-                </button>
-                <button 
-                  onClick={() => {
-                    const text = `RELATÓRIO DE MANUTENÇÃO\nOficina: ${selectedServiceForReport.workshopName}\nVeículo: ${selectedVehicle.name}\nValor Total: R$ ${selectedServiceForReport.cost.toLocaleString()}`;
-                    navigator.clipboard.writeText(text);
-                    alert('Resumo copiado!');
-                  }}
-                  className="bg-white border border-gray-200 text-gray-600 px-6 rounded-2xl font-bold hover:bg-gray-100 transition-all"
-                >
-                  Compartilhar
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <ServiceReportModal 
+        selectedService={selectedServiceForReport}
+        selectedVehicle={selectedVehicle}
+        onClose={() => setSelectedServiceForReport(null)}
+      />
 
       {/* MODAL: Web Vehicle Search */}
       <AnimatePresence>

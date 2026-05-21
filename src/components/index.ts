@@ -25,3 +25,5 @@ export * from './tabs/PartsTab';
 export * from './tabs/RemindersTab';
 export * from './tabs/ServicesTab';
 export * from './tabs/TiresTab';
+export * from './ServiceReportModal';
+export * from './DictionaryModal';

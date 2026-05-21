@@ -1,0 +1,25 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile containing AI credits and membership status.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique user ID" },
+        "aiCredits": { "type": "integer", "description": "Remaining AI credits" },
+        "isProMember": { "type": "boolean", "description": "Whether the user is a PRO member" },
+        "transactionHistory": {
+          "type": "array",
+          "description": "History of credit transactions"
+        }
+      },
+      "required": ["uid", "aiCredits", "isProMember"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User data stored by UID"
+    }
+  }
+}

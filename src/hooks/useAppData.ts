@@ -4,8 +4,10 @@ import { storageService } from '../services/storageService';
 import { geminiService } from '../services/geminiService';
 import { getCountryById } from '../config/countryConfig';
 import { THEMES } from '../constants';
+import { useFirebase } from '../contexts/FirebaseContext';
 
 export function useAppData() {
+  const { credits, isPro, consumeCredit } = useFirebase();
   const [data, setData] = useState<AppData>({ 
     vehicles: [],
     settings: {
@@ -17,9 +19,30 @@ export function useAppData() {
       countryId: 'BR',
       theme: 'default',
       vehicleIdentifierLabel: 'Placa',
-      vehicleIdentifierPlaceholder: 'AAA-0000'
+      vehicleIdentifierPlaceholder: 'AAA-0000',
+      aiCredits: 0,
+      isProMember: false
     }
   });
+
+  // Sync Firebase credits to state for legacy compatibility if needed
+  useEffect(() => {
+    setData(prev => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        aiCredits: credits,
+        isProMember: isPro
+      }
+    }));
+    
+    // Update gemini service internal state
+    geminiService.setGlobalSettings({
+      ...data.settings,
+      aiCredits: credits,
+      isProMember: isPro
+    });
+  }, [credits, isPro]);
 
   const currentCountry = getCountryById(data.settings?.countryId || 'BR');
 
@@ -55,9 +78,18 @@ export function useAppData() {
     };
     setData(merged as any);
     if (merged.settings) {
-      geminiService.setApiKey(merged.settings.geminiApiKey || process.env.GEMINI_API_KEY || '');
-      geminiService.setGlobalSettings(merged.settings);
+      geminiService.setApiKey(merged.settings.geminiApiKey || '');
+      geminiService.setGlobalSettings({
+        ...merged.settings,
+        aiCredits: credits,
+        isProMember: isPro
+      });
     }
+
+    // Configura callback de consumo de créditos REAL via Firebase
+    geminiService.onCreditConsumed((amount) => {
+      consumeCredit();
+    });
   }, []);
 
   useEffect(() => {
@@ -87,7 +119,8 @@ export function useAppData() {
     storageService.saveData(newData);
     
     if (newData.settings) {
-      if (newData.settings.geminiApiKey) geminiService.setApiKey(newData.settings.geminiApiKey);
+      const apiKey = newData.settings.geminiApiKey || '';
+      geminiService.setApiKey(apiKey);
       geminiService.setGlobalSettings(newData.settings);
     }
   };

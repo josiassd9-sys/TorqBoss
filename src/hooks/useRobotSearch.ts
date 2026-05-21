@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Vehicle, Country, AppData } from '../types';
-import { vehicleSearchService } from '../services/buscaPlacasService';
+import { buscaPlacasService } from '../services/buscaPlacasService';
 import { webVehicleSearchService } from '../services/webVehicleSearchService';
 import { geminiService } from '../services/geminiService';
 import { removeBackground } from "@imgly/background-removal";
@@ -55,23 +55,7 @@ export function useRobotSearch(
   }, [robotLogs]);
 
   const searchImage = async (customQuery?: string | any) => {
-    const queryStr = (typeof customQuery === 'string' && customQuery.trim().length > 0) ? customQuery.trim() : null;
-    
-    // Se for um link direto de imagem, aplica imediatamente em vez de pesquisar
-    if (queryStr && queryStr.startsWith('http')) {
-      const isImage = /\.(jpg|jpeg|png|webp|gif|svg|avif)/i.test(queryStr) || queryStr.includes('images');
-      if (isImage) {
-        if (selectedVehicle) {
-          updateSelectedVehicle({ imageUrl: queryStr });
-        } else {
-          setNewVehicle((prev: any) => ({ ...prev, imageUrl: queryStr }));
-        }
-        setPlateSearchStatus('✨ Foto aplicada via link!');
-        setIsGalleryOpen(false);
-        return;
-      }
-    }
-
+    const queryStr = (typeof customQuery === 'string' && customQuery.trim().length > 0) ? customQuery : null;
     const fullDescription = queryStr || `${newVehicle.name} ${newVehicle.model} ${newVehicle.version || ''} ${newVehicle.year || ''}`.trim();
     setSearchQuery(fullDescription);
     const fallbackSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(fullDescription + ' foto oficial alta resolução')}&tbm=isch`;
@@ -115,10 +99,10 @@ export function useRobotSearch(
       setRobotLogs(prev => [
         ...prev, 
         isLimit 
-          ? '[WARN] Google temporariamente ocupado. Aguarde o contador de recarga ou use a busca manual acima.' 
-          : `[ERROR] Falha técnica: ${errorMessage.substring(0, 50)}...`
+          ? '[AJUDA] Limite Grátis atingido! Adicione sua própria Chave API em Configurações > Chave API para eliminar esperas.' 
+          : `[ERROR] Falha técnica: ${errorMessage.substring(0, 80)}...`
       ]);
-      setPlateSearchStatus(isLimit ? '⏳ IA em Cooldown' : '⚠️ Erro na Busca');
+      setPlateSearchStatus(isLimit ? '⏳ Use sua Chave API' : '⚠️ Erro na Busca');
     } finally {
       setIsSearchingImage(false);
     }
@@ -216,7 +200,7 @@ export function useRobotSearch(
     setRobotLogs(['[INFO] Sistema de reconhecimento iniciado', `[INFO] Alvo: Placa ${plate}`]);
     
     try {
-      const popup = vehicleSearchService.openPopup(plate, currentCountry.searchPortalUrl);
+      const popup = buscaPlacasService.openPopup(plate, currentCountry.searchPortalUrl);
       if (popup) {
         robotPopupRef.current = popup;
         setRobotLogs(prev => [...prev, `[ROBOT] Portal ${currentCountry.name} aberto. Digite a placa lá!`, `[INFO] Robô aguardando você pesquisar no portal ${currentCountry.flag}...`]);
@@ -294,8 +278,17 @@ export function useRobotSearch(
       }
     } catch (err: any) {
       clearInterval(statusInterval);
-      setPlateSearchStatus('⚠️ Erro no servidor.');
-      setTimeout(() => setPlateSearchStatus(''), 3000);
+      const errorMessage = String(err?.message || '');
+      const isLimit = errorMessage.includes('LIMITE_IA') || errorMessage.includes('429');
+      
+      setRobotLogs(prev => [
+        ...prev, 
+        isLimit 
+          ? '[AJUDA] Limite Grátis atingido! Evite esperas adicionando sua própria Chave API em Configurações > Chave API.' 
+          : `[ERROR] Falha na busca avançada: ${errorMessage.substring(0, 60)}...`
+      ]);
+      setPlateSearchStatus(isLimit ? '⏳ Use sua Chave API' : '⚠️ Erro no servidor');
+      setTimeout(() => setPlateSearchStatus(''), 5000);
     } finally {
       setIsSearchingPlate(false);
     }
@@ -353,8 +346,15 @@ export function useRobotSearch(
       }
     } catch (error: any) {
       console.error('Assisted Process Error:', error);
-      const errorMsg = error.message || 'Erro ao processar dados com IA.';
-      setPlateSearchStatus(`❌ Falha: ${errorMsg}`);
+      const errorMessage = String(error?.message || '');
+      const isLimit = errorMessage.includes('LIMITE_IA') || errorMessage.includes('429');
+      
+      const errorMsg = isLimit 
+        ? 'Limite de IA atingido. Adicione sua própria Chave API para uso ilimitado.' 
+        : (error.message || 'Erro ao processar dados com IA.');
+        
+      setPlateSearchStatus(`❌ ${isLimit ? 'Limite de IA' : 'Falha'}`);
+      setRobotLogs(prev => [...prev, `[ERROR] ${errorMsg}`]);
       alert(errorMsg);
     } finally {
       setIsProcessingAssisted(false);

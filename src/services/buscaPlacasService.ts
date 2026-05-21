@@ -12,7 +12,7 @@ interface VehicleData {
   chassisNumber?: string;
 }
 
-export const vehicleSearchService = {
+export const buscaPlacasService = {
   /**
    * Abre o portal de busca configurado e retorna o handle da janela
    */

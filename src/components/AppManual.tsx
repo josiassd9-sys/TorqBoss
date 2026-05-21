@@ -297,7 +297,7 @@ export const AppManual: React.FC = () => {
         <p>O cérebro do FleetX depende de uma conexão com o <strong>Gemini (Google)</strong>. Veja como configurar:</p>
         <div className="space-y-4">
           <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 italic text-[11px]">
-            <strong>Por que preciso de uma chave?</strong> A IA tem um custo operacional. Ao inserir sua própria chave gratuita do Google AI Studio, você garante que as funções de leitura de manuais e diagnósticos funcionem sem limites impostos por nós.
+            <strong>Por que preciso de uma chave?</strong> A IA tem um custo operacional elevado. Ao inserir sua própria chave <strong className="text-amber-700">TOTALMENTE GRÁTIS</strong> do Google AI Studio, você garante que as funções de leitura de manuais e diagnósticos funcionam sem filas ou limites compartilhados.
           </div>
           <ul className="list-disc ml-6 space-y-2">
             <li><strong>Onde conseguir:</strong> Vá em Configurações &gt; Chave API e clique no link do Google AI Studio. É grátis para uso pessoal.</li>

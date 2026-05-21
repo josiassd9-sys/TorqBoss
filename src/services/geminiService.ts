@@ -1,10 +1,15 @@
 // src/services/geminiService.ts
 // Proxy service that calls the server-side Gemini API
 
+let onCreditConsumed: (amount: number) => void = () => {};
+let currentCredits = 0;
+let usingCustomKey = false;
+
 export const geminiService = {
   setApiKey: (key: string) => {
     // Key management is handled server-side via environment variables
     // But we still allow passing it for custom keys from settings
+    usingCustomKey = !!key;
     fetch('/api/gemini/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -13,6 +18,9 @@ export const geminiService = {
   },
 
   setGlobalSettings: (settings: any) => {
+    if (settings.aiCredits !== undefined) {
+      currentCredits = settings.aiCredits;
+    }
     fetch('/api/gemini/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -20,10 +28,19 @@ export const geminiService = {
     }).catch(console.error);
   },
 
+  onCreditConsumed: (callback: (amount: number) => void) => {
+    onCreditConsumed = callback;
+  },
+
   getCooldownRemaining: () => geminiService.call('getCooldownRemaining'),
 
   // Generic caller for any method in the service
   call: async (method: string, ...args: any[]): Promise<any> => {
+    // Verificação de créditos antes da chamada (se não for chave própria)
+    if (!usingCustomKey && currentCredits <= 0 && method !== 'validateApiKey' && method !== 'getCooldownRemaining') {
+      throw new Error("SALDO INSUFICIENTE: Seus créditos de IA acabaram. Recarregue na aba 'Carteira' ou adicione sua própria Chave API para continuar usando as funções automáticas.");
+    }
+
     let body;
     
     // Deep sanitizer to ensure no React events or DOM elements are sent
@@ -88,6 +105,11 @@ export const geminiService = {
       throw new Error(error.error || `API error: ${response.status}`);
     }
 
+    // Consumir crédito no client-side se for bem sucedido
+    if (!usingCustomKey && method !== 'validateApiKey' && method !== 'getCooldownRemaining') {
+      onCreditConsumed(1);
+    }
+
     return response.json();
   },
 
@@ -119,4 +141,5 @@ export const geminiService = {
   callAI: (prompt: string, jsonMode?: boolean, useGoogleSearch?: boolean, skipHistory?: boolean) => 
     geminiService.call('callAI', prompt, jsonMode, useGoogleSearch, skipHistory),
   clearHistory: () => geminiService.call('clearHistory'),
+  validateApiKey: (key: string) => geminiService.call('validateApiKey', key),
 };

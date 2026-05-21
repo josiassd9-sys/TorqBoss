@@ -9,14 +9,24 @@ export const odometerScanner = {
   async scanOdometer(): Promise<{ mileage: number; confidence: number; imageBase64?: string }> {
     console.log('Iniciando escaneamento de odômetro...');
     
-    // Simulação de delay de processamento
+    // NOTA PARA PRODUÇÃO (CAPACITOR):
+    // 1. Instalar: npm install @capacitor-community/mlkit-text-recognition
+    // 2. Importar o plugin
+    // 3. Chamar o método de leitura de imagem
+    /*
+    const result = await TextRecognition.detectText({
+      path: imagePath,
+      orientation: 'portrait'
+    });
+    // Tratar texto extraído para pegar apenas os números do odômetro
+    */
+
+    // Simulação de delay de processamento para Preview
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Em um cenário real, aqui abriríamos a câmera e processaríamos a imagem.
-    // Retornamos um valor fictício ou o valor lido.
     return {
-      mileage: 125430, // Exemplo de valor detectado
-      confidence: 0.92,
+      mileage: 0, // Retornar 0 e deixar usuário preencher no fallback em Preview
+      confidence: 0,
       imageBase64: ''
     };
   }

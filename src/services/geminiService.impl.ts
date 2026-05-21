@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { Part } from "../types";
 
 let currentApiKey = process.env.GEMINI_API_KEY || '';
+let isUsingCustomKey = false;
 
 let globalSettings = {
   language: 'pt-BR',
@@ -139,6 +140,13 @@ const normalizePriceType = (value: unknown): 'unidade' | 'jogo' | 'kit' | 'litro
 export const geminiService = {
   setApiKey: (key: string) => {
     currentApiKey = key;
+    const systemKey = process.env.GEMINI_API_KEY || '';
+    isUsingCustomKey = !!key && key !== systemKey;
+    
+    // Se for uma chave pessoal, remove qualquer bloqueio de cota anterior
+    if (isUsingCustomKey) {
+      (global as any).geminiCooldownUntil = 0;
+    }
   },
 
   setGlobalSettings: (settings: any) => {
@@ -204,8 +212,8 @@ export const geminiService = {
     const maxRetries = 5;
     const baseDelay = 2000;
     
-    // Controle global de cooldown
-    if (typeof (global as any).geminiCooldownUntil === 'number' && (global as any).geminiCooldownUntil > Date.now()) {
+    // Controle global de cooldown - ignorado se for chave customizada
+    if (!isUsingCustomKey && typeof (global as any).geminiCooldownUntil === 'number' && (global as any).geminiCooldownUntil > Date.now()) {
       const remainingSec = Math.ceil(((global as any).geminiCooldownUntil - Date.now()) / 1000);
       throw new Error(`AGUARDE: Limite de IA atingido por segurança. Tente em ${remainingSec} segundos.`);
     }
@@ -235,13 +243,14 @@ export const geminiService = {
           throw new Error("LENTIDÃO: A IA está demorando muito para responder. Tente novamente ou use a busca manual.");
         }
 
-        const maxRetriesForQuota = 2; // Tenta cota 2 vezes com delay progressivo
-        const maxRetriesForTransient = 3;
+        const maxRetriesForQuota = 3; // Aumentado para 3 tentativas
+        const maxRetriesForTransient = 4;
 
         if (isQuotaError && retries < maxRetriesForQuota) {
           retries++;
-          const delay = 15000 * retries; // 15s, depois 30s
-          console.warn(`[GEMINI] Cota atingida. Tentativa ${retries}/${maxRetriesForQuota}. Retrying in ${delay}ms...`);
+          // Delays progressivos: 5s, 10s, 20s
+          const delay = 5000 * Math.pow(2, retries - 1); 
+          console.warn(`[GEMINI] Cota atingida. Tentativa ${retries}/${maxRetriesForQuota}. Reiniciando em ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
           return execute();
         }
@@ -255,9 +264,16 @@ export const geminiService = {
         }
         
         if (isQuotaError) {
-          // Ativa cooldown de 30 segundos (reduzido de 60)
-          (global as any).geminiCooldownUntil = Date.now() + 30000;
-          throw new Error("LIMITE_IA: O sistema atingiu o limite temporário do Google. Aguarde 30 segundos ou use a busca manual.");
+          // Ativa cooldown de 30 segundos
+          if (!isUsingCustomKey) {
+            (global as any).geminiCooldownUntil = Date.now() + 30000;
+          }
+          
+          const msg = isUsingCustomKey 
+            ? "LIMITE_SUA_CHAVE: Sua Chave API pessoal atingiu o limite de cota do Google. Aguarde alguns segundos e tente novamente."
+            : "LIMITE_IA: O limite de uso gratuito compartilhado foi atingido. Aguarde 30 segundos ou adicione sua própria Chave API em Configurações > Chave API para uso ilimitado.";
+          
+          throw new Error(msg);
         }
         
         throw error;
@@ -275,7 +291,7 @@ export const geminiService = {
 
       if (skipHistory) {
         const response = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
+          model: "gemini-2.0-flash",
           contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
           config: {
             responseMimeType: jsonMode ? "application/json" : undefined,
@@ -315,7 +331,7 @@ export const geminiService = {
       }
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.0-flash",
         contents: conversationHistory.map(h => ({
           role: h.role, 
           parts: [{ text: h.content }]
@@ -971,7 +987,7 @@ export const geminiService = {
         }`;
 
       const scheduleResponse = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.0-flash",
         contents: [
           { inlineData: { mimeType: "application/pdf", data: pdfBase64 } },
           { text: context + schedulePrompt }
@@ -987,7 +1003,7 @@ export const geminiService = {
         Retorne um JSON com campos como tirePressure, oilSpecification, batteryInfo, fluidsCapacities, filters.`;
 
       const techResponse = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.0-flash",
         contents: [
           { inlineData: { mimeType: "application/pdf", data: pdfBase64 } },
           { text: context + techPrompt }
@@ -999,7 +1015,7 @@ export const geminiService = {
 
       // Texto Completo (Resumo)
       const fullTextResponse = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.0-flash",
         contents: [
           { inlineData: { mimeType: "application/pdf", data: pdfBase64 } },
           { text: context + `Gere um resumo completo em Markdown das especificações técnicas do veículo "${vehicleModel}" contidas neste manual.` }
@@ -1029,7 +1045,7 @@ export const geminiService = {
             Formate como Markdown profissional e detalhado.`;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.0-flash",
         contents: [
           {
             inlineData: {
@@ -1290,6 +1306,42 @@ export const geminiService = {
     } catch (error) {
       console.error("Market Value Update Error:", error);
       return 0;
+    }
+  },
+
+  validateApiKey: async (key: string): Promise<{ success: boolean; message: string }> => {
+    if (!key || key.trim().length < 20) {
+      return { success: false, message: 'Chave API muito curta ou inválida.' };
+    }
+
+    const previousKey = currentApiKey;
+    const wasUsingCustom = isUsingCustomKey;
+    try {
+      currentApiKey = key;
+      isUsingCustomKey = true; // Força para o teste
+      const ai = geminiService.getAI();
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash", 
+        contents: [{ role: 'user', parts: [{ text: "Diga apenas 'OK' se você está funcionando." }] }]
+      });
+      
+      const text = response.text || '';
+      
+      if (text.toUpperCase().includes('OK') || text.length > 0) {
+        // RESET DE SEGURANÇA: Limpa qualquer bloqueio de cota anterior ao inserir chave válida
+        (global as any).geminiCooldownUntil = 0;
+        return { success: true, message: 'Conexão estabelecida com sucesso! Sua chave é válida e o limite de espera foi removido.' };
+      }
+      return { success: false, message: 'A IA respondeu, mas de forma inesperada. Verifique se é a chave correta.' };
+    } catch (error: any) {
+      console.error('API Key Validation Error:', error);
+      currentApiKey = previousKey;
+      isUsingCustomKey = wasUsingCustom;
+      const msg = getErrorMessage(error);
+      if (msg.includes('API_KEY_INVALID')) return { success: false, message: 'Chave API Inválida (Google negou o acesso).' };
+      if (msg.includes('429')) return { success: false, message: 'Chave Válida, mas sem cota disponível no momento (Quota Excedida na sua chave).' };
+      return { success: false, message: `Erro ao validar: ${msg}` };
     }
   }
 };
