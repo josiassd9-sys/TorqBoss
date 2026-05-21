@@ -30,9 +30,14 @@ Organize a vida do seu carro como um engenheiro:
 - **Auditoria de Integridade**: Gere um índice de confiança que prova ao futuro comprador que seu carro foi impecavelmente bem cuidado.
 - **Agenda Preditiva**: Seja avisado sobre futuras revisões antes que o problema apareça.
 
-### ⛽ ECONOMIA E PERFORMANCE
-- **Gestão de Consumo**: Gráficos claros de eficiência (km/L) e custo por quilômetro rodado.
-- **Catálogo de Peças**: Guarde a numeração exata de cada filtro, pastilha ou lâmpada para nunca mais comprar a peça errada.
+### 💰 ECONOMIA EXTREMA: O DETECTOR DE DESPERDÍCIOS PARA SEU BOLSO
+Ter um automóvel não precisa ser sinônimo de contas abusivas. O FleetX é o seu escudo financeiro definitivo na relação com oficinas e autopeças:
+
+- **Catálogo Inteligente de Peças (Fim do "Preço de Urgência")**: Ao cadastrar a numeração, código original (part number) e especificações da lâmpada, pastilha de freio, filtros ou qualquer componente, você assume o controle. Consulte as referências no mercado regional para comparar ofertas e saber o preço médio real de cada item. Evite o superfaturamento clássico das oficinas e compre sempre o componente perfeito!
+- **Diga Adeus às Compras Erradas**: Quantas centenas de reais já foram perdidas comprando o filtro de óleo ou a pastilha de ano/tipo incompatível? Com o FleetX, você tem as especificações cirúrgicas à mão na hora de comprar, eliminando erros que custam tempo e dinheiro.
+- **Rastreador de "Combustível Adulterado" e Falhas**: Nossa ferramenta calcula a média exata de km/L e custo por km por abastecimento. Uma queda brusca no rendimento serve como alerta de combustível de má qualidade ou problemas silenciosos (como velas ou sensores desgastados), agindo antes que o motor quebre e custe caro.
+- **Planejamento Técnico e Antecipação**: Utilize a Agenda Preditiva para prever manutenções preventivas programadas. Compre as peças na internet de forma planejada a preços de atacado, em vez de pagar preços exorbitantes na urgência da quebra de última hora.
+- **Auditoria de Faturamento Contra Serviços Fantasmas**: Registre fotos reais das notas, ordens de serviço e embalagens das peças substituídas. O mecânico saberá que você audita o veículo, garantindo respeito ao seu orçamento e reduzindo serviços desnecessários.
 
 ### 🌎 CIDADÃO DO MUNDO
 Seja você brasileiro, europeu ou americano, o FleetX se adapta:

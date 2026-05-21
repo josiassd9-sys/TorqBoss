@@ -21,9 +21,10 @@ Este documento serve como a "Bússola de Desenvolvimento" para o FleetX, detalha
 - **Cálculo**: (KM Atual - KM Anterior) / Litros Abastecidos.
 - **Resultado**: Gráficos de tendência de consumo e custo por quilômetro.
 
-### 📚 Catálogo de Peças
-- **Função**: Banco de dados de peças instaladas.
-- **Diferencial**: Evita que o usuário esqueça o modelo exato da lâmpada, pastilha ou filtro que foi instalado anteriormente.
+### 📚 Catálogo Inteligente de Peças
+- **Função**: Banco de dados de peças instaladas e compatíveis.
+- **Lógica e Preço Médio Regional**: Permite indexar o "Part Number" (Código Original) e os dados de compatibilidade da peça instalada. No futuro, permite que essas informações cruzem referências no mercado regional para estimar o preço médio justo.
+- **Diferencial de Negócio**: Evita que o usuário compre peças incorretas ou pague valores inflacionados em emergências mecânicas. Ele serve como o guia definitivo de compras do proprietário.
 
 ### 🤖 Manual IA
 - **Função**: Tradutor técnico de manuais PDF.
