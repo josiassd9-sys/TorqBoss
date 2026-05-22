@@ -151,6 +151,7 @@ export function useAppData() {
       textSecondary: themeKey === 'custom' && customColors ? customColors.textSecondary : '#6B7280',
       buttonBg: themeKey === 'custom' && customColors ? customColors.buttonBg : (theme?.accent || '#E11D48'),
       buttonText: themeKey === 'custom' && customColors ? customColors.buttonText : '#FFFFFF',
+      vehicleHeaderBg: themeKey === 'custom' && customColors?.vehicleHeaderBg ? customColors.vehicleHeaderBg : (theme?.primary || '#141414'),
     };
 
     const header = data.settings?.headerConfig || {
@@ -181,6 +182,7 @@ export function useAppData() {
         --color-text-secondary: ${colors.textSecondary};
         --color-button-bg: ${colors.buttonBg};
         --color-button-text: ${colors.buttonText};
+        --color-vehicle-header-bg: ${colors.vehicleHeaderBg};
         
         --header-height: ${header.bannerHeight}px;
         --header-icon-scale: ${header.iconScale / 100};

@@ -298,18 +298,6 @@ export default function App() {
   const vehicleHealth = useMemo(() => getVehicleHealth(selectedVehicle), [selectedVehicle?.parts]);
   const maintenanceScore = useMemo(() => getMaintenanceScore(selectedVehicle), [selectedVehicle]);
 
-  useEffect(() => {
-    const theme = THEMES[(data.settings?.theme as keyof typeof THEMES) || 'default'];
-    const styleId = 'theme-overrides';
-    let styleTag = document.getElementById(styleId);
-    if (!styleTag) {
-      styleTag = document.createElement('style');
-      styleTag.id = styleId;
-      document.head.appendChild(styleTag);
-    }
-    styleTag.innerHTML = `:root { --color-brand-primary: ${theme.primary}; --color-brand-accent: ${theme.accent}; --color-brand-bg: ${theme.bg}; }`;
-  }, [data.settings?.theme]);
-
   const [isUpdatingFipe, setIsUpdatingFipe] = useState(false);
 
   const updateFipeValue = async (vId: string) => {

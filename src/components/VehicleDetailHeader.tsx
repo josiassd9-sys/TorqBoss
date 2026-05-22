@@ -391,7 +391,8 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
 
       {/* Vehicle Detail Header */}
       <div 
-        className="bg-zinc-950 text-white relative overflow-hidden mb-4 rounded-xl shadow-xl transition-all duration-300 flex items-center justify-center py-12"
+        style={{ backgroundColor: 'var(--color-vehicle-header-bg)' }}
+        className="text-white relative overflow-hidden mb-4 rounded-xl shadow-xl transition-all duration-300 flex flex-col items-center justify-center py-12"
       >
          <div className="relative z-10 flex flex-col items-center text-center">
           <div className="flex items-center gap-3 mb-4">
@@ -499,6 +500,79 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
                 </div>
               )}
 
+              {/* Informative Stats Cards - Moved here for better visibility */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full mb-6 max-w-4xl mx-auto px-4">
+                <div className="bg-white border border-zinc-100 p-4 rounded-xl text-left shadow-sm overflow-hidden">
+                  <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5 truncate">Engenharia</p>
+                  <p className="text-xl sm:text-2xl font-black italic tracking-tighter text-brand-primary truncate">{selectedVehicle.parts?.length || 0}</p>
+                  <p className="text-[9px] text-zinc-400 font-bold uppercase truncate">Itens</p>
+                </div>
+                <div className="bg-white border border-zinc-100 p-4 rounded-xl relative group text-left shadow-sm overflow-hidden">
+                  <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5 truncate">
+                    Odômetro IA
+                  </p>
+                  <div className="flex items-baseline gap-0.5 truncate">
+                    <p className="text-xl sm:text-2xl font-black italic tracking-tighter text-brand-primary truncate">{predictCurrentMileage(selectedVehicle).toLocaleString()}</p>
+                    <span className="text-[10px] text-brand-accent font-black uppercase">{getDistanceUnit()}</span>
+                  </div>
+                </div>
+                <div className="bg-white border border-zinc-100 p-4 rounded-xl text-left shadow-sm overflow-hidden">
+                  <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5 truncate">Consumo Global</p>
+                  <p className="text-xl sm:text-2xl font-black italic tracking-tighter text-brand-accent truncate">
+                    {(() => {
+                      const logs = [...(selectedVehicle.fuelLogs || [])].sort((a, b) => a.mileage - b.mileage);
+                      if (logs.length < 2) return '--';
+                      const totalKm = logs[logs.length - 1].mileage - logs[0].mileage;
+                      const totalL = logs.slice(1).reduce((sum, l) => sum + l.liters, 0);
+                      return totalL > 0 ? (totalKm / totalL).toFixed(1) : '--';
+                    })()}
+                  </p>
+                  <p className="text-[9px] text-brand-accent font-bold uppercase truncate">Km / Litro</p>
+                </div>
+                <div className="bg-white border border-zinc-100 p-4 rounded-xl text-left shadow-sm overflow-hidden">
+                  <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5 truncate">Saúde Estrutural</p>
+                  <p className={`text-xl sm:text-2xl font-black italic tracking-tighter truncate ${getVehicleHealth() > 80 ? 'text-emerald-500' : getVehicleHealth() > 50 ? 'text-amber-500' : 'text-rose-500'}`}>
+                    {Math.round(getVehicleHealth())}%
+                  </p>
+                </div>
+                <div className="bg-white border border-zinc-100 p-4 rounded-xl text-left shadow-sm overflow-hidden">
+                  <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5 truncate">Valorização</p>
+                  <div className="flex items-center gap-1.5 truncate">
+                     <p className="text-xl sm:text-2xl font-black italic tracking-tighter text-brand-primary truncate">
+                       {getMaintenanceScore()}%
+                     </p>
+                     <span className="bg-brand-accent text-white text-[7px] font-black px-1 py-0.5 rounded-full uppercase">GOLD</span>
+                  </div>
+                </div>
+                <motion.div 
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onUpdateFipe}
+                  className="bg-white border border-zinc-100 p-4 rounded-xl cursor-pointer hover:border-brand-accent transition-all text-left shadow-sm group overflow-hidden"
+                >
+                  <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5 flex justify-between items-center truncate">
+                    <span className="truncate">{marketRef}</span>
+                    <RefreshCw size={10} className={isUpdatingFipe ? "animate-spin text-brand-accent shrink-0" : "text-zinc-300 group-hover:text-brand-accent shrink-0"} />
+                  </p>
+                  <div className="flex items-center gap-2 truncate">
+                     <p className="text-base sm:text-xl font-black italic tracking-tighter text-emerald-600 truncate">
+                       {formatCurrency(selectedVehicle.fipeValue || 0)}
+                     </p>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Health Progress Bar - Moved here to accompany structural health card */}
+              <div className="w-full max-w-4xl mb-8 mx-auto px-4">
+                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/10">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${getVehicleHealth()}%` }}
+                    className={`h-full rounded-full ${getVehicleHealth() > 80 ? 'bg-green-500' : getVehicleHealth() > 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                    style={{ boxShadow: '0 0 15px rgba(0,0,0,0.5)' }}
+                  />
+                </div>
+              </div>
+
               {/* Tech Glossary Accordion */}
               <div className="w-full max-w-4xl space-y-2 mt-6">
                  {technicalSections.map((section) => (
@@ -543,78 +617,6 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
                  ))}
               </div>
             </div>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full border-t-4 border-zinc-950 pt-6 max-w-4xl mx-auto">
-          <div className="bg-white border border-zinc-100 p-4 rounded-xl text-left shadow-sm">
-            <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5">Engenharia</p>
-            <p className="text-xl sm:text-2xl font-black italic tracking-tighter text-brand-primary">{selectedVehicle.parts?.length || 0}</p>
-            <p className="text-[9px] text-zinc-400 font-bold uppercase">Itens</p>
-          </div>
-          <div className="bg-white border border-zinc-100 p-4 rounded-xl relative group text-left shadow-sm">
-            <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5">
-              Odômetro IA
-            </p>
-            <div className="flex items-baseline gap-0.5">
-              <p className="text-xl sm:text-2xl font-black italic tracking-tighter text-brand-primary">{predictCurrentMileage(selectedVehicle).toLocaleString()}</p>
-              <span className="text-[10px] text-brand-accent font-black uppercase">{getDistanceUnit()}</span>
-            </div>
-          </div>
-          <div className="bg-white border border-zinc-100 p-4 rounded-xl text-left shadow-sm">
-            <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5">Consumo Global</p>
-            <p className="text-xl sm:text-2xl font-black italic tracking-tighter text-brand-accent">
-              {(() => {
-                const logs = [...(selectedVehicle.fuelLogs || [])].sort((a, b) => a.mileage - b.mileage);
-                if (logs.length < 2) return '--';
-                const totalKm = logs[logs.length - 1].mileage - logs[0].mileage;
-                const totalL = logs.slice(1).reduce((sum, l) => sum + l.liters, 0);
-                return totalL > 0 ? (totalKm / totalL).toFixed(1) : '--';
-              })()}
-            </p>
-            <p className="text-[9px] text-brand-accent font-bold uppercase">Km / Litro</p>
-          </div>
-          <div className="bg-white border border-zinc-100 p-4 rounded-xl text-left shadow-sm">
-            <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5">Saúde Estrutural</p>
-            <p className={`text-xl sm:text-2xl font-black italic tracking-tighter ${getVehicleHealth() > 80 ? 'text-emerald-500' : getVehicleHealth() > 50 ? 'text-amber-500' : 'text-rose-500'}`}>
-              {Math.round(getVehicleHealth())}%
-            </p>
-          </div>
-          <div className="bg-white border border-zinc-100 p-4 rounded-xl text-left shadow-sm">
-            <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5">Valorização</p>
-            <div className="flex items-center gap-1.5">
-               <p className="text-xl sm:text-2xl font-black italic tracking-tighter text-brand-primary">
-                 {getMaintenanceScore()}%
-               </p>
-               <span className="bg-brand-accent text-white text-[7px] font-black px-1 py-0.5 rounded-full uppercase">GOLD</span>
-            </div>
-          </div>
-          <motion.div 
-            whileTap={{ scale: 0.95 }}
-            onClick={onUpdateFipe}
-            className="bg-white border border-zinc-100 p-4 rounded-xl cursor-pointer hover:border-brand-accent transition-all text-left shadow-sm group"
-          >
-            <p className="text-zinc-400 text-[9px] uppercase font-black tracking-widest mb-1.5 flex justify-between items-center">
-              {marketRef}
-              <RefreshCw size={10} className={isUpdatingFipe ? "animate-spin text-brand-accent" : "text-zinc-300 group-hover:text-brand-accent"} />
-            </p>
-            <div className="flex items-center gap-2">
-               <p className="text-lg sm:text-xl font-black italic tracking-tighter text-emerald-600">
-                 {formatCurrency(selectedVehicle.fipeValue || 0)}
-               </p>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Health Progress Bar */}
-        <div className="w-full max-w-4xl mt-3 mb-1 mx-auto">
-          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: `${getVehicleHealth()}%` }}
-              className={`h-full rounded-full ${getVehicleHealth() > 80 ? 'bg-green-500' : getVehicleHealth() > 50 ? 'bg-amber-500' : 'bg-red-500'}`}
-              style={{ boxShadow: '0 0 10px rgba(0,0,0,0.5)' }}
-            />
           </div>
         </div>
       </div>

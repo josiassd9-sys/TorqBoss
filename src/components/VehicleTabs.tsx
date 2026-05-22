@@ -134,15 +134,17 @@ export const VehicleTabs: React.FC<VehicleTabsProps> = ({
       <div className="flex gap-2 mt-2 w-full max-w-2xl overflow-x-auto pb-2 no-scrollbar px-1">
         <button 
           onClick={() => setIsAddingPart(true)}
-          className="flex-1 bg-brand-primary hover:bg-zinc-900 text-white px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-tighter transition-all shadow-md shrink-0 border border-zinc-950"
+          className="flex-1 bg-brand-primary hover:bg-zinc-900 text-white px-2 py-4 rounded-xl font-black uppercase text-[10px] tracking-tighter transition-all shadow-md shrink-0 border border-zinc-950 relative flex items-center justify-center group min-h-[52px]"
         >
-          <Plus size={14} /> Catalogar OEM
+          <span className="text-center px-1">Catalogar OEM</span>
+          <Plus size={12} className="absolute bottom-1.5 left-1.5 text-white/30" />
         </button>
         <button 
           onClick={() => setIsBudgetOpen(true)}
-          className="flex-1 bg-button-bg text-button-text px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-tighter border border-zinc-950 transition-all shadow-md shrink-0 flex items-center justify-center gap-2"
+          className="flex-1 bg-button-bg text-button-text px-2 py-4 rounded-xl font-black uppercase text-[10px] tracking-tighter border border-zinc-950 transition-all shadow-md shrink-0 relative flex items-center justify-center group min-h-[52px]"
         >
-          <ShoppingCart size={14} /> Orçamento ({(selectedVehicle.parts || []).filter(p => p.isInBudget).length})
+          <span className="text-center px-1">Orçamento ({(selectedVehicle.parts || []).filter(p => p.isInBudget).length})</span>
+          <ShoppingCart size={12} className="absolute bottom-1.5 left-1.5 opacity-30" />
         </button>
         <button 
           onClick={() => {
@@ -150,9 +152,10 @@ export const VehicleTabs: React.FC<VehicleTabsProps> = ({
             setSimulationResults([]);
             setIsSimulating(true);
           }}
-          className="flex-1 bg-card-bg hover:bg-zinc-50 text-text-primary px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-tighter border border-zinc-950 transition-all shadow-sm shrink-0 flex items-center justify-center gap-2"
+          className="flex-1 bg-card-bg hover:bg-zinc-50 text-text-primary px-2 py-4 rounded-xl font-black uppercase text-[10px] tracking-tighter border border-zinc-950 transition-all shadow-sm shrink-0 relative flex items-center justify-center group min-h-[52px]"
         >
-          <Activity size={14} /> Simulador
+          <span className="text-center px-1">Simulador</span>
+          <Activity size={12} className="absolute bottom-1.5 left-1.5 text-zinc-400 group-hover:text-brand-accent transition-colors" />
         </button>
       </div>
 

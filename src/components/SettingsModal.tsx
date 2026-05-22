@@ -391,6 +391,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                { label: 'Texto Secundário', key: 'textSecondary' as const, desc: 'Legendas e Apoio' },
                                { label: 'Botões', key: 'buttonBg' as const, desc: 'Fundo dos Botões' },
                                { label: 'Texto do Botão', key: 'buttonText' as const, desc: 'Etiqueta Interna' },
+                                { label: 'Fundo do Veículo', key: 'vehicleHeaderBg' as const, desc: 'Banner Interno' },
                              ].map((color) => {
                                const currentTheme = THEMES[data.settings.theme as keyof typeof THEMES];
                                const currentColor = data.settings.customThemeColors?.[color.key] || 
@@ -401,7 +402,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                   color.key === 'cardBg' ? '#FFFFFF' :
                                   color.key === 'textPrimary' ? '#000000' :
                                   color.key === 'textSecondary' ? '#6B7280' :
-                                  color.key === 'buttonBg' ? '#E11D48' : '#FFFFFF');
+                                  color.key === 'buttonBg' ? '#E11D48' : 
+                                   color.key === 'vehicleHeaderBg' ? (currentTheme?.primary || '#141414') :
+                                   '#FFFFFF');
 
                                return (
                                  <div key={color.key} className="space-y-3">
@@ -423,7 +426,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                             textPrimary: '#000000',
                                             textSecondary: '#6B7280',
                                             buttonBg: currentTheme?.accent || '#E11D48',
-                                            buttonText: '#FFFFFF'
+                                            buttonText: '#FFFFFF',
+                                            vehicleHeaderBg: currentTheme?.primary || '#141414'
                                           };
                                           
                                           updateSettings({ 
@@ -448,7 +452,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                             textPrimary: '#000000',
                                             textSecondary: '#6B7280',
                                             buttonBg: currentTheme?.accent || '#E11D48',
-                                            buttonText: '#FFFFFF'
+                                            buttonText: '#FFFFFF',
+                                            vehicleHeaderBg: currentTheme?.primary || '#141414'
                                           };
                                           
                                           updateSettings({ 
