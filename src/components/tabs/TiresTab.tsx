@@ -98,9 +98,9 @@ export const TiresTab: React.FC<TiresTabProps> = ({
         <div className="flex gap-2">
           <button 
             onClick={() => setIsAdding(!isAdding)}
-            className="bg-brand-primary text-white px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-brand-accent transition-all flex items-center gap-2 shadow-sm"
+            className="bg-brand-primary text-white px-4 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest hover:bg-zinc-900 transition-all flex items-center gap-2 shadow-sm border border-zinc-950"
           >
-            {isAdding ? 'Cancelar' : <><Plus size={14} /> Registrar Troca</>}
+            {isAdding ? 'Sair' : <><Plus size={14} /> Troca de Pneus</>}
           </button>
         </div>
       </div>
@@ -109,100 +109,90 @@ export const TiresTab: React.FC<TiresTabProps> = ({
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl"
+          className="bg-white p-6 rounded-xl border border-gray-100 shadow-md"
         >
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-1">Marca</label>
+              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1">Marca</label>
               <input 
                 required
-                className="w-full bg-gray-50 border-gray-100 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-brand-accent focus:bg-white outline-none transition-all"
+                className="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 text-xs font-bold outline-none transition-all focus:bg-white"
                 value={newTire.brand}
                 onChange={e => setNewTire({...newTire, brand: e.target.value})}
-                placeholder="Ex: Michelin, Pirelli..."
+                placeholder="Ex: Michelin"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-1">Modelo</label>
+              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1">Modelo</label>
               <input 
                 required
-                className="w-full bg-gray-50 border-gray-100 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-brand-accent focus:bg-white outline-none transition-all"
+                className="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 text-xs font-bold outline-none transition-all focus:bg-white"
                 value={newTire.model}
                 onChange={e => setNewTire({...newTire, model: e.target.value})}
-                placeholder="Ex: Primacy 4, P1..."
+                placeholder="Ex: Primacy"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-1">Data da Troca</label>
+              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1">Data</label>
               <input 
                 type="date"
                 required
-                className="w-full bg-gray-50 border-gray-100 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-brand-accent focus:bg-white outline-none transition-all"
+                className="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 text-xs font-bold outline-none transition-all focus:bg-white"
                 value={newTire.installationDate}
                 onChange={e => setNewTire({...newTire, installationDate: e.target.value})}
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-1">Km na Troca</label>
+              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1">KM Troca</label>
               <input 
                 type="number"
                 required
-                className="w-full bg-gray-50 border-gray-100 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-brand-accent focus:bg-white outline-none transition-all"
+                className="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 text-xs font-bold outline-none transition-all focus:bg-white"
                 value={newTire.installationMileage}
                 onChange={e => setNewTire({...newTire, installationMileage: Number(e.target.value)})}
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-1">Vida Útil Estimada (km)</label>
+              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1">Vida Útil (km)</label>
               <input 
                 type="number"
                 required
-                className="w-full bg-gray-50 border-gray-100 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-brand-accent focus:bg-white outline-none transition-all"
+                className="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 text-xs font-bold outline-none transition-all focus:bg-white"
                 value={newTire.expectedLifeMileage}
                 onChange={e => setNewTire({...newTire, expectedLifeMileage: Number(e.target.value)})}
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-1">Posição</label>
+              <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest pl-1">Posição</label>
               <select 
-                className="w-full bg-gray-50 border-gray-100 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-brand-accent focus:bg-white outline-none transition-all"
+                className="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 text-xs font-bold outline-none transition-all focus:bg-white"
                 value={newTire.position}
                 onChange={e => setNewTire({...newTire, position: e.target.value as any})}
               >
-                <option value="all">Todos (Jogo)</option>
+                <option value="all">Jogo Completo</option>
                 <option value="front">Dianteiros</option>
                 <option value="rear">Traseiros</option>
                 <option value="spare">Estepe</option>
               </select>
             </div>
-            <div className="md:col-span-2 space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest pl-1">Notas Adicionais</label>
-              <textarea 
-                className="w-full bg-gray-50 border-gray-100 rounded-2xl p-4 text-sm font-bold focus:ring-2 focus:ring-brand-accent focus:bg-white outline-none transition-all"
-                rows={2}
-                value={newTire.notes}
-                onChange={e => setNewTire({...newTire, notes: e.target.value})}
-                placeholder="Alinhamento feito, cambagem, etc..."
-              />
-            </div>
             <button 
               type="submit"
-              className="md:col-span-2 bg-brand-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-brand-accent transition-all shadow-lg active:scale-[0.98]"
+              className="md:col-span-2 bg-brand-primary text-white py-3.5 rounded-lg font-black uppercase tracking-widest text-[10px] hover:bg-zinc-900 transition-all shadow-md active:scale-95 border border-zinc-950"
             >
-              Confirmar Registro de Pneus
+              Confirmar Registro
             </button>
           </form>
         </motion.div>
       )}
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-3">
         {tireSets.length === 0 ? (
-          <div className="text-center py-20 bg-white/50 backdrop-blur-sm rounded-3xl border border-dashed border-gray-200">
-            <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Disc size={40} className="text-gray-300" />
+          <div className="text-center py-16 bg-white/50 backdrop-blur-sm rounded-xl border border-dashed border-gray-200">
+            <div className="bg-gray-50 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <Disc size={32} className="text-gray-300" />
             </div>
-            <h4 className="text-lg font-black text-gray-900 tracking-tight">Nenhum registro de pneus</h4>
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-2">Clique no botão acima para registrar uma troca.</p>
+            <h4 className="text-base font-black text-gray-900 tracking-tight">Sem registros</h4>
+            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">Registrar uma troca de pneus.</p>
           </div>
         ) : (
           tireSets.map((tire) => {
@@ -215,107 +205,85 @@ export const TiresTab: React.FC<TiresTabProps> = ({
               <motion.div
                 layout
                 key={tire.id}
-                className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all group overflow-hidden relative"
+                className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md transition-all group overflow-hidden relative"
               >
-                <div className="flex flex-col gap-6">
-                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-inner", usage > 90 ? "bg-red-50 text-red-500" : "bg-brand-primary/5 text-brand-primary")}>
-                        <Disc size={32} strokeWidth={2.5} />
+                <div className="flex flex-col gap-5">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center shrink-0 shadow-inner", usage > 90 ? "bg-red-50 text-red-500" : "bg-brand-primary/5 text-brand-primary")}>
+                        <Disc size={28} strokeWidth={2.5} />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-black text-xl text-gray-900 leading-tight">{tire.brand} {tire.model}</h4>
-                          <span className={cn("text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest", bgStatusColor, "text-white")}>
-                            {usage > 90 ? 'Crítico' : usage > 75 ? 'Atenção' : 'Excelente'}
+                          <h4 className="font-black text-base text-gray-900 leading-tight">{tire.brand}</h4>
+                          <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded uppercase tracking-widest", bgStatusColor, "text-white")}>
+                            {usage > 90 ? 'Crítico' : 'OK'}
                           </span>
                         </div>
-                        <p className="text-[10px] font-black uppercase text-gray-400 mt-1 tracking-widest">
-                          {tire.position === 'all' ? 'Jogo Completo' : 
-                           tire.position === 'front' ? 'Eixo Dianteiro' : 
-                           tire.position === 'rear' ? 'Eixo Traseiro' : 'Estepe'} {tire.size ? ` • ${tire.size}` : ''}
+                        <p className="text-[8px] font-black uppercase text-gray-400 mt-0.5 tracking-widest">
+                          {tire.position} • {tire.model}
                         </p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
                       <div className="text-right">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Utilização</p>
-                        <p className={cn("text-2xl font-black font-mono leading-none", statusColor)}>{usage.toFixed(0)}%</p>
+                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Vida Útil</p>
+                        <p className={cn("text-xl font-black font-mono leading-none", statusColor)}>{usage.toFixed(0)}%</p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1.5">
                         {!tire.aiInsights && (
                           <button 
                             onClick={() => handleAnalyzeAI(tire)}
                             disabled={analyzingId === tire.id}
-                            className="p-3 bg-brand-primary/5 text-brand-primary hover:bg-brand-primary hover:text-white rounded-xl transition-all shadow-sm flex items-center gap-2"
-                            title="Analisar com IA"
+                            className="p-2.5 bg-brand-primary/5 text-brand-primary hover:bg-zinc-900 hover:text-white rounded-lg transition-all shadow-sm"
+                            title="Analisar IA"
                           >
-                            {analyzingId === tire.id ? <Loader2 size={20} className="animate-spin" /> : <Sparkles size={20} />}
+                            {analyzingId === tire.id ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
                           </button>
                         )}
                         <button 
                           onClick={() => onDeleteTire(tire.id)}
-                          className="p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                          className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                         >
-                          <Trash2 size={20} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Calendar size={12} className="text-gray-400" />
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Instalação</p>
-                      </div>
-                      <p className="text-sm font-black text-gray-700">{new Date(tire.installationDate).toLocaleDateString('pt-BR')}</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div className="bg-gray-50/50 p-2.5 rounded-lg border border-gray-100">
+                      <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Troca</p>
+                      <p className="text-[10px] font-black text-gray-700">{new Date(tire.installationDate).toLocaleDateString('pt-BR')}</p>
                     </div>
-                    <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Gauge size={12} className="text-gray-400" />
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Km Inicial</p>
-                      </div>
-                      <p className="text-sm font-black font-mono text-gray-700">{tire.installationMileage.toLocaleString()} km</p>
+                    <div className="bg-gray-50/50 p-2.5 rounded-lg border border-gray-100">
+                      <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Inicial</p>
+                      <p className="text-[10px] font-black font-mono text-gray-700">{tire.installationMileage.toLocaleString()} km</p>
                     </div>
-                    <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Activity size={12} className="text-gray-400" />
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Km Rodados</p>
-                      </div>
-                      <p className="text-sm font-black font-mono text-gray-700">
+                    <div className="bg-gray-50/50 p-2.5 rounded-lg border border-gray-100">
+                      <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Rodados</p>
+                      <p className="text-[10px] font-black font-mono text-gray-700">
                         {(currentMileage - tire.installationMileage).toLocaleString()} km
                       </p>
                     </div>
-                    <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
-                      <div className="flex items-center gap-2 mb-1">
-                        <CheckCircle2 size={12} className="text-gray-400" />
-                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Expectativa</p>
-                      </div>
-                      <p className="text-sm font-black font-mono text-gray-700">{tire.expectedLifeMileage.toLocaleString()} km</p>
+                    <div className="bg-gray-50/50 p-2.5 rounded-lg border border-gray-100">
+                      <p className="text-[7px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Meta</p>
+                      <p className="text-[10px] font-black font-mono text-gray-700">{tire.expectedLifeMileage.toLocaleString()} km</p>
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                     <div className="h-4 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100 p-1">
+                  <div className="space-y-2">
+                     <div className="h-2 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100">
                        <motion.div 
                          initial={{ width: 0 }}
                          animate={{ width: `${usage}%` }}
-                         className={cn("h-full rounded-full transition-colors relative", bgStatusColor)}
-                       >
-                         <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"></div>
-                       </motion.div>
+                         className={cn("h-full rounded-full transition-colors", bgStatusColor)}
+                       />
                      </div>
-                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 p-3 rounded-2xl border border-gray-100">
-                        <div className="flex items-center gap-2">
-                           <div className={cn("w-2 h-2 rounded-full animate-pulse", bgStatusColor)}></div>
-                           <span>{remaining > 0 ? `Restam aprox. ${remaining.toLocaleString()} km` : 'Recomendamos Substituição'}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                           <span className="opacity-50">Score Técnico:</span>
-                           <span className={cn("font-black", statusColor)}>{(100 - usage).toFixed(0)} pontos</span>
-                        </div>
+                     <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 p-2 rounded-lg border border-gray-100 shadow-sm">
+                        <span>{remaining > 0 ? `+${remaining.toLocaleString()} km` : 'Substituir Agora'}</span>
+                        <span className={statusColor}>Score: {(100 - usage).toFixed(0)}</span>
                      </div>
                   </div>
 

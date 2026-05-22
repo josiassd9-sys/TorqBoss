@@ -6,3 +6,4 @@ export * from './PartsTab';
 export * from './RemindersTab';
 export * from './ServicesTab';
 export * from './TiresTab';
+export * from './StructuralDNATab';

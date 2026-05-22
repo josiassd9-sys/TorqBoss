@@ -24,30 +24,30 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <div className="flex justify-center w-full">
         <motion.div 
           whileHover={{ scale: 1.01, y: -2 }}
-          className="w-full h-32 sm:h-48 rounded-2xl shadow-xl shadow-gray-200/40 shrink-0 border border-zinc-800/50 flex items-center justify-center overflow-hidden bg-brand-primary"
+          className="w-full h-32 sm:h-48 rounded-xl shadow-xl shadow-zinc-200/50 shrink-0 border-2 border-zinc-50 flex items-center justify-center overflow-hidden bg-transparent"
         >
           <img 
             src="/src/assets/images/fleetx_logo_strada.png" 
             alt="FleetX Logo" 
-            className="max-w-[95%] max-h-[95%] object-contain"
+            className="w-full h-full object-cover"
           />
         </motion.div>
       </div>
 
       {/* Linha 2: Título do App e Foto de Acesso (Login) */}
       <div className="flex justify-between items-center w-full pt-1">
-        <div className="text-left">
-          <div className="flex items-center gap-2 mb-0.5">
-             <h1 className="text-2xl font-black tracking-tight text-brand-primary leading-none uppercase italic">
+        <div className="text-left max-w-[70%]">
+          <div className="flex items-center gap-1.5 mb-0.5">
+             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-brand-primary leading-none uppercase italic truncate">
                {data.settings?.appName || 'FleetX'}
              </h1>
              {isPro && (
-               <span className="bg-brand-accent text-white px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest leading-none">PRO</span>
+               <span className="bg-brand-accent text-white px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-widest leading-none shrink-0">PRO</span>
              )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-[0.2em] leading-none">Sistema de Gestão Ativo</p>
+            <p className="text-[9px] text-zinc-950 font-black uppercase tracking-[0.2em] leading-none truncate">Monitoramento Ativo</p>
           </div>
         </div>
 
@@ -70,22 +70,22 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       </div>
       
       {/* Linha 3: Botões de Ações */}
-      <div className="flex items-center gap-3 w-full lg:justify-end overflow-x-auto no-scrollbar pb-1 lg:pb-0">
+      <div className="flex items-center gap-2 w-full lg:justify-end overflow-x-auto no-scrollbar pb-1 lg:pb-0">
         <motion.button 
-          whileHover={{ y: -4, scale: 1.02 }}
+          whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setIsSettingsOpen(true)}
-          className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white border border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-600 hover:text-brand-primary hover:border-brand-primary/30 transition-all shadow-xl shadow-gray-200/20 shrink-0"
+          className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-white border border-zinc-950 text-[10px] font-black uppercase tracking-tighter text-brand-primary hover:bg-zinc-50 transition-all shadow-sm shrink-0"
         >
-          <Settings size={16} /> <span>Configurações</span>
+          <Settings size={14} /> <span className="whitespace-nowrap">Ajustes</span>
         </motion.button>
         <motion.button 
-          whileHover={{ y: -4, scale: 1.02 }}
+          whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setIsAddingVehicle(true)}
-          className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-brand-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-brand-primary/20 hover:bg-brand-accent transition-all shrink-0"
+          className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-brand-primary text-white text-[10px] font-black uppercase tracking-tighter shadow-md hover:bg-zinc-900 transition-all shrink-0"
         >
-          <Plus size={16} /> <span>Novo Veículo</span>
+          <Plus size={14} /> <span className="whitespace-nowrap">Novo Veículo</span>
         </motion.button>
       </div>
     </header>

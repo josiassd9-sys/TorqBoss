@@ -22,66 +22,66 @@ export const ServicesTab: React.FC<ServicesTabProps> = ({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h3 className="text-xl font-black italic uppercase tracking-tighter text-brand-primary flex items-center gap-2">
-            <Wrench size={24} className="text-brand-accent" /> Histórico de Manutenção
+            <Wrench size={24} className="text-brand-accent fill-brand-accent" /> Histórico Maintenance
           </h3>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Registros oficiais de oficina e reparos</p>
+          <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">Registros oficiais de oficina e reparos FleetX</p>
         </div>
         <button 
           onClick={onAddService}
-          className="bg-brand-primary text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-brand-accent transition-all shadow-xl shadow-brand-primary/20"
+          className="w-full sm:w-auto bg-brand-primary text-white px-8 py-3 rounded-lg font-black uppercase text-[10px] tracking-widest hover:bg-zinc-900 transition-all shadow-md border border-zinc-950"
         >
           + Registrar Serviço
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-3">
         {(!services || services.length === 0) ? (
-          <div className="text-center py-24 bg-gray-50 rounded-[2rem] border border-dashed border-gray-200">
-            <div className="bg-white w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <Wrench size={40} className="text-gray-200" />
+          <div className="text-center py-16 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <div className="bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <Wrench size={32} className="text-gray-200" />
             </div>
-            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Nenhum serviço registrado ainda.</p>
+            <p className="text-gray-400 font-bold uppercase tracking-widest text-[9px]">Sem registros.</p>
           </div>
         ) : (
           [...services].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((service) => (
             <motion.div 
               key={service.id} 
               layout
-              className="bg-white p-6 rounded-3xl border border-gray-100 transition-all hover:border-brand-primary/20 shadow-sm group relative overflow-hidden"
+              className="bg-white p-6 rounded-xl border border-zinc-100 hover:border-brand-primary/40 transition-all shadow-sm group relative overflow-hidden"
             >
-              <div className="flex flex-wrap items-start justify-between gap-4 relative z-10">
-                <div className="space-y-2">
+              <div className="flex flex-col sm:flex-row items-start justify-between gap-4 relative z-10">
+                <div className="space-y-3 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black bg-gray-100 text-gray-400 px-2.5 py-1 rounded-lg uppercase tracking-widest">
+                    <span className="text-[8px] font-black bg-zinc-950 text-white px-2 py-0.5 rounded uppercase tracking-widest italic">
                       {new Date(service.date).toLocaleDateString('pt-BR')}
                     </span>
-                    <span className="text-[10px] font-black bg-brand-primary/10 text-brand-primary px-2.5 py-1 rounded-lg uppercase tracking-widest">
+                    <span className="text-[8px] font-black bg-brand-accent text-brand-primary px-2 py-0.5 rounded uppercase tracking-widest italic">
                       {service.mileage.toLocaleString()} km
                     </span>
                   </div>
-                  <h4 className="text-lg font-black text-brand-primary uppercase tracking-tight leading-none">{service.provider}</h4>
-                  <p className="text-sm font-bold text-gray-500 italic">"{service.description}"</p>
+                  <h4 className="text-xl font-black text-brand-primary uppercase tracking-tighter leading-none italic">{service.provider}</h4>
+                  <p className="text-xs font-bold text-zinc-500 italic">"{service.description}"</p>
                   
                   {service.items && service.items.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-4">
                        {service.items.map((item, idx) => (
-                         <div key={idx} className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-xl">
+                         <div key={idx} className="flex items-center gap-1.5 bg-zinc-50 border border-zinc-200 px-3 py-1.5 rounded-lg">
                             <Box size={10} className="text-brand-accent" />
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">{item}</span>
+                            <span className="text-[9px] font-black text-zinc-600 uppercase tracking-tight">{item}</span>
                          </div>
                        ))}
                     </div>
                   )}
                 </div>
 
-                <div className="flex flex-col items-end gap-3">
-                   <div className="text-right">
-                      <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1">Custo Total</p>
-                      <p className="text-2xl font-mono font-black text-brand-accent">{formatCurrency(service.cost)}</p>
+                <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-4 sm:pt-0 pt-4 border-t sm:border-0 border-zinc-50">
+                   <div className="text-left sm:text-right">
+                      <p className="text-[8px] text-zinc-400 font-black uppercase tracking-widest mb-0.5">Total</p>
+                      <p className="text-xl font-black text-brand-accent tracking-tighter">{formatCurrency(service.cost)}</p>
                    </div>
                    <button 
                     onClick={() => onDeleteItem(service.id)}
-                    className="p-2 text-gray-200 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                    className="p-2 text-zinc-300 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all border border-transparent hover:border-rose-100"
                   >
                     <Trash2 size={18} />
                   </button>

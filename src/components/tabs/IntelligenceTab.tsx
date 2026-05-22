@@ -55,18 +55,18 @@ export const IntelligenceTab: React.FC<IntelligenceTabProps> = ({
         <h3 className="text-xl font-black italic uppercase tracking-tighter text-brand-primary flex items-center gap-2 mb-2">
           <Cpu size={24} className="text-brand-accent" /> Intelligence Hub
         </h3>
-        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">IA aplicada em diagnóstico, finanças e previsibilidade</p>
+        <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">IA aplicada em diagnóstico, finanças e previsibilidade</p>
       </div>
 
       {/* Diagnostic AI Section */}
-      <div className="bg-brand-primary/5 p-8 rounded-[2.5rem] border border-brand-primary/10 shadow-sm overflow-hidden relative">
-        <div className="flex items-center gap-3 mb-6 relative z-10">
-          <div className="bg-brand-primary p-3 rounded-2xl shadow-xl shadow-brand-primary/20">
-            <Cpu size={20} className="text-white" />
+      <div className="bg-brand-primary/5 p-6 sm:p-10 rounded-xl border-2 border-brand-primary/10 shadow-sm overflow-hidden relative">
+        <div className="flex items-center gap-4 mb-6 relative z-10">
+          <div className="bg-brand-primary p-3 rounded-lg shadow-xl">
+            <Cpu size={20} className="text-brand-accent" />
           </div>
           <div>
-            <h3 className="text-lg font-black text-brand-primary tracking-tight uppercase">Mecânico IA Especialista</h3>
-            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Diagnóstico por sintomas e perfil de uso</p>
+            <h3 className="text-lg sm:text-2xl font-black text-brand-primary tracking-tighter uppercase italic">IA Especialista</h3>
+            <p className="text-[9px] text-zinc-600 font-black uppercase tracking-widest leading-none mt-1">Diagnóstico por sintomas</p>
           </div>
         </div>
 
@@ -75,16 +75,16 @@ export const IntelligenceTab: React.FC<IntelligenceTabProps> = ({
             <textarea
               value={symptomQuery}
               onChange={(e) => setSymptomQuery(e.target.value)}
-              placeholder="Ex: 'Sinto um tranco metálico quando troco da 2ª para a 3ª marcha' ou 'Barulho de grilo na roda dianteira esquerda'..."
-              className="w-full bg-white border border-gray-100 rounded-3xl px-8 py-7 focus:ring-4 focus:ring-brand-primary/10 outline-none text-base font-medium min-h-[160px] shadow-inner transition-all"
+              placeholder="Descreva o que seu carro está sentindo..."
+              className="w-full bg-white border border-zinc-950 rounded-lg px-6 py-6 focus:ring-4 focus:ring-brand-primary/5 outline-none text-base font-bold min-h-[150px] shadow-sm transition-all placeholder:text-zinc-300"
             />
             <button
               onClick={runDiagnosis}
               disabled={isDiagnosing || !symptomQuery}
-              className="absolute bottom-6 right-6 bg-brand-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-brand-accent hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-brand-primary/20 disabled:opacity-50 disabled:scale-95 flex items-center gap-3 group"
+              className="absolute bottom-4 right-4 bg-brand-primary text-white px-6 py-4 rounded-lg font-black uppercase tracking-tighter text-[10px] hover:bg-zinc-900 transition-all shadow-xl disabled:opacity-50 flex items-center gap-2 group"
             >
-              {isDiagnosing ? <RefreshCw className="animate-spin" size={16} /> : <Zap size={16} className="group-hover:animate-pulse" />}
-              Analisar Agora
+              {isDiagnosing ? <RefreshCw className="animate-spin" size={14} /> : <Zap size={14} />}
+              Analisar
             </button>
           </div>
 
@@ -92,10 +92,10 @@ export const IntelligenceTab: React.FC<IntelligenceTabProps> = ({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white p-8 rounded-[2rem] border border-brand-primary/10 shadow-2xl relative overflow-hidden"
+              className="bg-white p-6 rounded-lg border border-brand-primary/10 shadow-xl relative overflow-hidden"
             >
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-primary via-brand-accent to-brand-primary"></div>
-              <div className="markdown-body text-sm leading-relaxed">
+              <div className="absolute top-0 left-0 w-full h-1 bg-brand-accent"></div>
+              <div className="markdown-body text-xs leading-relaxed">
                 <Markdown>{diagnosisResult}</Markdown>
               </div>
             </motion.div>
@@ -106,39 +106,39 @@ export const IntelligenceTab: React.FC<IntelligenceTabProps> = ({
       </div>
 
       {/* TCO & Efficiency Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6 flex flex-col justify-between">
-          <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white p-6 sm:p-8 rounded-xl border border-zinc-950 shadow-md space-y-6 flex flex-col justify-between">
+          <div className="space-y-6 text-left">
             <div className="flex items-center justify-between">
-              <h4 className="text-[10px] font-black uppercase tracking-[2px] text-gray-400">Eficiência Operacional Real</h4>
-              <div className="bg-green-100 text-green-600 p-2.5 rounded-xl border border-green-200">
-                <TrendingUp size={18} />
+              <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-950">Eficiência Real</h4>
+              <div className="bg-brand-primary text-white p-2 rounded-lg">
+                <TrendingUp size={16} />
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-50/50 p-5 rounded-2xl border border-gray-100">
-                <p className="text-[9px] font-black uppercase text-gray-400 mb-2">Custo por KM (Comb.)</p>
-                <div className="flex items-baseline gap-1">
-                   <span className="text-xs font-bold text-gray-400">R$</span>
-                   <p className="text-2xl font-black text-brand-primary tracking-tighter">
+              <div className="bg-zinc-50 p-4 rounded-lg border border-zinc-100">
+                <p className="text-[9px] font-black uppercase text-zinc-500 mb-1">$/KM</p>
+                <div className="flex items-baseline gap-0.5">
+                   <span className="text-[10px] font-black text-brand-accent">R$</span>
+                   <p className="text-xl font-black text-brand-primary tracking-tighter italic">
                      {costPerKm.toFixed(2)}
                    </p>
                 </div>
               </div>
-              <div className="bg-gray-50/50 p-5 rounded-2xl border border-gray-100">
-                <p className="text-[9px] font-black uppercase text-gray-400 mb-2">Gasto Médio Mensal</p>
-                <div className="flex items-baseline gap-1">
-                   <span className="text-xs font-bold text-gray-400">R$</span>
-                   <p className="text-2xl font-black text-brand-primary tracking-tighter">
+              <div className="bg-zinc-50 p-4 rounded-lg border border-zinc-100">
+                <p className="text-[9px] font-black uppercase text-zinc-500 mb-1">Mensal</p>
+                <div className="flex items-baseline gap-0.5">
+                   <span className="text-[10px] font-black text-brand-accent">R$</span>
+                   <p className="text-xl font-black text-brand-primary tracking-tighter italic">
                      {Math.round(avgMonthlyExpense).toLocaleString()}
                    </p>
                 </div>
               </div>
             </div>
 
-            <p className="text-xs text-gray-500 font-bold italic opacity-80 leading-relaxed">
-              * Cálculo baseado em {traveledKm.toLocaleString()} KM de telemetria registrada desde o primeiro abastecimento.
+            <p className="text-[10px] text-zinc-500 font-bold italic leading-tight">
+              * Baseado em {traveledKm.toLocaleString()} KM de telemetria FleetX.
             </p>
           </div>
 
@@ -146,54 +146,42 @@ export const IntelligenceTab: React.FC<IntelligenceTabProps> = ({
              <button 
               onClick={runTCOAnalysis}
               disabled={isAnalyzingTco}
-              className="w-full py-5 bg-brand-primary/5 border border-brand-primary/10 text-brand-primary rounded-2xl text-[10px] font-black uppercase tracking-[2px] hover:bg-brand-primary hover:text-white transition-all flex items-center justify-center gap-3"
+              className="w-full py-4 bg-brand-primary text-white border-2 border-zinc-950 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] hover:bg-zinc-900 transition-all flex items-center justify-center gap-2 shadow-md"
             >
               {isAnalyzingTco ? <RefreshCw className="animate-spin" size={14} /> : <TrendingUp size={14} />}
-              Gerar Estudo de TCO IA
+              Estudo TCO IA
             </button>
-
-            {tcoAnalysis && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-6 bg-brand-primary/5 rounded-2xl border border-brand-primary/10 text-[11px] leading-relaxed max-h-[300px] overflow-y-auto custom-scrollbar"
-              >
-                <div className="markdown-body">
-                   <Markdown>{tcoAnalysis}</Markdown>
-                </div>
-              </motion.div>
-            )}
           </div>
         </div>
 
-        <div className="bg-brand-primary p-8 rounded-[2.5rem] shadow-2xl shadow-brand-primary/20 text-white space-y-6 relative overflow-hidden flex flex-col justify-between border border-white/5">
+        <div className="bg-zinc-950 p-6 sm:p-8 rounded-xl shadow-xl text-white space-y-6 relative overflow-hidden flex flex-col justify-between border-2 border-white/10 group text-left">
           <div className="space-y-6 relative z-10">
             <div className="flex items-center justify-between">
-              <h4 className="text-[10px] font-black uppercase tracking-[2px] text-white/50">Score de Saúde & Conservação</h4>
-              <ShieldCheck size={24} className="text-brand-accent" />
+              <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Score FleetX</h4>
+              <ShieldCheck size={20} className="text-brand-accent group-hover:scale-110 transition-transform" />
             </div>
 
             <div>
-              <div className="flex items-end gap-3 mb-3">
-                <span className="text-7xl font-black tracking-tighter text-brand-accent leading-none">{vehicle.healthScore || 85}</span>
-                <span className="text-xs font-black uppercase mb-3 tracking-widest text-white/40">Score Geral</span>
+              <div className="flex items-end gap-2 mb-2">
+                <span className="text-5xl font-black tracking-tighter text-brand-accent leading-none italic">{vehicle.healthScore || 85}</span>
+                <span className="text-[10px] font-black uppercase mb-1 tracking-widest text-zinc-600">Pontos</span>
               </div>
-              <p className="text-xs font-bold leading-relaxed text-white/60 max-w-[280px]">
-                Seu perfil de direção <span className="font-black text-brand-accent uppercase italic">{vehicle.drivingStyle === 'smooth' ? 'PÉ LEVE' : vehicle.drivingStyle === 'aggressive' ? 'ESPORTIVO' : 'EQUILIBRADO'}</span> e regime <span className="font-black text-brand-accent uppercase italic">{vehicle.usageProfile === 'urban' ? 'URBANO' : 'Pista'}</span> influenciam diretamente este índice.
+              <p className="text-xs font-bold leading-relaxed text-zinc-400">
+                Perfil <span className="font-black text-white bg-zinc-800 px-1.5 py-0.5 rounded italic">{vehicle.drivingStyle === 'smooth' ? 'Eco' : vehicle.drivingStyle === 'aggressive' ? 'Sport' : 'Bal.'}</span>: alto índice estrutural.
               </p>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-white/10 relative z-10 space-y-3">
-            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
-              <span className="text-white/40">Integridade dos Sistemas</span>
-              <span className="text-brand-accent">Excepcional</span>
+          <div className="pt-6 border-t border-white/10 relative z-10 space-y-3">
+            <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-[0.1em]">
+              <span className="text-zinc-500">Integridade</span>
+              <span className="text-brand-accent italic">Excellent</span>
             </div>
-            <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden shadow-inner">
+            <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden p-0.5 border border-white/5">
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${vehicle.healthScore || 85}%` }}
-                className="h-full bg-gradient-to-r from-brand-accent to-yellow-400"
+                className="h-full bg-brand-accent rounded-full"
               />
             </div>
           </div>

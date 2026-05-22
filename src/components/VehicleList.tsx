@@ -36,37 +36,37 @@ export const VehicleList: React.FC<VehicleListProps> = ({
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-wrap md:flex-nowrap items-center gap-2 mb-2 pb-2 border-b border-gray-100"
+        className="flex flex-wrap md:flex-nowrap items-center gap-1.5 mb-2 pb-2 border-b border-gray-100"
       >
-        <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-50 shadow-sm min-w-[140px]">
-          <Car size={14} className="text-brand-accent" />
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-1">Frota</span>
-          <span className="text-sm font-black text-brand-primary">{data.vehicles?.length || 0}</span>
+        <div className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-gray-50 shadow-sm min-w-[120px]">
+          <Car size={12} className="text-brand-accent" />
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mr-1">Frota</span>
+          <span className="text-xs font-black text-brand-primary">{data.vehicles?.length || 0}</span>
         </div>
 
-        <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-50 shadow-sm min-w-[140px]">
-          <Zap size={14} className="text-brand-accent fill-brand-accent" />
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-1">Créditos IA</span>
+        <div className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-gray-50 shadow-sm min-w-[120px]">
+          <Zap size={12} className="text-brand-accent fill-brand-accent" />
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mr-1">Créditos IA</span>
           {isPro ? (
-            <span className="text-[10px] bg-brand-primary text-white font-black px-1.5 py-0.5 rounded uppercase tracking-widest">PRO</span>
+            <span className="text-[8px] bg-brand-primary text-white font-black px-1.5 py-0.5 rounded uppercase tracking-widest">PRO</span>
           ) : (
-            <span className="text-sm font-black text-brand-primary">{user ? credits : '--'}</span>
+            <span className="text-xs font-black text-brand-primary">{user ? credits : '--'}</span>
           )}
         </div>
         
-        <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-50 shadow-sm min-w-[140px]">
-          <Box size={14} className="text-brand-accent" />
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-1">Peças</span>
-          <span className="text-sm font-black text-brand-primary">
+        <div className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-gray-50 shadow-sm min-w-[120px]">
+          <Box size={12} className="text-brand-accent" />
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mr-1">Peças</span>
+          <span className="text-xs font-black text-brand-primary">
             {data.vehicles.length > 0 ? (data.vehicles[0].parts?.length || 0) : 0}
           </span>
         </div>
 
-        <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white rounded border border-gray-50 shadow-sm min-w-[140px]">
-          <Disc size={14} className="text-blue-500" />
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-1">Pneus</span>
-          <span className="text-sm font-black text-blue-600">
-            {data.vehicles.length > 0 ? (data.vehicles[0].tireSets?.[0]?.brand || 'OK') : '--'}
+        <div className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-gray-50 shadow-sm min-w-[120px]">
+          <Disc size={12} className="text-blue-500" />
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mr-1">Pneus</span>
+          <span className="text-xs font-black text-blue-600">
+            {data.vehicles.length > 0 ? (data.vehicles[0].tireSets?.[0]?.brand?.slice(0, 5) || 'OK') : '--'}
           </span>
         </div>
       </motion.div>
@@ -100,14 +100,14 @@ export const VehicleList: React.FC<VehicleListProps> = ({
                   <BrandLogo 
                     vehicleName={vehicle.name} 
                     brandLogoUrl={vehicle.brandLogoUrl}
-                    className="w-10 h-10 rounded shadow-sm"
+                    className="w-8 h-8 rounded shadow-sm"
                   />
-                  <h3 className="text-lg font-black text-brand-primary tracking-tight leading-none">{vehicle.name}</h3>
+                  <h3 className="text-base font-black text-brand-primary tracking-tight leading-none">{vehicle.name}</h3>
                 </div>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest line-clamp-1">{vehicle.model} • {vehicle.year}</p>
+                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest line-clamp-1">{vehicle.model} • {vehicle.year}</p>
               </div>
 
-              <div className="relative w-full mb-2 group-hover:scale-[1.02] transition-transform duration-500 overflow-hidden rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.1)] ring-2 ring-white/50">
+              <div className="relative w-full mb-2 group-hover:scale-[1.02] transition-transform duration-500 overflow-hidden rounded-xl shadow-md ring-1 ring-white/50">
                 <VehicleImage 
                   src={vehicle.imageUrl} 
                   alt={vehicle.name} 
@@ -116,18 +116,18 @@ export const VehicleList: React.FC<VehicleListProps> = ({
               </div>
               
               <div className="text-center w-full">
-                <div className="relative flex items-center justify-center gap-4 pt-2 border-t border-gray-50">
-                  <div className="flex items-center gap-1.5">
-                    <Gauge size={14} className="text-brand-accent" />
-                    <span className="text-xs font-mono font-bold text-gray-700">{formatDistance(vehicle.mileage)}</span>
+                <div className="relative flex items-center justify-center gap-3 pt-2 border-t border-gray-50">
+                  <div className="flex items-center gap-1">
+                    <Gauge size={12} className="text-brand-accent" />
+                    <span className="text-[10px] font-mono font-bold text-gray-700">{formatDistance(vehicle.mileage)}</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <Box size={14} className="text-brand-accent" />
-                    <span className="text-xs font-mono font-bold text-gray-700">{(vehicle.parts?.length || 0)} itens</span>
+                  <div className="flex items-center gap-1">
+                    <Box size={12} className="text-brand-accent" />
+                    <span className="text-[10px] font-mono font-bold text-gray-700">{(vehicle.parts?.length || 0)} itens</span>
                   </div>
                   {vehicle.fipeValue && (
-                    <div className="flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded text-[10px] font-black text-green-600">
-                      <DollarSign size={10} />
+                    <div className="flex items-center gap-1 bg-green-50 px-1.5 py-0.5 rounded text-[9px] font-black text-green-600">
+                      <DollarSign size={8} />
                       {formatCurrency(vehicle.fipeValue)}
                     </div>
                   )}

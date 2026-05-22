@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   Plus,
   ShoppingCart,
-  Activity
+  Activity,
+  Layers
 } from 'lucide-react';
 import { Vehicle } from '../types';
 import { 
@@ -23,7 +24,8 @@ import {
   IntelligenceTab, 
   ManualTab, 
   RemindersTab, 
-  AuditTab 
+  AuditTab,
+  StructuralDNATab
 } from './tabs';
 
 interface VehicleTabsProps {
@@ -123,23 +125,24 @@ export const VehicleTabs: React.FC<VehicleTabsProps> = ({
     { id: 'intelligence', label: 'Inteligência', icon: Cpu },
     { id: 'manual', label: 'Manual', icon: Book },
     { id: 'reminders', label: 'Alertas', icon: Bell },
+    { id: 'dna', label: 'DNA Estrutural', icon: Layers },
     { id: 'audit', label: 'Auditoria', icon: ShieldCheck },
   ];
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 mt-2 w-full max-w-2xl overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-2 mt-2 w-full max-w-2xl overflow-x-auto pb-2 no-scrollbar px-1">
         <button 
           onClick={() => setIsAddingPart(true)}
-          className="flex-1 bg-brand-accent hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-brand-accent/20 whitespace-nowrap text-sm flex items-center justify-center gap-2"
+          className="flex-1 bg-brand-primary hover:bg-zinc-900 text-white px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-tighter transition-all shadow-md shrink-0 border border-zinc-950"
         >
-          <Plus size={18} /> Catalogar Peça
+          <Plus size={14} /> Catalogar OEM
         </button>
         <button 
           onClick={() => setIsBudgetOpen(true)}
-          className="flex-1 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-bold border border-white/10 transition-all whitespace-nowrap text-sm flex items-center justify-center gap-2"
+          className="flex-1 bg-white hover:bg-zinc-50 text-brand-primary px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-tighter border border-zinc-950 transition-all shadow-sm shrink-0"
         >
-          <ShoppingCart size={18} /> Carrinho ({(selectedVehicle.parts || []).filter(p => p.isInBudget).length})
+          <ShoppingCart size={14} /> Orçamento ({(selectedVehicle.parts || []).filter(p => p.isInBudget).length})
         </button>
         <button 
           onClick={() => {
@@ -147,24 +150,24 @@ export const VehicleTabs: React.FC<VehicleTabsProps> = ({
             setSimulationResults([]);
             setIsSimulating(true);
           }}
-          className="flex-1 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-bold border border-white/10 transition-all whitespace-nowrap text-sm flex items-center justify-center gap-2"
+          className="flex-1 bg-white hover:bg-zinc-50 text-brand-primary px-4 py-3 rounded-lg font-black uppercase text-[10px] tracking-tighter border border-zinc-950 transition-all shadow-sm shrink-0"
         >
-          <Activity size={18} /> Simular
+          <Activity size={14} /> Simulador
         </button>
       </div>
 
-      <div className="flex overflow-x-auto gap-2 pb-1 -mx-1 scrollbar-hide">
+      <div className="flex overflow-x-auto gap-2 pb-2 -mx-1 no-scrollbar px-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all font-bold text-xs ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-lg whitespace-nowrap transition-all font-black text-[9px] uppercase tracking-widest ${
               activeTab === tab.id 
-              ? 'bg-brand-primary text-white shadow-lg' 
-              : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 shadow-sm'
+              ? 'bg-brand-primary text-white shadow-md z-10' 
+              : 'bg-white text-zinc-950 hover:bg-zinc-50 border border-zinc-100 shadow-sm'
             }`}
           >
-            <tab.icon size={16} />
+            <tab.icon size={12} />
             {tab.label}
           </button>
         ))}
@@ -262,6 +265,12 @@ export const VehicleTabs: React.FC<VehicleTabsProps> = ({
             onGeneratePassport={handleGeneratePassport}
             isGeneratingPassport={isGeneratingPassport}
             healthScore={selectedVehicle.healthScore || 0}
+          />
+        )}
+
+        {activeTab === 'dna' && (
+          <StructuralDNATab 
+            vehicle={selectedVehicle}
           />
         )}
       </div>

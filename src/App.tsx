@@ -423,6 +423,7 @@ export default function App() {
               isGeneratingPassport={isGeneratingPassport}
               digitalPassport={digitalPassport}
               onRefreshPredictions={handleManualRefresh}
+              onOpenDNA={() => setActiveTab('dna')}
               onDiagnose={handleDiagnose}
               isDiagnosing={isDiagnosing}
               symptomQuery={symptomQuery}

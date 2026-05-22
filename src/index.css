@@ -5,18 +5,18 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   
-  --color-brand-primary: #141414;
-  --color-brand-accent: #E11D48; /* Crimson / Automotive red */
-  --color-brand-bg: #F8F9FA;
-  --color-brand-surface: #FFFFFF;
+  --color-brand-primary: #000000;
+  --color-brand-accent: #2563EB;
+  --color-brand-bg: #FFFFFF;
+  --color-brand-surface: #F8FAFC;
 
-  /* Global radius override to 8px (test) */
-  --radius-xs: 8px;
-  --radius-sm: 8px;
+  /* Standard Professional Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 8px;
-  --radius-xl: 8px;
-  --radius-2xl: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
   --radius-3xl: 8px;
   --radius-4xl: 8px;
   --radius-full: 8px;
@@ -40,7 +40,7 @@
 @layer base {
   body {
     @apply bg-brand-bg text-brand-primary font-sans antialiased;
-    background: radial-gradient(circle at 50% 50%, #ffffff 0%, #e2e8f0 100%);
+    background: #FFFFFF;
     background-attachment: fixed;
     position: relative;
   }
@@ -103,6 +103,23 @@
   .markdown-body ol { @apply list-decimal list-inside mb-3 space-y-1 text-gray-600; }
   .markdown-body strong { @apply text-brand-primary font-bold; }
   .markdown-body code { @apply bg-gray-100 px-1 rounded text-brand-accent font-mono text-sm; }
+
+  /* Premium Buttons and Controls */
+  .btn-premium {
+    @apply bg-brand-primary text-white font-black uppercase tracking-tighter px-5 py-3 rounded-lg transition-all hover:opacity-90 active:scale-[0.98] shadow-md shadow-black/5 text-xs;
+  }
+  
+  .btn-accent {
+    @apply bg-brand-accent text-white font-black uppercase tracking-tighter px-5 py-3 rounded-lg transition-all hover:opacity-90 active:scale-[0.98] shadow-md shadow-brand-accent/10 text-xs;
+  }
+
+  .text-muted {
+    @apply text-zinc-500 font-medium;
+  }
+
+  .border-premium {
+    @apply border-zinc-100 border;
+  }
 
   @keyframes progress-shimmer {
     0% { opacity: 0.3; transform: translateX(-100%); }

@@ -73,8 +73,35 @@ export function useAppData() {
   useEffect(() => {
     const loadedData = storageService.loadData();
     
+    let vehicles = loadedData.vehicles || [];
+    if (vehicles.length === 0) {
+      vehicles = [{
+        id: 'simulated-strada-2024',
+        name: 'Fiat',
+        model: 'Strada Ultra Turbo',
+        year: '2024',
+        plate: 'FLX-2024',
+        color: 'Cinza Silverstone',
+        mileage: 4500,
+        imageUrl: '/src/assets/images/fleetx_logo_strada.png',
+        brandLogoUrl: '',
+        healthScore: 98,
+        fipeValue: 132000,
+        parts: [
+          { id: 'p1', name: 'Óleo Selènia 5W30', status: 'healthy', installMileage: 0, lifeExpectancy: 10000, category: 'Motor', price: 350 },
+          { id: 'p2', name: 'Filtro de Óleo OEM', status: 'healthy', installMileage: 0, lifeExpectancy: 10000, category: 'Motor', price: 85 },
+          { id: 'p3', name: 'Pastilhas de Freio', status: 'healthy', installMileage: 0, lifeExpectancy: 35000, category: 'Freios', price: 420 },
+        ],
+        services: [],
+        fuelLogs: [],
+        reminders: [],
+        tireSets: []
+      }];
+    }
+
     const merged = {
       ...loadedData,
+      vehicles,
       settings: {
         language: 'pt-BR',
         currency: 'BRL',
