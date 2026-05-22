@@ -48,6 +48,12 @@ O sistema é agnóstico em relação à localização:
 - **Organização**: Estrutura em "Acordeão" para fácil leitura.
 - **Campos Específicos**: Cronogramas de revisão, Especificações de Fluidos, Fusíveis e Relés, Símbolos do Painel e Notas Técnicas.
 
+### 6. DNA Estrutural (Visualização OEM e Componentes)
+- **Engenharia Reversa IA**: Esquemas OEM preditivos que mapeiam presilhas e pontos ocultos de fixação no chassi para desmontagens sem quebra ou danos.
+- **Buscador de DNA Técnico**: Base técnica integrada sobre materiais (polímeros), torque de especificação técnica e sequência lógica de logística reversa.
+- **Fluxo de Montagem FleetX**: Renderização conceitual do processo fabril (Body-in-White, Paint & Coat, Trim & Internals e Final Assembly).
+- **Detlhamento Avançado**: Catalogação estrita de polímeros (ASTM D4000), fixações físicas (DIN 933) e aerodinâmica de vedação.
+
 ---
 
 ## 🛠️ Ecossistema de Desenvolvimento (Roadmap Híbrido)
@@ -69,7 +75,8 @@ Agora que o projeto caminha para o desenvolvimento em **VS Code** e geração de
 2. **Preserve a Estética FleetX**: Bordas `3xl`, fontes `JetBrains Mono`, ícones `Lucide` e tons sofisticados.
 3. **Segurança de Créditos**: Toda interação de IA deve validar o saldo via `useFirebase`.
 4. **Respeite o Manual**: O manual em `AppManual.tsx` deve ser a fonte da verdade para o usuário final.
+5. **Ajuste de Banner Isolado**: Todo o ecossistema de "Configurações Finas do Banner" (opacidade, desfoque, altura, escala da pickup/logotipo e fundo customizado) se destina **única e exclusivamente** ao cabeçalho visual da **Página Inicial (`AppHeader.tsx`)**. Sob nenhuma hipótese essas configurações devem atingir ou sobresscrever o estilo dos cabeçalhos dos detalhes de veículos selecionados (`VehicleDetailHeader.tsx`) ou cards internos de garagem, que devem reter seu visual corporativo escuro sólido e layout de detalhes intocados.
 
 ---
-*Documento atualizado em 21 de Maio de 2026 - FleetX Engineering Team.*
+*Documento atualizado em 22 de Maio de 2026 - FleetX Engineering Team.*
 

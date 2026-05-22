@@ -346,9 +346,39 @@ export const AppManual: React.FC = () => {
       >
         <p>Seus dados são sagrados e estão sob seu total controle.</p>
         <ul className="list-disc ml-6 space-y-2">
-          <li><strong>Dados Locais:</strong> Todas as informações são armazenadas via LocalStorage. Nada é enviado para nuvens externas sem sua ação direta.</li>
+          <li><strong>Dados Locais:</strong> Todas as informações são armazenadas via LocalStorage. Nada é enviado para nuvem externa sem sua ação direta.</li>
           <li><strong>Backup e Restauração:</strong> Gere um arquivo JSON com 100% dos dados da sua frota para migração rápida entre aparelhos.</li>
           <li><strong>Privacidade do Robô:</strong> Configure quais portais de busca o sistema deve utilizar para manter sua navegação eficiente.</li>
+        </ul>
+      </ManualItem>
+
+      <ManualItem
+        title="DNA Estrutural: Engenharia Reversa e Componentes OEM"
+        icon={<Cpu size={20} />}
+        isOpen={openIndex === 15}
+        onToggle={() => toggleIndex(15)}
+      >
+        <p>A aba de <strong>DNA Estrutural</strong> do veículo disponibiliza dados de nível de engenharia para desmontabilidade e compatibilidade de materiais:</p>
+        <ul className="list-disc ml-6 space-y-2">
+          <li><strong>Engenharia Reversa IA:</strong> Acesse guias conceituais ilustrando pontos ideais de fixação técnica, evitando quebrar presilhas plásticas frágeis durante a manutenção de componentes do seu veículo.</li>
+          <li><strong>Buscador de DNA Técnico:</strong> Filtre de forma organizada materiais construtivos (como polímeros de para-choques e painéis), torques descritos por normas de montagem e lógicas de sequenciamento lógico desmontável.</li>
+          <li><strong>Fluxo de Montagem FleetX:</strong> Acompanhe as principais fases de construção conceitual, desde a estrutura pura (Body-in-White) e pintura de proteção (Paint & Coat) até a montagem final de acabamento.</li>
+          <li><strong>Detalhamento Avançado:</strong> Especificações industriais consolidadas como Polímeros Ativos (ASTM D4000), Fixação Técnica (DIN 933) e Aerodinâmica para spoilers e vedações herméticas.</li>
+        </ul>
+      </ManualItem>
+
+      <ManualItem
+        title="Customização Fina de Estilo: Ajuste do Banner da Página Inicial"
+        icon={<GalleryHorizontal size={20} />}
+        isOpen={openIndex === 16}
+        onToggle={() => toggleIndex(16)}
+      >
+        <p>O cabeçalho visual e o banner da sua página inicial podem ser configurados milimetricamente para um design sob medida. Vá em Configurações &gt; Estilo e utilize os refinamentos do Cabeçalho:</p>
+        <ul className="list-disc ml-6 space-y-2">
+          <li><strong>Escala do Logotipo (Pickup):</strong> Controle o tamanho exato da pickup tech centralizada do banner da Home (de 50% a 200%). Esse ajuste de precisão afeta exclusivamente a entrada do aplicativo, mantendo os designs das imagens internas de veículos na Garagem intactos.</li>
+          <li><strong>Altura do Banner:</strong> Controle fluido da altura de exibição do cabeçalho principal da página inicial.</li>
+          <li><strong>Opacidade e Desfoque (Blur):</strong> Controle preciso da transparência de cor e do efeito desfocado fosco no fundo do banner.</li>
+          <li><strong>Cor e Imagem Personalizada:</strong> Defina cores hexadecimais sólidas ou passe a URL direta de uma textura externa (como fibra de carbono ou aço escovado) para servir de plano de fundo do seu FleetX de forma profissional.</li>
         </ul>
       </ManualItem>
     </div>

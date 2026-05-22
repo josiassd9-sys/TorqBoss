@@ -31,6 +31,11 @@ Este documento serve como a "Bússola de Desenvolvimento" para o FleetX, detalha
 - **Processo**: O manual é enviado para o Gemini com um prompt especializado que estrutura a resposta em abas técnicas.
 - **Resultado**: Informação mastigada sobre óleos, fusíveis e luzes de painel sem precisar folhear centenas de páginas.
 
+### 🧬 DNA Estrutural (Visualização OEM e Componentes)
+- **Função**: Mapear as especificações de engenharia de chassi, fixações e materiais do veículo para desmontagens seguras e rastreio industrial.
+- **Lógica**: Centraliza esquemas de desmontagem OEM com foco em engenharia reversa para prever presilhas e encaixes ocultos por sistema de torque, acabamento (Trim) e pintura.
+- **Valor**: Reduz o custo com peças quebradas por técnicos ou proprietários durante procedimentos de desmontagem ou personalização estética.
+
 ---
 
 ## 2. Configurações Globais (Aba Regional e Estilo)
@@ -39,9 +44,15 @@ Este documento serve como a "Bússola de Desenvolvimento" para o FleetX, detalha
 - **Multilinguagem**: O app suporta 9 idiomas. A troca de idioma no `SettingsModal` dispara o `i18n.changeLanguage()`.
 - **Adaptabilidade de Placa**: A lógica de `vehicleIdentifierLabel` e `vehicleIdentifierPlaceholder` permite que o app mude de "Placa (AAA-0000)" para "Matrícula (00-AA-00)" instantaneamente, atendendo o mercado europeu e americano.
 
-### 🎨 Design System Profissional
+### 🎨 Design System Profissional e Customização de Banner
 - **Paletas de Cores**: Oferecemos 20+ temas sofisticados (Slate, Bordeaux, Nordic, Graphite).
-- **Consistência de Marca**: O ícone oficial da pickup tecnológica é injetado no `AppHeader` e nos PDFs de relatório.
+- **Consistência de Marca**: O ícone oficial da pickup tecnológica é injetado no `AppHeader` (página inicial) e nos PDFs de relatório.
+- **Configurações Finas do Banner (Exclusivo da Página Inicial)**: Painel de ajuste cirúrgico que controla a estética do banner superior principal, de forma totalmente independente dos cards e do cabeçalho de detalhes dos veículos (que preservam o visual corporativo original dos detalhes). **Essas propriedades não devem em nenhum momento se misturar ou afetar outros componentes do app para evitar poluição visual e confusão no uso técnico:**
+  - *Escala do Logotipo (`iconScale`)*: Permite ajustar o tamanho exato da pickup centralizada do banner da Home (50% a 200%).
+  - *Altura do Banner (`bannerHeight`)*: Controle fluido da área de destaque (120px a 240px).
+  - *Opacidade (`bgOpacity`)*: Determina o nível de transparência da cor de fundo (0% a 100%).
+  - *Efeito Blur (`bgBlur`)*: Adiciona um efeito fosco/desfocado de fundo ao banner principal.
+  - *Background Customizado*: Permite definir cores hexadecimais sólidas ou carregar imagens de textura personalizadas.
 
 ---
 
