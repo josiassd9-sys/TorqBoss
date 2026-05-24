@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { FileText, Loader2, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 
-type DocFile = 'README.md' | 'LOGICA_NEGOCIO.md' | 'security_spec.md' | 'MONETIZACAO_PLATAFORMA.md' | 'MARKETING_PLAYSTORE.md';
+type DocFile = 'README.md' | 'LOGICA_NEGOCIO.md' | 'security_spec.md' | 'MONETIZACAO_PLATAFORMA.md' | 'MARKETING_PLAYSTORE.md' | 'COMO_GERAR_APK.md';
 
 export const DevDocsTab: React.FC = () => {
     const [activeDoc, setActiveDoc] = React.useState<DocFile>('README.md');
@@ -38,7 +38,8 @@ export const DevDocsTab: React.FC = () => {
                     { id: 'LOGICA_NEGOCIO.md', label: 'Lógica de Negócio' },
                     { id: 'security_spec.md', label: 'Segurança' },
                     { id: 'MONETIZACAO_PLATAFORMA.md', label: 'Monetização e Pagamentos' },
-                    { id: 'MARKETING_PLAYSTORE.md', label: 'Marketing Play Store' }
+                    { id: 'MARKETING_PLAYSTORE.md', label: 'Marketing Play Store' },
+                    { id: 'COMO_GERAR_APK.md', label: 'Gerar APK Android' }
                 ].map((doc) => (
                     <button
                         key={doc.id}

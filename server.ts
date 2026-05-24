@@ -25,7 +25,7 @@ async function startServer() {
   // API Route for Dev Documentation
   app.get("/api/dev/docs/:filename", async (req, res) => {
     const { filename } = req.params;
-    const allowedFiles = ["README.md", "LOGICA_NEGOCIO.md", "security_spec.md", "MONETIZACAO_PLATAFORMA.md", "MARKETING_PLAYSTORE.md"];
+    const allowedFiles = ["README.md", "LOGICA_NEGOCIO.md", "security_spec.md", "MONETIZACAO_PLATAFORMA.md", "MARKETING_PLAYSTORE.md", "COMO_GERAR_APK.md"];
     
     if (!allowedFiles.includes(filename)) {
       return res.status(403).json({ error: "Access denied" });

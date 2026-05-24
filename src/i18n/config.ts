@@ -6,11 +6,12 @@ const resources = {
   pt: {
     translation: {
       "app_name": "FleetX - Meu Carro Top",
+      "app_subtitle": "— Meu Carro Top",
       "import_vehicle": "Importar Veículo",
       "add_vehicle": "Adicionar Veículo",
       "settings": "Configurações",
       "odometer_scan": "Escanear Odômetro",
-      "mileage": "Quilometragem",
+      "mileage": "KM",
       "last_mileage": "Última KM registrada",
       "scan_success": "KM detectada com sucesso!",
       "confirm": "Confirmar",
@@ -31,6 +32,7 @@ const resources = {
   en: {
     translation: {
       "app_name": "FleetX - My Top Car",
+      "app_subtitle": "— My Top Car",
       "import_vehicle": "Import Vehicle",
       "add_vehicle": "Add Vehicle",
       "settings": "Settings",
@@ -56,6 +58,7 @@ const resources = {
   es: {
     translation: {
       "app_name": "FleetX - Mi Carro Top",
+      "app_subtitle": "— Mi Carro Top",
       "import_vehicle": "Importar Vehículo",
       "add_vehicle": "Agregar Vehículo",
       "settings": "Configuración",
@@ -81,6 +84,7 @@ const resources = {
   fr: {
     translation: {
       "app_name": "FleetX - Ma Super Voiture",
+      "app_subtitle": "— Ma Super Voiture",
       "import_vehicle": "Importer un véhicule",
       "add_vehicle": "Ajouter un véhicule",
       "settings": "Paramètres",
@@ -106,6 +110,7 @@ const resources = {
   it: {
     translation: {
       "app_name": "FleetX - La Mia Auto Top",
+      "app_subtitle": "— La Mia Auto Top",
       "import_vehicle": "Importa Veicolo",
       "add_vehicle": "Aggiungi Veicolo",
       "settings": "Impostazioni",
@@ -131,6 +136,7 @@ const resources = {
   de: {
     translation: {
       "app_name": "FleetX - Mein Top Auto",
+      "app_subtitle": "— Mein Top Auto",
       "import_vehicle": "Fahrzeug importieren",
       "add_vehicle": "Fahrzeug hinzufügen",
       "settings": "Einstellungen",
@@ -156,6 +162,7 @@ const resources = {
   ru: {
     translation: {
       "app_name": "FleetX - Мой Авто Топ",
+      "app_subtitle": "— Мой Авто Топ",
       "import_vehicle": "Импорт автомобиля",
       "add_vehicle": "Добавить автомобиль",
       "settings": "Настройки",
@@ -181,6 +188,7 @@ const resources = {
   zh: {
     translation: {
       "app_name": "FleetX - 我的顶级爱车",
+      "app_subtitle": "— 我的顶级爱车",
       "import_vehicle": "导入车辆",
       "add_vehicle": "添加车辆",
       "settings": "设置",
@@ -206,6 +214,7 @@ const resources = {
   ko: {
     translation: {
       "app_name": "FleetX - 내 최고의 차",
+      "app_subtitle": "— 내 최고의 차",
       "import_vehicle": "차량 가져오기",
       "add_vehicle": "차량 추가",
       "settings": "설정",

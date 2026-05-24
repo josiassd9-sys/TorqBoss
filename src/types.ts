@@ -188,6 +188,7 @@ export interface AppData {
     apiBrasilDeviceToken?: string;
     plateApiHost?: string;
     appName?: string;
+    appSubtitle?: string;
     agencyName?: string;
     vehicleIdentifierLabel?: string; // Default: 'Placa'
     vehicleIdentifierPlaceholder?: string; // Default: 'AAA-0000'
@@ -225,6 +226,7 @@ export interface AppData {
     showInternalBrowser?: boolean;
     aiCredits?: number;
     isProMember?: boolean;
+    isDeveloperOverridePro?: boolean;
     transactionHistory?: { id: string; date: string; amount: number; description: string; type: 'credit' | 'debit' }[];
   };
 }

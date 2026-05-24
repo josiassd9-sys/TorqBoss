@@ -38,7 +38,7 @@ export const IntelligenceTab: React.FC<IntelligenceTabProps> = ({
   createdAt,
   fuelAnalytics
 }) => {
-  const [activeSection, setActiveSection] = React.useState<string | null>('diagnosis');
+  const [activeSection, setActiveSection] = React.useState<string | null>(null);
 
   const totalFuelCost = fuelAnalytics?.totalCost || (vehicle.fuelLogs || []).reduce((acc, l) => acc + l.cost, 0);
   const totalServiceCost = (vehicle.services || []).reduce((acc, l) => acc + l.cost, 0);

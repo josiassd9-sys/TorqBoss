@@ -91,15 +91,17 @@ export function useFileHandlers(
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const base64 = await fileToBase64(file);
-      const resized = await resizeImage(base64, 1200, 800);
+      const resized = await resizeImage(file, 1200, 800);
       if (selectedVehicle) {
         updateSelectedVehicle({ imageUrl: resized });
       } else {
         setNewVehicle(prev => ({ ...prev, imageUrl: resized }));
       }
     } catch (error) {
+      console.error(error);
       alert('Erro ao processar imagem.');
+    } finally {
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -107,15 +109,17 @@ export function useFileHandlers(
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const base64 = await fileToBase64(file);
-      const resized = await resizeImage(base64, 400, 400);
+      const resized = await resizeImage(file, 400, 400);
       if (selectedVehicle) {
         updateSelectedVehicle({ brandLogoUrl: resized });
       } else {
         setNewVehicle(prev => ({ ...prev, brandLogoUrl: resized }));
       }
     } catch (error) {
+      console.error(error);
       alert('Erro ao processar logotipo.');
+    } finally {
+      if (e.target) e.target.value = '';
     }
   };
 

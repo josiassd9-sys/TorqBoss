@@ -1,9 +1,11 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Settings, Plus, Zap, User as UserIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { HeaderLogo } from './';
 import { AppData } from '../types';
 import { useFirebase } from '../contexts/FirebaseContext';
+import fleetxLogo from '../assets/images/fleetx_logo_strada.png';
 
 interface AppHeaderProps {
   data: AppData;
@@ -17,50 +19,19 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   setIsAddingVehicle
 }) => {
   const { user, credits, isPro } = useFirebase();
+  const { t } = useTranslation();
 
   return (
     <header className="flex flex-col gap-4 mb-6">
-      {/* Linha 1: Logotipo Retangular Elevado e Centralizado */}
-      <div className="flex justify-center w-full">
-        <motion.div 
-          whileHover={{ scale: 1.005 }}
-          style={{ 
-            height: `${data.settings.headerConfig?.bannerHeight || 128}px`,
-            backgroundColor: data.settings.headerConfig?.bgColor || '#141414',
-            backgroundImage: data.settings.headerConfig?.bgImage ? `url(${data.settings.headerConfig.bgImage})` : 'none',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: data.settings.headerConfig?.bgOpacity ?? 1,
-            backdropFilter: `blur(${data.settings.headerConfig?.bgBlur || 0}px)`,
-          }}
-          className="w-full rounded-xl shadow-xl shadow-zinc-200/50 shrink-0 border-2 border-zinc-50 flex items-center justify-center overflow-hidden transition-all duration-300"
-        >
-          {(data.settings.headerConfig?.showIcon ?? true) && (
-            <motion.img 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ 
-                opacity: 1, 
-                scale: (data.settings.headerConfig?.iconScale || 100) / 100 
-              }}
-              src="/src/assets/images/fleetx_logo_strada.png" 
-              alt="FleetX Logo" 
-              style={{ 
-                height: '100px', // Base height for consistent scaling independent of container height
-                width: 'auto',
-                transformOrigin: 'center center'
-              }}
-              className="object-contain transition-all duration-300 pointer-events-none"
-            />
-          )}
-        </motion.div>
-      </div>
-
-      {/* Linha 2: Título do App e Foto de Acesso (Login) */}
+      {/* Linha 1: Título do App e Foto de Acesso (Login) */}
       <div className="flex justify-between items-center w-full pt-1">
         <div className="text-left max-w-[70%]">
           <div className="flex items-center gap-1.5 mb-0.5">
-             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-brand-primary leading-none uppercase italic truncate">
-               {data.settings?.appName || 'FleetX'}
+             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-brand-primary leading-none uppercase italic truncate flex items-baseline gap-1.5">
+               <span>{data.settings?.appName || 'FleetX'}</span>
+               <span className="text-[10px] sm:text-xs font-bold text-zinc-400/80 not-italic tracking-normal normal-case shrink-0">
+                 data.settings?.appSubtitle ? data.settings.appSubtitle : t('app_subtitle')
+               </span>
              </h1>
              {isPro && (
                <span className="bg-brand-accent text-white px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-widest leading-none shrink-0">PRO</span>
@@ -88,6 +59,41 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             )}
           </motion.div>
         )}
+      </div>
+
+      {/* Linha 2: Logotipo Retangular Elevado e Centralizado (Banner) */}
+      <div className="flex justify-center w-full">
+        <motion.div 
+          whileHover={{ scale: 1.005 }}
+          style={{ 
+            height: `${data.settings.headerConfig?.bannerHeight || 55}px`,
+            backgroundColor: data.settings.headerConfig?.bgColor || '#141414',
+            backgroundImage: data.settings.headerConfig?.bgImage ? `url(${data.settings.headerConfig.bgImage})` : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: data.settings.headerConfig?.bgOpacity ?? 1,
+            backdropFilter: `blur(${data.settings.headerConfig?.bgBlur || 0}px)`,
+          }}
+          className="w-full rounded-xl shadow-xl shadow-zinc-200/50 shrink-0 border-2 border-zinc-50 flex items-center justify-center overflow-hidden transition-all duration-300"
+        >
+          {(data.settings.headerConfig?.showIcon ?? true) && (
+            <motion.img 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ 
+                opacity: 1, 
+                scale: (data.settings.headerConfig?.iconScale || 50) / 100 
+              }}
+              src={fleetxLogo} 
+              alt="FleetX Logo" 
+              style={{ 
+                height: '100px', // Base height for consistent scaling independent of container height
+                width: 'auto',
+                transformOrigin: 'center center'
+              }}
+              className="object-contain transition-all duration-300 pointer-events-none"
+            />
+          )}
+        </motion.div>
       </div>
       
       {/* Linha 3: Botões de Ações */}

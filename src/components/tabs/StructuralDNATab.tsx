@@ -17,7 +17,7 @@ interface StructuralDNATabProps {
 }
 
 export const StructuralDNATab: React.FC<StructuralDNATabProps> = ({ vehicle }) => {
-  const [activeSection, setActiveSection] = React.useState<string | null>('reverse');
+  const [activeSection, setActiveSection] = React.useState<string | null>(null);
 
   const sections = [
     {

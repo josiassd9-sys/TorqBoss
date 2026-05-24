@@ -43,13 +43,52 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [credits, setCredits] = useState(0);
-  const [isPro, setIsPro] = useState(false);
+  const [isPro, setIsPro] = useState(() => {
+    try {
+      const saved = localStorage.getItem('automaster_ai_data');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.settings?.isDeveloperOverridePro) {
+          return true;
+        }
+      }
+    } catch (_) {}
+    return false;
+  });
+
+  useEffect(() => {
+    const handleDevProChange = () => {
+      try {
+        const saved = localStorage.getItem('automaster_ai_data');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setIsPro(!!parsed?.settings?.isDeveloperOverridePro);
+        }
+      } catch (_) {}
+    };
+
+    window.addEventListener('fleetx-developer-pro-changed', handleDevProChange);
+    return () => window.removeEventListener('fleetx-developer-pro-changed', handleDevProChange);
+  }, []);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       setLoading(false);
       
+      const checkDevOverride = () => {
+        try {
+          const saved = localStorage.getItem('automaster_ai_data');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed?.settings?.isDeveloperOverridePro) {
+              return true;
+            }
+          }
+        } catch (_) {}
+        return false;
+      };
+
       if (u) {
         const path = `users/${u.uid}`;
         try {
@@ -64,11 +103,11 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               transactionHistory: [{ id: 'init-' + Date.now(), date: new Date().toISOString(), amount: 10, description: 'Bônus de Instalação (Cloud)', type: 'credit' }]
             });
             setCredits(10);
-            setIsPro(false);
+            setIsPro(checkDevOverride() ? true : false);
           } else {
             const data = userDoc.data();
             setCredits(data.aiCredits || 0);
-            setIsPro(data.isProMember || false);
+            setIsPro(checkDevOverride() ? true : (data.isProMember || false));
           }
 
           // Real-time listener for credits
@@ -76,7 +115,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             if (snapshot.exists()) {
               const data = snapshot.data();
               setCredits(data.aiCredits || 0);
-              setIsPro(data.isProMember || false);
+              setIsPro(checkDevOverride() ? true : (data.isProMember || false));
             }
           }, (error) => {
             handleFirestoreError(error, OperationType.GET, path);
@@ -88,7 +127,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
       } else {
         setCredits(0);
-        setIsPro(false);
+        setIsPro(checkDevOverride() ? true : false);
       }
     });
 

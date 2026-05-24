@@ -6,6 +6,7 @@ import { getCountryById } from '../config/countryConfig';
 import { THEMES } from '../constants';
 import { useFirebase } from '../contexts/FirebaseContext';
 import i18n from '../i18n/config';
+import fleetxLogo from '../assets/images/fleetx_logo_strada.png';
 
 export function useAppData() {
   const { credits, isPro, consumeCredit } = useFirebase();
@@ -74,30 +75,13 @@ export function useAppData() {
     const loadedData = storageService.loadData();
     
     let vehicles = loadedData.vehicles || [];
-    if (vehicles.length === 0) {
-      vehicles = [{
-        id: 'simulated-strada-2024',
-        createdAt: new Date().toISOString(),
-        name: 'Fiat',
-        model: 'Strada Ultra Turbo',
-        year: '2024',
-        plate: 'FLX-2024',
-        color: 'Cinza Silverstone',
-        mileage: 4500,
-        imageUrl: '/src/assets/images/fleetx_logo_strada.png',
-        brandLogoUrl: '',
-        healthScore: 98,
-        fipeValue: 132000,
-        parts: [
-          { id: 'p1', name: 'Óleo Selènia 5W30', status: 'ok', installedAtMileage: 0, expectedLifeMileage: 10000, category: 'Motor', estimatedPrice: 350, description: 'Sintético' },
-          { id: 'p2', name: 'Filtro de Óleo OEM', status: 'ok', installedAtMileage: 0, expectedLifeMileage: 10000, category: 'Motor', estimatedPrice: 85, description: 'Original' },
-          { id: 'p3', name: 'Pastilhas de Freio', status: 'ok', installedAtMileage: 0, expectedLifeMileage: 35000, category: 'Freios', estimatedPrice: 420, description: 'Semimetálica' },
-        ],
-        services: [],
-        fuelLogs: [],
-        reminders: [],
-        tireSets: []
-      }];
+
+    const loadedSettings = (loadedData.settings || {}) as any;
+    if (loadedSettings.headerConfig) {
+      if (loadedSettings.headerConfig.iconScale === 100 && loadedSettings.headerConfig.bannerHeight === 180) {
+        loadedSettings.headerConfig.iconScale = 50;
+        loadedSettings.headerConfig.bannerHeight = 55;
+      }
     }
 
     const merged = {
@@ -111,15 +95,15 @@ export function useAppData() {
         region: 'Brasil',
         marketReferenceName: 'Tabela FIPE',
         headerConfig: {
-          iconScale: 100,
-          bannerHeight: 180,
+          iconScale: 50,
+          bannerHeight: 55,
           bgOpacity: 1,
           bgBlur: 0,
           showIcon: true,
           bgColor: '#141414'
         },
-        ...(loadedData.settings || {})
-      }
+        ...loadedSettings
+      } as any
     };
     setData(merged as any);
     if (merged.settings) {
@@ -156,8 +140,8 @@ export function useAppData() {
     };
 
     const header = data.settings?.headerConfig || {
-      iconScale: 100,
-      bannerHeight: 180,
+      iconScale: 50,
+      bannerHeight: 55,
       bgOpacity: 1,
       bgBlur: 0,
       showIcon: true,

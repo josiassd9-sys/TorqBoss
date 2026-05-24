@@ -12,10 +12,18 @@ export const formatCurrency = (value: number, currency: string = 'BRL', language
   }).format(value);
 };
 
-export const resizeImage = (base64Str: string, maxWidth = 1200, maxHeight = 1200): Promise<string> => {
-  return new Promise((resolve) => {
+export const resizeImage = (source: string | File, maxWidth = 1200, maxHeight = 1200): Promise<string> => {
+  return new Promise((resolve, reject) => {
     const img = new Image();
-    img.src = base64Str;
+    let objectUrl: string | null = null;
+    
+    if (source instanceof File) {
+      objectUrl = URL.createObjectURL(source);
+      img.src = objectUrl;
+    } else {
+      img.src = source;
+    }
+    
     img.onload = () => {
       const canvas = document.createElement('canvas');
       let width = img.width;
@@ -38,8 +46,18 @@ export const resizeImage = (base64Str: string, maxWidth = 1200, maxHeight = 1200
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0, width, height);
       
-      // Comprime para JPEG com 70% de qualidade para reduzir drasticamente o tamanho
-      resolve(canvas.toDataURL('image/jpeg', 0.7));
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+      resolve(dataUrl);
+    };
+
+    img.onerror = (err) => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+      reject(err);
     };
   });
 };

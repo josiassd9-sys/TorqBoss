@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { 
   Box, Search, Package, ExternalLink, Calculator, Trash2, 
-  Settings, CheckCircle2, AlertTriangle, Clock 
+  Settings, CheckCircle2, AlertTriangle, Clock, ChevronDown 
 } from 'lucide-react';
 import { Part, Vehicle } from '../../types';
 
@@ -25,25 +25,47 @@ export const PartsTab: React.FC<PartsTabProps> = ({
   formatCurrency
 }) => {
   const currentMileage = predictCurrentMileage(vehicle);
+  const [isExpanded, setIsExpanded] = React.useState(false);
 
   return (
     <div className="space-y-6 text-left">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h3 className="text-xl font-black italic uppercase tracking-tighter text-brand-primary flex items-center gap-2">
-            <Box size={24} className="text-brand-accent" /> Stock & Componentes
-          </h3>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Catálogo de peças e monitoramento de vida útil</p>
-        </div>
+      <div className="pb-2 border-b border-gray-100">
         <button 
-          onClick={onAddPart}
-          className="bg-brand-primary text-white px-5 py-3 rounded-lg font-black uppercase text-[9px] tracking-widest hover:bg-zinc-900 transition-all shadow-md shadow-brand-primary/10 border border-zinc-950"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full flex justify-between items-center text-left focus:outline-none group/accordion py-2"
         >
-          + Acervo de Peças
+          <div>
+            <h3 className="text-xl font-black italic uppercase tracking-tighter text-brand-primary flex items-center gap-2 group-hover/accordion:text-brand-accent transition-colors">
+              <Box size={24} className="text-brand-accent" /> Stock & Componentes
+            </h3>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Catálogo de peças e monitoramento de vida útil</p>
+          </div>
+          <motion.div
+            animate={{ rotate: isExpanded ? 180 : 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-brand-primary transition-colors shrink-0"
+          >
+            <ChevronDown size={24} />
+          </motion.div>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <motion.div
+        initial={false}
+        animate={{ height: isExpanded ? 'auto' : 0, opacity: isExpanded ? 1 : 0 }}
+        transition={{ duration: 0.25, ease: "easeInOut" }}
+        className="space-y-6 overflow-hidden"
+      >
+        <div className="flex justify-end pt-2">
+          <button 
+            onClick={onAddPart}
+            className="bg-brand-primary text-white px-5 py-3 rounded-lg font-black uppercase text-[9px] tracking-widest hover:bg-zinc-900 transition-all shadow-md shadow-brand-primary/10 border border-zinc-950"
+          >
+            + Acervo de Peças
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {(!vehicle.parts || vehicle.parts.length === 0) ? (
           <div className="col-span-full text-center py-16 bg-gray-50 rounded-xl border border-dashed border-gray-200">
             <div className="bg-white w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm">
@@ -149,6 +171,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({
           })
         )}
       </div>
+      </motion.div>
     </div>
   );
 };

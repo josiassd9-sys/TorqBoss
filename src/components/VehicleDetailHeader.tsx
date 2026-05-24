@@ -26,7 +26,8 @@ import {
   BadgePercent,
   Calculator,
   DollarSign,
-  Share2
+  Share2,
+  ChevronDown
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -121,7 +122,8 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
   onUpdateFipe,
   marketRef
 }) => {
-  const [activeTechnicalSection, setActiveTechnicalSection] = React.useState<string | null>('agenda');
+  const [activeTechnicalSection, setActiveTechnicalSection] = React.useState<string | null>(null);
+  const [isTechSectionsExpanded, setIsTechSectionsExpanded] = React.useState(false);
 
   const technicalSections = [
     { 
@@ -479,6 +481,31 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
                   </div>
                 </button>
 
+                {/* Discrete button to toggle technical sections accordion block below */}
+                <button 
+                  onClick={() => setIsTechSectionsExpanded(!isTechSectionsExpanded)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all ${
+                    isTechSectionsExpanded 
+                      ? 'bg-brand-accent/20 border-brand-accent/35 text-white' 
+                      : 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-400'
+                  }`}
+                  title={isTechSectionsExpanded ? "Recolher Módulos IA" : "Expandir Módulos IA"}
+                >
+                  <motion.div
+                    animate={{ rotate: isTechSectionsExpanded ? 180 : 0 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                    className="flex items-center justify-center shrink-0"
+                  >
+                    <ChevronDown size={16} className={isTechSectionsExpanded ? 'text-brand-accent' : 'text-zinc-400'} />
+                  </motion.div>
+                  <div className="text-left">
+                    <p className="text-[10px] font-black uppercase text-gray-400 leading-none">Módulos IA</p>
+                    <p className="text-xs font-black text-white">
+                      {isTechSectionsExpanded ? 'Recolher' : 'Expandir'}
+                    </p>
+                  </div>
+                </button>
+
                 {(selectedVehicle.version || selectedVehicle.engine) && (
                   <div className="flex flex-wrap items-center justify-center gap-2">
                     {selectedVehicle.version && (
@@ -590,7 +617,15 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
               </div>
 
               {/* Tech Glossary Accordion */}
-              <div className="w-full max-w-4xl space-y-2 mt-6">
+              <motion.div 
+                initial={false}
+                animate={{ 
+                  height: isTechSectionsExpanded ? 'auto' : 0,
+                  opacity: isTechSectionsExpanded ? 1 : 0
+                }}
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
+                className="w-full max-w-4xl space-y-2 mt-6 overflow-hidden"
+              >
                  {technicalSections.map((section) => (
                    <div 
                      key={section.id} 
@@ -631,7 +666,7 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
                      </motion.div>
                    </div>
                  ))}
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>

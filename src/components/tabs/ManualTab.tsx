@@ -95,9 +95,7 @@ export const ManualTab: React.FC<ManualTabProps> = ({
   manualChatResponse,
   manualPDFInputRef
 }) => {
-  const [activeSection, setActiveSection] = useState<string | null>(
-    vehicle.manualTranscription ? 'transcription' : (vehicle.manual ? 'technical' : null)
-  );
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const handleToggle = (id: string) => {
     setActiveSection(activeSection === id ? null : id);

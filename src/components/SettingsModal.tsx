@@ -237,6 +237,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                          />
                        </div>
 
+                        <div>
+                          <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2.5 block">Subtítulo Personalizado do App</label>
+                          <input 
+                            type="text" 
+                            placeholder="Ex: — Meu Carro Top" 
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-bold text-gray-800 placeholder-gray-400 focus:bg-white focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none" 
+                            value={data.settings.appSubtitle || ''} 
+                            onChange={(e) => updateSettings({ appSubtitle: e.target.value })} 
+                          />
+                          <p className="text-[9px] text-gray-400 mt-1.5 font-bold uppercase tracking-wider">Deixe em branco para usar o subtítulo padrão do idioma selecionado.</p>
+                        </div>
+
                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                           <div>
                             <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2.5 block text-left">Idioma do Sistema</label>
@@ -313,6 +325,40 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           </div>
                        </div>
                        
+                        {user?.email === 'josias.sd9@gmail.com' && (
+    <div className="pt-6 border-t border-gray-100 flex flex-col gap-4">
+                             <div className="flex flex-col gap-1">
+                                <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Painel Sandbox (Desenvolvedor)</h4>
+                                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Use para testar as funcionalidades PRO e as integrações locais na geração de testes do APK.</p>
+                             </div>
+                             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+                                <div className="flex items-center gap-3">
+                                   <div className="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center font-black text-sm">🛠️</div>
+                                   <div>
+                                      <p className="text-[10px] font-black uppercase text-amber-900">Override Licença PRO</p>
+                                      <p className="text-[9px] font-black text-amber-700 uppercase tracking-wider">Status: {data.settings.isDeveloperOverridePro ? 'ATIVADO (SANDBOX)' : 'DESATIVADO (NORMAL)'}</p>
+                                   </div>
+                                </div>
+                                <button
+                                   onClick={() => {
+                                      const nextState = !data.settings.isDeveloperOverridePro;
+                                      updateSettings({ isDeveloperOverridePro: nextState });
+                                      setTimeout(() => {
+                                         window.dispatchEvent(new Event('fleetx-developer-pro-changed'));
+                                      }, 50);
+                                   }}
+                                   className={`w-full sm:w-auto px-5 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                                      data.settings.isDeveloperOverridePro 
+                                         ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20 hover:bg-amber-700' 
+                                         : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                                   }`}
+                                >
+                                   {data.settings.isDeveloperOverridePro ? 'Desativar PRO de Teste' : 'Ativar PRO de Teste'}
+                                </button>
+                             </div>
+                          </div>
+)}
+
                        <div className="sm:hidden pt-8 mt-8 border-t border-gray-100">
                           <button 
                             onClick={onResetData}
@@ -507,7 +553,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                              <div>
                                 <div className="flex justify-between mb-2">
                                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Escala do Veículo</label>
-                                   <span className="text-[10px] font-black text-brand-primary">{data.settings.headerConfig?.iconScale || 100}%</span>
+                                   <span className="text-[10px] font-black text-brand-primary">{data.settings.headerConfig?.iconScale || 50}%</span>
                                 </div>
                                 <input 
                                   type="range" 
@@ -515,10 +561,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                   max="1000" 
                                   step="0.1"
                                   className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-brand-primary"
-                                  value={data.settings.headerConfig?.iconScale || 100}
+                                  value={data.settings.headerConfig?.iconScale || 50}
                                   onChange={(e) => updateSettings({ 
                                     headerConfig: { 
-                                      bannerHeight: 180,
+                                      bannerHeight: 55,
                                       bgOpacity: 1,
                                       bgBlur: 0,
                                       showIcon: true,
@@ -533,7 +579,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                              <div>
                                 <div className="flex justify-between mb-2">
                                    <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Altura do Cabeçalho</label>
-                                   <span className="text-[10px] font-black text-brand-primary">{data.settings.headerConfig?.bannerHeight || 180}px</span>
+                                   <span className="text-[10px] font-black text-brand-primary">{data.settings.headerConfig?.bannerHeight || 55}px</span>
                                 </div>
                                 <input 
                                   type="range" 
@@ -541,10 +587,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                   max="800" 
                                   step="5"
                                   className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-brand-primary"
-                                  value={data.settings.headerConfig?.bannerHeight || 180}
+                                  value={data.settings.headerConfig?.bannerHeight || 55}
                                   onChange={(e) => updateSettings({ 
                                     headerConfig: { 
-                                      iconScale: 100,
+                                      iconScale: 50,
                                       bgOpacity: 1,
                                       bgBlur: 0,
                                       showIcon: true,
@@ -570,8 +616,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                   value={data.settings.headerConfig?.bgOpacity || 1}
                                   onChange={(e) => updateSettings({ 
                                     headerConfig: { 
-                                      iconScale: 100,
-                                      bannerHeight: 180,
+                                      iconScale: 50,
+                                      bannerHeight: 55,
                                       bgBlur: 0,
                                       showIcon: true,
                                       bgColor: '#141414',
@@ -594,8 +640,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                     e.preventDefault();
                                     updateSettings({ 
                                       headerConfig: { 
-                                        iconScale: 100,
-                                        bannerHeight: 180,
+                                        iconScale: 50,
+                                        bannerHeight: 55,
                                         bgOpacity: 1,
                                         bgBlur: 0,
                                         bgColor: '#141414',
@@ -619,8 +665,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                      value={data.settings.headerConfig?.bgColor || '#141414'}
                                      onChange={(e) => updateSettings({ 
                                        headerConfig: { 
-                                         iconScale: 100,
-                                         bannerHeight: 180,
+                                         iconScale: 50,
+                                         bannerHeight: 55,
                                          bgOpacity: 1,
                                          bgBlur: 0,
                                          showIcon: true,
@@ -635,8 +681,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                       value={data.settings.headerConfig?.bgColor || '#141414'}
                                       onChange={(e) => updateSettings({ 
                                       headerConfig: { 
-                                        iconScale: 100,
-                                        bannerHeight: 180,
+                                        iconScale: 50,
+                                        bannerHeight: 55,
                                         bgOpacity: 1,
                                         bgBlur: 0,
                                         showIcon: true,
@@ -657,8 +703,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                   value={data.settings.headerConfig?.bgImage || ''}
                                    onChange={(e) => updateSettings({ 
                                      headerConfig: { 
-                                       iconScale: 100,
-                                       bannerHeight: 180,
+                                       iconScale: 50,
+                                       bannerHeight: 55,
                                        bgOpacity: 1,
                                        bgBlur: 0,
                                        showIcon: true,
@@ -764,56 +810,64 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                    )}
 
                    {activeSubTab === 'apiKey' && (
-                    <div className="space-y-6 text-left h-full flex flex-col">
-                      <div className={`bg-gray-50 border border-gray-200 p-5 sm:p-6 rounded-lg relative overflow-hidden ${!data.settings.isProMember ? 'grayscale-[0.5]' : ''}`}>
-                        
-                        {!data.settings.isProMember && (
-                           <div className="absolute inset-0 bg-white/95 backdrop-blur-[3px] z-20 flex flex-col items-center justify-center p-6 text-center">
-                              <div className="bg-brand-primary text-white p-3.5 rounded-lg mb-4 shadow-xl shadow-brand-primary/10">
-                                <Shield size={32} />
-                              </div>
-                              <h4 className="text-xl font-black text-brand-primary uppercase tracking-tighter mb-2 italic">Acesso Restrito</h4>
-                              <p className="text-xs text-gray-700 font-bold max-w-[280px] mb-6">
-                                A função de usar sua <strong>Própria Chave API</strong> é exclusiva para usuários do plano <strong>MEU CARRO PRO</strong>.
+                    <div className="space-y-6 text-left w-full pb-8">
+                       {!data.settings.isProMember && (
+                          <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 p-5 rounded-xl flex flex-col sm:flex-row items-center sm:items-start gap-4 shadow-md mb-2">
+                            <div className="bg-orange-600 text-white p-3 rounded-lg shadow-lg shrink-0">
+                              <Shield size={24} />
+                            </div>
+                            <div className="flex-1 text-center sm:text-left">
+                              <h4 className="text-sm font-black text-orange-950 uppercase tracking-tighter italic">Função Exclusiva PRO</h4>
+                              <p className="text-[11px] text-orange-850 font-bold mt-1 leading-relaxed">
+                                Inserir sua <strong>Própria Chave API</strong> é uma funcionalidade restrita do plano <strong>MEU CARRO PRO</strong>. 
+                                A Chave permite acesso totalmente livre, imediato e gratuito (utilizando sua conta Google) para rodar o Robô de Placas, busca de imagens e inteligência artificial sem filas ou tempo de espera do servidor compartilhado.
                               </p>
                               <button 
                                 onClick={() => setActiveSubTab('wallet')}
-                                className="bg-brand-primary text-white px-8 py-4 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-xl shadow-brand-primary/20 hover:scale-[1.05] transition-all"
+                                className="mt-3 bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-orange-600/20 active:scale-95 transition-all inline-flex items-center gap-2 font-bold"
                               >
-                                Ver Planos PRO
+                                Ativar Versão PRO Agora <Zap size={12} />
                               </button>
-                           </div>
-                        )}
+                            </div>
+                          </div>
+                       )}
 
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 bg-brand-primary text-white rounded-lg flex items-center justify-center shadow-lg shadow-brand-primary/10">
-                            <Key size={20} />
-                          </div>
-                          <div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-brand-primary leading-none">Inteligência Artificial (Gemini)</h3>
-                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Sua própria conexão com o Google</p>
-                          </div>
-                        </div>
-                        
-                        <p className="text-xs text-gray-700 font-medium mb-6 leading-relaxed">
-                          Para usar as funções de <strong>Robô de Placa</strong>, <strong>Busca de Imagens</strong> e <strong>Análise de Manuais</strong> sem limites de espera, insira sua chave pessoal. É 100% gratuita para uso individual.
-                        </p>
-                        
-                        <div className="relative group">
-                          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-brand-primary group-focus-within:scale-110 transition-transform">
-                            <Key size={18} />
-                          </div>
-                          <input 
-                            type="password" 
-                            placeholder="Cole sua Chave API aqui..."
-                            className="w-full bg-white border border-gray-200 rounded-lg py-5 pl-14 pr-6 font-mono text-sm text-yellow-600 focus:border-brand-primary outline-none transition-all shadow-sm focus:ring-4 focus:ring-brand-primary/15 focus:bg-white"
-                            value={data.settings.geminiApiKey || ''}
-                            onChange={(e) => {
-                              updateSettings({ geminiApiKey: e.target.value });
-                              setTestStatus('idle');
-                            }}
-                          />
-                        </div>
+                       <div className={`bg-gray-50 border border-gray-200 p-5 sm:p-6 rounded-lg relative overflow-hidden ${!data.settings.isProMember ? 'opacity-85' : ''}`}>
+
+                         <div className="flex items-center gap-3 mb-4">
+                           <div className="w-10 h-10 bg-brand-primary text-white rounded-lg flex items-center justify-center shadow-lg shadow-brand-primary/10">
+                             <Key size={20} />
+                           </div>
+                           <div>
+                             <h3 className="text-sm font-black uppercase tracking-widest text-brand-primary leading-none">Inteligência Artificial (Gemini)</h3>
+                             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">Sua própria conexão com o Google</p>
+                           </div>
+                         </div>
+                         
+                         <p className="text-xs text-gray-700 font-medium mb-6 leading-relaxed">
+                           Para usar as funções de <strong>Robô de Placa</strong>, <strong>Busca de Imagens</strong> e <strong>Análise de Manuais</strong> sem limites de espera, insira sua chave pessoal. É 100% gratuita para uso individual.
+                         </p>
+                         
+                         <div className="relative group">
+                           <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-brand-primary group-focus-within:scale-110 transition-transform">
+                             <Key size={18} />
+                           </div>
+                           <input 
+                             type="password" 
+                             placeholder={data.settings.isProMember ? "Cole sua Chave API aqui..." : "Chave bloqueada - Requer Plano PRO"}
+                             disabled={!data.settings.isProMember}
+                             className={`w-full border rounded-lg py-5 pl-14 pr-6 font-mono text-sm outline-none transition-all shadow-sm ${
+                               !data.settings.isProMember 
+                                 ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed select-none' 
+                                 : 'bg-white text-yellow-600 border-gray-200 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15'
+                             }`}
+                             value={data.settings.geminiApiKey || ''}
+                             onChange={(e) => {
+                               updateSettings({ geminiApiKey: e.target.value });
+                               setTestStatus('idle');
+                             }}
+                           />
+                         </div>
 
                         <div className="mt-4 flex flex-col gap-3">
                           <button

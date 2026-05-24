@@ -732,7 +732,7 @@ export const VehicleFormModal: React.FC<VehicleFormModalProps> = ({
                       />
                     </div>
                     <div className="col-span-1">
-                      <label className="text-xs font-bold text-gray-400 uppercase ml-1 block mb-1">Quilometragem</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase ml-1 block mb-1">KM</label>
                       <input 
                         type="number" 
                         placeholder="0"
