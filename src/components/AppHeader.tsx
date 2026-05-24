@@ -30,7 +30,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-brand-primary leading-none uppercase italic truncate flex items-baseline gap-1.5">
                <span>{data.settings?.appName || 'FleetX'}</span>
                <span className="text-[10px] sm:text-xs font-bold text-zinc-400/80 not-italic tracking-normal normal-case shrink-0">
-                 data.settings?.appSubtitle ? data.settings.appSubtitle : t('app_subtitle')
+                 {data.settings?.appSubtitle ? data.settings.appSubtitle : t('app_subtitle')}
                </span>
              </h1>
              {isPro && (
