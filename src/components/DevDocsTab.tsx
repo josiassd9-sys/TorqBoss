@@ -73,9 +73,33 @@ export const DevDocsTab: React.FC = () => {
                         </button>
                     </div>
                 ) : (
-                    <div className="p-6 sm:p-8 overflow-y-auto max-h-[60vh] prose prose-sm prose-slate max-w-none">
-                        <div className="markdown-body">
-                            <ReactMarkdown>{content}</ReactMarkdown>
+                    <div className="p-4 sm:p-8 overflow-y-auto max-h-[65vh] text-left custom-scrollbar">
+                        <div className="markdown-body prose prose-sm prose-slate max-w-none 
+                            prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-headings:italic prose-headings:text-brand-primary
+                            prose-p:text-gray-600 prose-p:font-bold prose-p:leading-relaxed prose-p:text-[11px] sm:prose-p:text-xs
+                            prose-strong:text-brand-primary prose-strong:font-black
+                            prose-code:bg-gray-100 prose-code:p-1 prose-code:rounded prose-code:text-[10px] prose-code:font-mono prose-code:text-brand-primary
+                            prose-pre:bg-zinc-900 prose-pre:p-4 prose-pre:rounded-xl prose-pre:border-l-4 prose-pre:border-brand-primary prose-pre:shadow-xl
+                            prose-li:text-gray-600 prose-li:font-bold prose-li:text-[11px] sm:prose-li:text-xs
+                            break-words overflow-hidden">
+                            <ReactMarkdown
+                                components={{
+                                    pre: ({ children }) => (
+                                        <pre className="overflow-x-auto custom-scrollbar-dark my-4 p-4 text-[10px] sm:text-xs leading-relaxed">
+                                            {children}
+                                        </pre>
+                                    ),
+                                    code: ({ children, className }) => {
+                                        const isInline = !className;
+                                        if (isInline) {
+                                            return <code className="bg-brand-primary/10 text-brand-primary px-1.5 py-0.5 rounded font-mono text-[9px] sm:text-[10px] font-black break-all">{children}</code>;
+                                        }
+                                        return <code className="block w-full font-mono text-zinc-100 break-words whitespace-pre-wrap">{children}</code>;
+                                    }
+                                }}
+                            >
+                                {content}
+                            </ReactMarkdown>
                         </div>
                     </div>
                 )}
