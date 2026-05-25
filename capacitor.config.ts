@@ -2,15 +2,20 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.fleetx.app',
-  appName: 'Meu Carro Top',
+  appName: 'FleetX',
   webDir: 'dist',
   server: {
     androidScheme: 'https'
   },
-  // Plugin configurations can go here
   plugins: {
     Filesystem: {},
-    Share: {}
+    Share: {},
+    // 🛠️ Configuração obrigatória adicionada para o plugin do Google:
+    GoogleAuth: {
+      scopes: ['profile', 'email'],
+      serverClientId: '://googleusercontent.com',
+      forceCodeForRefreshToken: true
+    }
   }
 };
 

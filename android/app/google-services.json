@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "718759502049-tgapieco14mn549i07oh8nas5h6si1ds.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fleetx.app",
+            "certificate_hash": "ba65d17b3ba0ed546691f89e385bc1131488d788"
+          }
+        },
+        {
           "client_id": "718759502049-crb938h7svtdcl205kfu7a5m04ngllpv.apps.googleusercontent.com",
           "client_type": 3
         }

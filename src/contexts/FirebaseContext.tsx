@@ -1,6 +1,19 @@
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db, googleProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, User, doc, getDoc, setDoc, onSnapshot, increment, arrayUnion } from '../lib/firebase';
+// Importação direta dos recursos do pacote oficial do Firebase Auth:
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { 
+  auth, 
+  db, 
+  onAuthStateChanged, 
+  User, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  onSnapshot, 
+  increment, 
+  arrayUnion
+} from '../lib/firebase';
 
 enum OperationType {
   CREATE = 'create',
@@ -57,17 +70,16 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return false;
   });
 
-  useEffect(() => {
-      getRedirectResult(auth)
-    .then((result) => {
-      if (result?.user) {
-        console.log('Google login success:', result.user);
-      }
-    })
-    .catch((error) => {
-      console.error('Redirect login error:', error);
-    });
+    useEffect(() => {
+    // 🛠️ INICIALIZAÇÃO CORRIGIDA: Agora com o ID Web Client real obtido do Google Cloud
+    GoogleAuth.initialize({
+      clientId: '718759502049-crb938h7svtdcl205kfu7a5m04ngllpv.apps.googleusercontent.com',
+      scopes: ['profile', 'email'],
+      grantOfflineAccess: true,
+    }).catch(err => console.error('Erro na inicialização automática do Google Auth:', err));
+
     const handleDevProChange = () => {
+
       try {
         const saved = localStorage.getItem('automaster_ai_data');
         if (saved) {
@@ -144,25 +156,39 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return () => unsubscribeAuth();
   }, []);
 
-  const login = async () => {
-  try {
+      const login = async () => {
+    try {
+      // 1. Abre a gaveta nativa do Android com as contas do Google
+      const googleUser = await GoogleAuth.signIn();
+      console.log('GOOGLE CAPACITOR USER:', googleUser);
 
-    const googleUser = await GoogleAuth.signIn();
+      // 2. Extrai de forma isolada o token de identidade necessário
+      const idToken = googleUser.authentication.idToken;
 
-    console.log('GOOGLE LOGIN:', googleUser);
+      if (!idToken) {
+        throw new Error('O plugin nativo não devolveu um idToken válido.');
+      }
 
-    alert('Login Google funcionando!');
+      // 3. Monta a credencial estrita para o Firebase Auth (Usando apenas o idToken)
+      const credential = GoogleAuthProvider.credential(idToken);
 
-  } catch (error) {
+      // 4. Autentica e vincula o usuário na nuvem do Firebase
+      const userCredential = await signInWithCredential(auth, credential);
+      console.log('Firebase login nativo efetuado:', userCredential.user);
 
-    console.error('Google login error:', error);
+      alert('Login Google efetuado e vinculado com sucesso!');
 
-    alert('Erro Login Google: ' + JSON.stringify(error));
-  }
-};
+    } catch (error) {
+      console.error('Google login error:', error);
+      alert('Erro Login Google: ' + JSON.stringify(error));
+    }
+  };
+
+
 
   const logout = async () => {
     try {
+      await GoogleAuth.signOut();
       await auth.signOut();
     } catch (error) {
       console.error('Logout error:', error);
