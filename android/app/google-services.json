@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "718759502049",
+    "project_id": "fleetx-163df",
+    "storage_bucket": "fleetx-163df.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:718759502049:android:8cdfa95f257d6eb06017a0",
+        "android_client_info": {
+          "package_name": "com.fleetx.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "718759502049-78sbd91enpq0le33sr9juc44piltigfq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fleetx.app",
+            "certificate_hash": "6150903f4c286e486e4efd6e581c073d37f12684"
+          }
+        },
+        {
+          "client_id": "718759502049-crb938h7svtdcl205kfu7a5m04ngllpv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKPhxsMrk0GF7K56NBXFi0o_WGNknZAII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "718759502049-crb938h7svtdcl205kfu7a5m04ngllpv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

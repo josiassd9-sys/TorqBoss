@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.topcar.meucarro',
+  appId: 'com.fleetx.app',
   appName: 'Meu Carro Top',
   webDir: 'dist',
   server: {

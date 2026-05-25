@@ -1,5 +1,6 @@
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db, googleProvider, signInWithPopup, onAuthStateChanged, User, doc, getDoc, setDoc, onSnapshot, increment, arrayUnion } from '../lib/firebase';
+import { auth, db, googleProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, User, doc, getDoc, setDoc, onSnapshot, increment, arrayUnion } from '../lib/firebase';
 
 enum OperationType {
   CREATE = 'create',
@@ -57,6 +58,15 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   });
 
   useEffect(() => {
+      getRedirectResult(auth)
+    .then((result) => {
+      if (result?.user) {
+        console.log('Google login success:', result.user);
+      }
+    })
+    .catch((error) => {
+      console.error('Redirect login error:', error);
+    });
     const handleDevProChange = () => {
       try {
         const saved = localStorage.getItem('automaster_ai_data');
@@ -135,12 +145,21 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   const login = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error('Login error:', error);
-    }
-  };
+  try {
+
+    const googleUser = await GoogleAuth.signIn();
+
+    console.log('GOOGLE LOGIN:', googleUser);
+
+    alert('Login Google funcionando!');
+
+  } catch (error) {
+
+    console.error('Google login error:', error);
+
+    alert('Erro Login Google: ' + JSON.stringify(error));
+  }
+};
 
   const logout = async () => {
     try {

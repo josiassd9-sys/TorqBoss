@@ -1,16 +1,25 @@
 // src/services/geminiService.ts
 // Proxy service that calls the server-side Gemini API
 
+// ===================== CONFIGURAÇÃO PARA APP HÍBRIDO =====================
+
+// Detecta se está rodando no Capacitor (app nativo Android)
+const isNativeApp = window.location.protocol === 'capacitor:';
+
+// URL de Produção (Backend na nuvem)
+const PRODUCAO_API_URL = 'https://ais-dev-exgrcbouh4ydginh4gncxc-510605507081.us-west2.run.app';
+
+// Base URL dinâmica
+const API_BASE = isNativeApp ? PRODUCAO_API_URL : '';
+
 let onCreditConsumed: (amount: number) => void = () => {};
 let currentCredits = 0;
 let usingCustomKey = false;
 
 export const geminiService = {
   setApiKey: (key: string) => {
-    // Key management is handled server-side via environment variables
-    // But we still allow passing it for custom keys from settings
     usingCustomKey = !!key;
-    fetch('/api/gemini/settings', {
+    fetch(`${API_BASE}/api/gemini/settings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ apiKey: key })
@@ -21,7 +30,7 @@ export const geminiService = {
     if (settings.aiCredits !== undefined) {
       currentCredits = settings.aiCredits;
     }
-    fetch('/api/gemini/settings', {
+    fetch(`${API_BASE}/api/gemini/settings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ settings })
@@ -34,67 +43,51 @@ export const geminiService = {
 
   getCooldownRemaining: () => geminiService.call('getCooldownRemaining'),
 
-  // Generic caller for any method in the service
   call: async (method: string, ...args: any[]): Promise<any> => {
-    // Verificação de créditos antes da chamada (se não for chave própria)
     if (!usingCustomKey && currentCredits <= 0 && method !== 'validateApiKey' && method !== 'getCooldownRemaining') {
-      throw new Error("SALDO INSUFICIENTE: Seus créditos de IA acabaram. Recarregue na aba 'Carteira' ou adicione sua própria Chave API para continuar usando as funções automáticas.");
+      throw new Error("SALDO INSUFICIENTE: Seus créditos de IA acabaram. Recarregue na aba 'Carteira' ou adicione sua própria Chave API.");
     }
 
     let body;
     
-    // Deep sanitizer to ensure no React events or DOM elements are sent
     const sanitize = (val: any): any => {
       if (val === null || val === undefined) return val;
       if (typeof val !== 'object') return val;
       
       const seen = new WeakSet();
-      
       const clean = (obj: any): any => {
         if (obj === null || typeof obj !== 'object') return obj;
         if (seen.has(obj)) return '[Circular]';
         seen.add(obj);
 
-        // Errors
         if (obj instanceof Error) return { message: obj.message, name: obj.name };
-        // HTML Elements
         if (obj instanceof HTMLElement || (obj.constructor && obj.constructor.name.includes('Element'))) return `[DOM: ${obj.tagName || 'Node'}]`;
-        // React events
         if (obj.nativeEvent || (obj.constructor && obj.constructor.name === 'SyntheticBaseEvent')) return '[React Event]';
         
         if (Array.isArray(obj)) return obj.map(clean);
         
         const result: any = {};
         for (const key of Object.keys(obj)) {
-          // Skip internal React properties
           if (key.startsWith('__react') || key === '$$typeof' || key === '_owner') continue;
-          
           try {
-            const value = obj[key];
-            result[key] = clean(value);
+            result[key] = clean(obj[key]);
           } catch (e) {
             result[key] = '[Inaccessible]';
           }
         }
         return result;
       };
-
-      try {
-        return clean(val);
-      } catch (e) {
-        return '[Serialization Failed]';
-      }
+      return clean(val);
     };
 
     try {
       const sanitizedArgs = args.map(sanitize);
       body = JSON.stringify({ method, args: sanitizedArgs });
     } catch (e) {
-      console.warn('Critical sanitization failure for AI call:', e);
-      body = JSON.stringify({ method, args: ['[Critical Failure]'] });
+      body = JSON.stringify({ method, args: ['[Serialization Error]'] });
     }
 
-    const response = await fetch('/api/gemini/call', {
+    const response = await fetch(`${API_BASE}/api/gemini/call`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body
@@ -105,7 +98,6 @@ export const geminiService = {
       throw new Error(error.error || `API error: ${response.status}`);
     }
 
-    // Consumir crédito no client-side se for bem sucedido
     if (!usingCustomKey && method !== 'validateApiKey' && method !== 'getCooldownRemaining') {
       onCreditConsumed(1);
     }
@@ -113,7 +105,7 @@ export const geminiService = {
     return response.json();
   },
 
-  // Facade methods to match the previous interface
+  // === Facade methods (não mexer) ===
   detectRegionalDefaults: (locale: string, timezone: string) => geminiService.call('detectRegionalDefaults', locale, timezone),
   researchPart: (partName: string, vehicleModel: string) => geminiService.call('researchPart', partName, vehicleModel),
   searchVehicleLogo: (brandName: string) => geminiService.call('searchVehicleLogo', brandName),
