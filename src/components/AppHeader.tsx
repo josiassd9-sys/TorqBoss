@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { HeaderLogo } from './';
 import { AppData } from '../types';
 import { useFirebase } from '../contexts/FirebaseContext';
-import fleetxLogo from '../assets/images/fleetx_logo_strada.png';
+import torqbossLogo from '../assets/images/torqboss_logo_strada.png';
 
 interface AppHeaderProps {
   data: AppData;
@@ -28,7 +28,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         <div className="text-left max-w-[70%]">
           <div className="flex items-center gap-1.5 mb-0.5">
              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-brand-primary leading-none uppercase italic truncate flex items-baseline gap-1.5">
-               <span>{data.settings?.appName || 'FleetX'}</span>
+               <span>{data.settings?.appName || 'torqboss'}</span>
                <span className="text-[10px] sm:text-xs font-bold text-zinc-400/80 not-italic tracking-normal normal-case shrink-0">
                  {data.settings?.appSubtitle ? data.settings.appSubtitle : t('app_subtitle')}
                </span>
@@ -83,8 +83,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 opacity: 1, 
                 scale: (data.settings.headerConfig?.iconScale || 50) / 100 
               }}
-              src={fleetxLogo} 
-              alt="FleetX Logo" 
+              src={torqbossLogo} 
+              alt="torqboss Logo" 
               style={{ 
                 height: '100px', // Base height for consistent scaling independent of container height
                 width: 'auto',

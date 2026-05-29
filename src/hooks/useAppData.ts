@@ -6,7 +6,7 @@ import { getCountryById } from '../config/countryConfig';
 import { THEMES } from '../constants';
 import { useFirebase } from '../contexts/FirebaseContext';
 import i18n from '../i18n/config';
-import fleetxLogo from '../assets/images/fleetx_logo_strada.png';
+import torqbossLogo from '../assets/images/torqboss_logo_strada.png';
 
 export function useAppData() {
   const { credits, isPro, consumeCredit } = useFirebase();

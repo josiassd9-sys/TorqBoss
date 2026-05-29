@@ -10,6 +10,7 @@ import { geminiService } from '../services/geminiService';
 import { useFirebase } from '../contexts/FirebaseContext';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { auth } from '../lib/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -26,10 +27,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onUpdateSettings,
   onResetData
 }) => {
-  const { user, loading, login, logout, credits, isPro, addCredits, upgradeToPro } = useFirebase();
+  const { user, loading, login, logout, loginWithEmailPassword, credits, isPro, addCredits, upgradeToPro } = useFirebase();  
   const [activeSubTab, setActiveSubTab] = React.useState<'general' | 'theme' | 'appearance' | 'search' | 'privacy' | 'manual' | 'apiKey' | 'wallet' | 'account' | 'data' | 'devDocs'>('manual');
   const [testStatus, setTestStatus] = React.useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [testMessage, setTestMessage] = React.useState('');
+
+  // 🔍 ADICIONE AQUI O CONSOLE.LOG
+  console.log('activeSubTab:', activeSubTab, 'user:', user);
 
   const handleFullBackup = () => {
     const backupContent = JSON.stringify({ ...data, exportType: 'full_backup', version: '2.0' }, null, 2);
@@ -38,7 +42,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     const link = document.createElement('a');
     const date = new Date().toISOString().split('T')[0];
     link.href = url;
-    link.download = `fleetx_backup_total_${date}.fleetx-backup`;
+    link.download = `torqboss_backup_total_${date}.torqboss-backup`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -332,7 +336,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <label className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2.5 block">Nome da Agência / Usuário</label>
                       <input
                         type="text"
-                        placeholder="Ex: FleetX Gestão de Frotas"
+                        placeholder="Ex: torqboss Gestão de Frotas"
                         className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 font-bold text-gray-800 placeholder-gray-400 focus:bg-white focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition-all outline-none"
                         value={data.settings.agencyName || ''}
                         onChange={(e) => updateSettings({ agencyName: e.target.value })}
@@ -446,12 +450,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               const nextState = !settings.isDeveloperOverridePro;
                               updateSettings({ isDeveloperOverridePro: nextState });
                               setTimeout(() => {
-                                window.dispatchEvent(new Event('fleetx-developer-pro-changed'));
+                                window.dispatchEvent(new Event('torqboss-developer-pro-changed'));
                               }, 50);
                             }}
                             className={`w-full sm:w-auto px-5 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${data.settings.isDeveloperOverridePro
-                                ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20 hover:bg-amber-700'
-                                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                              ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20 hover:bg-amber-700'
+                              : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
                               }`}
                           >
                             {data.settings.isDeveloperOverridePro ? 'Desativar PRO de Teste' : 'Ativar PRO de Teste'}
@@ -894,7 +898,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </div>
                       <div className="relative z-10">
                         <p className="text-xs sm:text-sm text-gray-650 leading-relaxed font-bold mb-6 italic opacity-95">
-                          O <strong>FleetX</strong> utiliza tecnologia LocalFirst. Isso significa que 100% dos seus registros de veículos, manutenções e fotos permanecem exclusivamente no armazenamento do seu dispositivo.
+                          O <strong>torqboss</strong> utiliza tecnologia LocalFirst. Isso significa que 100% dos seus registros de veículos, manutenções e fotos permanecem exclusivamente no armazenamento do seu dispositivo.
                           <br /><br />
                           Nenhuma informação é enviada para servidores externos, exceto seus créditos IA e status PRO que são sincronizados via Google Firebase para sua conveniência entre múltiplos aparelhos.
                         </p>
@@ -958,8 +962,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           placeholder={data.settings.isProMember ? "Cole sua Chave API aqui..." : "Chave bloqueada - Requer Plano PRO"}
                           disabled={!data.settings.isProMember}
                           className={`w-full border rounded-lg py-5 pl-14 pr-6 font-mono text-sm outline-none transition-all shadow-sm ${!data.settings.isProMember
-                              ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed select-none'
-                              : 'bg-white text-yellow-600 border-gray-200 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15'
+                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed select-none'
+                            : 'bg-white text-yellow-600 border-gray-200 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15'
                             }`}
                           value={data.settings.geminiApiKey || ''}
                           onChange={(e) => {
@@ -989,8 +993,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           }}
                           disabled={testStatus === 'testing' || !data.settings.geminiApiKey}
                           className={`flex items-center justify-center gap-3 py-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:scale-100 ${testStatus === 'success' ? 'bg-emerald-500 text-black shadow-emerald-500/25' :
-                              testStatus === 'error' ? 'bg-red-500 text-white shadow-red-500/25' :
-                                'bg-brand-primary text-white shadow-brand-primary/20 hover:scale-[1.02]'
+                            testStatus === 'error' ? 'bg-red-500 text-white shadow-red-500/25' :
+                              'bg-brand-primary text-white shadow-brand-primary/20 hover:scale-[1.02]'
                             }`}
                         >
                           {testStatus === 'testing' ? (
@@ -1216,7 +1220,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="space-y-6 text-left">
                     <div className="flex flex-col gap-1 mb-6">
                       <h3 className="text-lg sm:text-xl font-black italic uppercase tracking-tighter text-brand-primary leading-none">Minha Conta</h3>
-                      <p className="text-[9px] sm:text-xs font-bold text-gray-505 uppercase tracking-widest">Sincronize sua experiência FleetX</p>
+                      <p className="text-[9px] sm:text-xs font-bold text-gray-505 uppercase tracking-widest">Sincronize sua experiência torqboss</p>
                     </div>
 
                     {loading ? (
@@ -1265,6 +1269,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         <p className="text-sm text-gray-500 font-bold max-w-sm mx-auto mb-8 leading-relaxed">
                           Crie sua conta para salvar seus veículos e créditos na nuvem Google. Acesse de qualquer lugar!
                         </p>
+
+                        {/* BOTÃO DE TESTE - EMAIL/SENHA */}
+                        <button
+                          onClick={() => loginWithEmailPassword('Josias@torqboss.com', 'torqboss-0007')}
+                          className="mb-4 w-full bg-orange-500 text-white px-10 py-3 rounded-lg text-xs font-black uppercase tracking-widest shadow-lg hover:bg-orange-600 transition-all flex items-center justify-center gap-2"
+                        >
+                          🔧 TESTAR LOGIN (Email/Senha)
+                        </button>
+
+                        {/* BOTÃO ORIGINAL DO GOOGLE */}
                         <button
                           onClick={login}
                           className="bg-brand-primary text-white px-10 py-5 rounded-lg text-xs font-black uppercase tracking-widest shadow-xl shadow-brand-primary/30 hover:scale-[1.05] transition-all flex items-center justify-center gap-3 mx-auto"
@@ -1278,7 +1292,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <div className="flex gap-4 items-start">
                         <ShieldCheck className="text-green-500 shrink-0" size={24} />
                         <div>
-                          <h5 className="text-[10px] font-black uppercase tracking-widest text-gray-505 mb-1">Segurança FleetX</h5>
+                          <h5 className="text-[10px] font-black uppercase tracking-widest text-gray-505 mb-1">Segurança torqboss</h5>
                           <p className="text-[10px] text-gray-600 font-medium leading-relaxed">
                             Nós não armazenamos suas senhas. O login é processado com total segurança pelo <strong>Firebase Authentication</strong> do Google.
                             Seus dados de veículos continuam sendo salvos localmente, mas seus créditos e status PRO são sincronizados via nuvem.
@@ -1303,7 +1317,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         </div>
                         <h4 className="text-sm font-black text-brand-primary uppercase tracking-tighter mb-2 italic">Exportar Backup Total</h4>
                         <p className="text-[10px] text-gray-500 font-bold mb-6 leading-relaxed">
-                          Gera um arquivo <strong>.fleetx-backup</strong> contendo todos os veículos, manutenções, registros de combustível e configurações de conta.
+                          Gera um arquivo <strong>.torqboss-backup</strong> contendo todos os veículos, manutenções, registros de combustível e configurações de conta.
                         </p>
                         <button
                           onClick={handleFullBackup}
@@ -1323,7 +1337,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         </p>
                         <label className="w-full bg-amber-500 text-white py-4 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
                           <Download size={14} /> Selecionar Arquivo
-                          <input type="file" accept=".fleetx-backup,.json" className="hidden" onChange={handleFullRestore} />
+                          <input type="file" accept=".torqboss-backup,.json" className="hidden" onChange={handleFullRestore} />
                         </label>
                       </div>
                     </div>
@@ -1383,7 +1397,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                         <button
                           onClick={() => {
-                            if (confirm('Deseja limpar TODOS os dados locais do FleetX?')) {
+                            if (confirm('Deseja limpar TODOS os dados locais do torqboss?')) {
                               limpezaProfunda();
                             }
                           }}
@@ -1414,7 +1428,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {activeSubTab === 'manual' && (
                   <div className="space-y-6 text-left">
                     <div className="flex flex-col gap-1 mb-6">
-                      <h3 className="text-lg sm:text-xl font-black italic uppercase tracking-tighter text-brand-primary leading-none">Manual FleetX</h3>
+                      <h3 className="text-lg sm:text-xl font-black italic uppercase tracking-tighter text-brand-primary leading-none">Manual torqboss</h3>
                       <p className="text-[9px] sm:text-xs font-bold text-gray-505 uppercase tracking-widest">Domine todas as ferramentas</p>
                     </div>
                     <AppManual />

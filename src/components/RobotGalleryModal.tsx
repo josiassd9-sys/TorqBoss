@@ -124,7 +124,7 @@ export const RobotGalleryModal: React.FC<RobotGalleryModalProps> = ({
               <div className="flex items-center gap-2 px-4 overflow-x-auto scrollbar-none pb-1">
                  <div className="flex items-center gap-1.5 bg-gray-200/50 px-2 py-1 rounded-md">
                    <Sparkles size={10} className="text-brand-accent" />
-                   <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">IA FleetX:</span>
+                   <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">IA torqboss:</span>
                  </div>
                  {['oficial', 'alta resolução', 'frente', 'traseira', 'interior'].map(tag => (
                    <button 
@@ -157,7 +157,7 @@ export const RobotGalleryModal: React.FC<RobotGalleryModalProps> = ({
                   <Camera size={20} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-brand-primary uppercase tracking-tighter leading-none">Navegador FleetX</h2>
+                  <h2 className="text-lg font-black text-brand-primary uppercase tracking-tighter leading-none">Navegador torqboss</h2>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Sincronizado com: {vehicleName}</p>
                 </div>
               </div>

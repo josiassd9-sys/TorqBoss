@@ -24,10 +24,30 @@ import {
 
 import firebaseConfig from '../../firebase-applet-config.json';
 
-const app = initializeApp(firebaseConfig);
+import { debugLog, debugError } from '../debug';
+
+debugLog('INICIANDO FIREBASE');
+
+let app;
+
+try {
+
+  app = initializeApp(firebaseConfig);
+
+  debugLog('FIREBASE INITIALIZE OK');
+
+} catch (err: any) {
+
+  debugError(`FIREBASE INIT ERROR: ${err?.message}`);
+
+  throw err;
+}
 
 export const db = getFirestore(app);
+
 export const auth = getAuth(app);
+
+debugLog('AUTH E FIRESTORE OK');
 
 export const googleProvider = new GoogleAuthProvider();
 

@@ -97,7 +97,7 @@ export const AppManual: React.FC = () => {
         onToggle={() => toggleIndex(0)}
       >
         <div className="space-y-4">
-          <p>O FleetX foi projetado para ser um cidadão do mundo. Na aba <strong>Regional</strong> das configurações, você define como o aplicativo deve se comportar visualmente e tecnicamente de acordo com o seu país:</p>
+          <p>O torqboss foi projetado para ser um cidadão do mundo. Na aba <strong>Regional</strong> das configurações, você define como o aplicativo deve se comportar visualmente e tecnicamente de acordo com o seu país:</p>
           
           <div className="bg-blue-50 p-5 rounded-xl border border-blue-100 space-y-3">
             <div>
@@ -112,12 +112,12 @@ export const AppManual: React.FC = () => {
           </div>
 
           <ul className="list-disc ml-6 space-y-2">
-            <li><strong>Idiomas Suportados:</strong> O FleetX agora fala 9 idiomas: Português, Inglês, Espanhol, Francês, Italiano, Alemão, Russo, Chinês e Coreano.</li>
+            <li><strong>Idiomas Suportados:</strong> O torqboss agora fala 9 idiomas: Português, Inglês, Espanhol, Francês, Italiano, Alemão, Russo, Chinês e Coreano.</li>
             <li><strong>Símbolo Monetário e Regional:</strong> Customize a moeda (R$, €, $, etc.), o nome da sua agência/empresa e até a Referência de Mercado (Ex: Tabela FIPE ou KBB).</li>
             <li><strong>Subtítulo da Marca:</strong> Personalize o texto que aparece logo abaixo do logo principal. Por padrão é "Meu Carro Top", mas você pode mudar para algo que identifique melhor sua frota ou empresa.</li>
           </ul>
           
-          <p className="text-[11px] italic font-bold text-gray-400">Essa flexibilidade permite que gestores de frota em qualquer continente utilizem o FleetX com a mesma precisão técnica e cultural.</p>
+          <p className="text-[11px] italic font-bold text-gray-400">Essa flexibilidade permite que gestores de frota em qualquer continente utilizem o torqboss com a mesma precisão técnica e cultural.</p>
         </div>
       </ManualItem>
 
@@ -128,7 +128,7 @@ export const AppManual: React.FC = () => {
         onToggle={() => toggleIndex(1)}
       >
         <div className="space-y-4">
-          <p>O FleetX permite que você adeque a ferramenta à sua marca ou preferência pessoal com alto nível de sofisticação:</p>
+          <p>O torqboss permite que você adeque a ferramenta à sua marca ou preferência pessoal com alto nível de sofisticação:</p>
           <ul className="list-disc ml-6 space-y-2">
             <li><strong>20+ Paletas de Cores:</strong> Escolha entre temas como "Slate Professional", "Bordeaux Luxury", "Nordic Minimalism" ou "Graphite Tech". São tons selecionados para passar autoridade e clareza.</li>
             <li><strong>Nova Identidade Visual:</strong> O ícone oficial (Vetor de Pickup Tech) agora estampa o cabeçalho e relatórios, garantindo um visual moderno de "Fleet Management" de última geração.</li>
@@ -146,14 +146,14 @@ export const AppManual: React.FC = () => {
         <div className="space-y-6">
           <div>
             <h4 className="font-black text-brand-primary uppercase text-[10px] mb-2 tracking-widest">1. Cadastrando o Primeiro Veículo</h4>
-            <p className="text-[11px] mb-2">Abra o app, clique no botão <strong>"+"</strong>. Digite a placa. O robô FleetX buscará os dados. Confirme marca e modelo. Salve. Pronto, seu veículo agora tem uma identidade digital.</p>
+            <p className="text-[11px] mb-2">Abra o app, clique no botão <strong>"+"</strong>. Digite a placa. O robô torqboss buscará os dados. Confirme marca e modelo. Salve. Pronto, seu veículo agora tem uma identidade digital.</p>
           </div>
           <div>
             <h4 className="font-black text-brand-primary uppercase text-[10px] mb-2 tracking-widest">2. O Primeiro Envio ao Mecânico</h4>
             <p className="text-[11px] mb-2">No cabeçalho do veículo, clique no ícone de <strong>Compartilhar (Share)</strong>. Selecione "Gerar Cartão do Veículo". Envie o arquivo ou link via WhatsApp para seu mecânico.</p>
           </div>
           <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 italic text-[11px]">
-            <strong>Cenário Real:</strong> Imaginemos que você está na recepção da oficina. Em vez de falar tudo de cor, você envia o cartão digital. O mecânico abre no FleetX dele e já sabe que sua última troca de correia foi há 20 mil km.
+            <strong>Cenário Real:</strong> Imaginemos que você está na recepção da oficina. Em vez de falar tudo de cor, você envia o cartão digital. O mecânico abre no torqboss dele e já sabe que sua última troca de correia foi há 20 mil km.
           </div>
         </div>
       </ManualItem>
@@ -187,7 +187,7 @@ export const AppManual: React.FC = () => {
         isOpen={openIndex === 4}
         onToggle={() => toggleIndex(4)}
       >
-        <p>Um histórico de manutenção só vale dinheiro se for íntegro. No FleetX, cada registro é "auditado" por tecnologia invisível:</p>
+        <p>Um histórico de manutenção só vale dinheiro se for íntegro. No torqboss, cada registro é "auditado" por tecnologia invisível:</p>
         <ul className="list-disc ml-6 space-y-2">
           <li><strong>Logs Forenses:</strong> Toda vez que um mecânico salva um serviço, o sistema registra silenciosamente o <strong>ID Único do Aparelho</strong>, a <strong>Data e Hora Exata</strong> e a <strong>Localização Geográfica</strong> (se habilitada).</li>
           <li><strong>Certificado de Origem:</strong> No relatório final, consta uma assinatura digital que prova que aquele documento foi gerado pelo sistema e não editado em um editor de texto comum.</li>
@@ -203,7 +203,7 @@ export const AppManual: React.FC = () => {
       >
         <p>Por que usar este ecossistema em vez de papel e caneta?</p>
         <ul className="list-disc ml-6 space-y-3">
-          <li><strong>Valorização na Venda:</strong> Um carro com "Laudo FleetX" pode valer até 15% mais no mercado de usados, pois elimina o medo do comprador sobre manutenções negligenciadas.</li>
+          <li><strong>Valorização na Venda:</strong> Um carro com "Laudo torqboss" pode valer até 15% mais no mercado de usados, pois elimina o medo do comprador sobre manutenções negligenciadas.</li>
           <li><strong>Liberdade de Escolha:</strong> Se você viajar e precisar de outra oficina, o novo mecânico lerá o QR Code do seu carro e saberá exatamente o que foi feito pelo mecânico anterior.</li>
           <li><strong>Garantia de Peças:</strong> O sistema te avisa quando uma peça trocada está chegando ao fim da garantia, permitindo que você acione a oficina a tempo.</li>
           <li><strong>Economia Real:</strong> Evite o "empurrometro". Com a Agenda Preditiva, você só troca o que realmente precisa, baseado no desgaste real e não no 'achismo'.</li>
@@ -216,7 +216,7 @@ export const AppManual: React.FC = () => {
         isOpen={openIndex === 6}
         onToggle={() => toggleIndex(6)}
       >
-        <p>O FleetX foi projetado para que o conhecimento sobre o carro nunca se perca, independentemente de quantas vezes você trocar de oficina.</p>
+        <p>O torqboss foi projetado para que o conhecimento sobre o carro nunca se perca, independentemente de quantas vezes você trocar de oficina.</p>
         <ul className="list-disc ml-6 space-y-3">
           <li><strong>Facilitação para Novos Mecânicos:</strong> Quando um novo profissional assume o veículo, ele tem acesso imediato a todo o histórico de serviços, marcas de peças utilizadas e diagnósticos anteriores. Isso evita redundâncias e garante que ele comece o trabalho com clareza total.</li>
           <li><strong>Entendimento de Dificuldades:</strong> Relatórios detalhados permitem que o novo mecânico entenda possíveis dificuldades técnicas já enfrentadas no passado, facilitando a resolução de problemas recorrentes.</li>
@@ -230,10 +230,10 @@ export const AppManual: React.FC = () => {
         isOpen={openIndex === 7}
         onToggle={() => toggleIndex(7)}
       >
-        <p>Como o FleetX sabe quando você deve ir à oficina?</p>
+        <p>Como o torqboss sabe quando você deve ir à oficina?</p>
         <ul className="list-disc ml-6 space-y-2">
           <li><strong>Cálculo de KM Médio:</strong> Ao registrar dois abastecimentos ou serviços com KM diferentes, o sistema entende seu padrão de uso.</li>
-          <li><strong>Sugestão de Manutenção:</strong> Se o manual diz "trocar óleo a cada 10 mil km ou 1 ano", o FleetX cruza seu KM médio para te avisar 30 dias antes da data provável.</li>
+          <li><strong>Sugestão de Manutenção:</strong> Se o manual diz "trocar óleo a cada 10 mil km ou 1 ano", o torqboss cruza seu KM médio para te avisar 30 dias antes da data provável.</li>
           <li><strong>Estratégia de Custo:</strong> O sistema simula o gasto anual previsto, permitindo que você se planeje financeiramente para revisões pesadas (como correia dentada ou suspensão).</li>
         </ul>
       </ManualItem>
@@ -272,7 +272,7 @@ export const AppManual: React.FC = () => {
         isOpen={openIndex === 10}
         onToggle={() => toggleIndex(10)}
       >
-        <p>Para lojistas e colecionadores, o FleetX atua como um ERP automotivo simplificado:</p>
+        <p>Para lojistas e colecionadores, o torqboss atua como um ERP automotivo simplificado:</p>
         <div className="space-y-4">
           <div className="bg-green-50 p-4 rounded-xl border border-green-100">
             <h4 className="font-black text-green-700 uppercase text-[10px] mb-2 tracking-widest">Análise de ROI e Valuation</h4>
@@ -302,7 +302,7 @@ export const AppManual: React.FC = () => {
         <ul className="list-disc ml-6 space-y-2">
           <li><strong>Estrutura em Acordeão:</strong> As informações são organizadas em abas como "Cronograma de Manutenção", "Notas Técnicas", "Especificações" e "Transcrição Completa".</li>
           <li><strong>Fusíveis e Símbolos do Painel:</strong> Agora a IA identifica e lista automaticamente a caixa de fusíveis e o significado de cada luz espia do painel.</li>
-          <li><strong>Sistema de Notas e Legendas:</strong> O FleetX detecta condições repetitivas (Ex: "Somente para veículos turbo*") e organiza essas legendas em uma seção dedicada, evitando poluição visual.</li>
+          <li><strong>Sistema de Notas e Legendas:</strong> O torqboss detecta condições repetitivas (Ex: "Somente para veículos turbo*") e organiza essas legendas em uma seção dedicada, evitando poluição visual.</li>
           <li><strong>Especificações de Fluidos:</strong> Identifique rapidamente o tipo exato de óleo, fluido de freio ou líquido de arrefecimento recomendado com precisão cirúrgica.</li>
         </ul>
       </ManualItem>
@@ -313,7 +313,7 @@ export const AppManual: React.FC = () => {
         isOpen={openIndex === 12}
         onToggle={() => toggleIndex(12)}
       >
-        <p>O <strong>Robô</strong> é o seu assistente de pesquisa externa. Na aba correspondente, você pode ensinar ao FleetX onde buscar informações sobre seus veículos:</p>
+        <p>O <strong>Robô</strong> é o seu assistente de pesquisa externa. Na aba correspondente, você pode ensinar ao torqboss onde buscar informações sobre seus veículos:</p>
         <ul className="list-disc ml-6 space-y-2">
           <li><strong>Adicionar Links de Consulta:</strong> Insira URLs de portais de autopeças, sites de consulta de placas ou bancos de imagens.</li>
           <li><strong>Uso de Variáveis:</strong> Ao cadastrar um link, use a tag <code>{'{{VALOR}}'}</code>. O sistema substituirá automaticamente pela Placa/Matrícula do carro ao clicar no botão de busca.</li>
@@ -328,7 +328,7 @@ export const AppManual: React.FC = () => {
         isOpen={openIndex === 13}
         onToggle={() => toggleIndex(13)}
       >
-        <p>O cérebro do FleetX depende de uma conexão com o <strong>Gemini (Google)</strong>. Veja como configurar:</p>
+        <p>O cérebro do torqboss depende de uma conexão com o <strong>Gemini (Google)</strong>. Veja como configurar:</p>
         <div className="space-y-4">
           <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 italic text-[11px]">
             <strong>Por que preciso de uma chave?</strong> A IA tem um custo operacional elevado. Ao inserir sua própria chave <strong className="text-amber-700">TOTALMENTE GRÁTIS</strong> do Google AI Studio, você garante que as funções de leitura de manuais e diagnósticos funcionam sem filas ou limites compartilhados.
@@ -366,7 +366,7 @@ export const AppManual: React.FC = () => {
         <ul className="list-disc ml-6 space-y-2">
           <li><strong>Engenharia Reversa IA:</strong> Acesse guias conceituais ilustrando pontos ideais de fixação técnica, evitando quebrar presilhas plásticas frágeis durante a manutenção de componentes do seu veículo.</li>
           <li><strong>Buscador de DNA Técnico:</strong> Filtre de forma organizada materiais construtivos (como polímeros de para-choques e painéis), torques descritos por normas de montagem e lógicas de sequenciamento lógico desmontável.</li>
-          <li><strong>Fluxo de Montagem FleetX:</strong> Acompanhe as principais fases de construção conceitual, desde a estrutura pura (Body-in-White) e pintura de proteção (Paint & Coat) até a montagem final de acabamento.</li>
+          <li><strong>Fluxo de Montagem torqboss:</strong> Acompanhe as principais fases de construção conceitual, desde a estrutura pura (Body-in-White) e pintura de proteção (Paint & Coat) até a montagem final de acabamento.</li>
           <li><strong>Detalhamento Avançado:</strong> Especificações industriais consolidadas como Polímeros Ativos (ASTM D4000), Fixação Técnica (DIN 933) e Aerodinâmica para spoilers e vedações herméticas.</li>
         </ul>
       </ManualItem>
@@ -385,7 +385,7 @@ export const AppManual: React.FC = () => {
           <li><strong>Escala do Logotipo (Pickup):</strong> Controle o tamanho exato da pickup tech centralizada do banner da Home (de 50% a 200%). Esse ajuste de precisão afeta exclusivamente a entrada do aplicativo, mantendo os designs das imagens internas de veículos na Garagem intactos.</li>
           <li><strong>Altura do Banner:</strong> Controle fluido da altura de exibição do cabeçalho principal da página inicial.</li>
           <li><strong>Opacidade e Desfoque (Blur):</strong> Controle preciso da transparência de cor e do efeito desfocado fosco no fundo do banner.</li>
-          <li><strong>Cor e Imagem Personalizada:</strong> Defina cores hexadecimais sólidas ou passe a URL direta de uma textura externa (como fibra de carbono ou aço escovado) para servir de plano de fundo do seu FleetX de forma profissional.</li>
+          <li><strong>Cor e Imagem Personalizada:</strong> Defina cores hexadecimais sólidas ou passe a URL direta de uma textura externa (como fibra de carbono ou aço escovado) para servir de plano de fundo do seu torqboss de forma profissional.</li>
         </ul>
       </ManualItem>
     </div>

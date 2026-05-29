@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.fleetx.app"
+    namespace = "com.torqboss.app"
     compileSdk = rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.fleetx.app"
+        applicationId "com.torqboss.app"
 
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -20,8 +20,22 @@ android {
         }
     }
 
+    // ==================== CONFIGURAÇÃO DE ASSINATURA (ADICIONADO) ====================
+    signingConfigs {
+        release {
+            // O arquivo .keystore deve estar dentro da pasta 'app'
+            storeFile file("torqboss-release.keystore")
+            // ⚠️ SUBSTITUA AS SENHAS PELAS QUE VOCÊ DEFINIU AO CRIAR O KEYSTORE
+            storePassword "TorqBoss-0007"
+            keyAlias "torqboss"
+            keyPassword "TorqBoss-0007"   // geralmente a mesma do storePassword
+        }
+    }
+
     buildTypes {
         release {
+            // 🔐 Usa a configuração de assinatura definida acima
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -31,7 +45,7 @@ android {
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             if (output.outputFileName.endsWith(".apk")) {
-                output.outputFileName = "FleetX.apk"
+                output.outputFileName = "TorqBoss.apk"
             }
         }
     }

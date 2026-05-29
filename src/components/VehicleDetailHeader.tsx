@@ -270,7 +270,7 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
         <div className="pt-4 text-left">
           <div className="bg-white/5 border border-white/10 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-xs text-gray-500 font-bold italic">Selo de procedência digital FleetX.</p>
+              <p className="text-xs text-gray-500 font-bold italic">Selo de procedência digital torqboss.</p>
               <button onClick={onGeneratePassport} disabled={isGeneratingPassport} className="text-[9px] font-black uppercase bg-green-500/10 text-green-400 px-3 py-1.5 rounded-lg border border-green-500/20">
                 {isGeneratingPassport ? 'Gerando...' : 'Ver Certificado'}
               </button>

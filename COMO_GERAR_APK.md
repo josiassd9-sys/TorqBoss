@@ -1,12 +1,12 @@
-# Guia Completo: Transformando o FleetX em App Híbrido (Android APK)
+# Guia Completo: Transformando o torqboss em App Híbrido (Android APK)
 
 Este guia prático ensina o passo a passo completo para exportar este projeto para a sua máquina, configurá-lo no **VS Code**, sincronizá-lo com o **Capacitor** e compilar o arquivo **APK** nativo utilizando o **Android Studio**.
 
 ---
 
-## 🎯 Entendendo a Arquitetura Híbrida do FleetX
+## 🎯 Entendendo a Arquitetura Híbrida do torqboss
 
-O FleetX é um aplicativo **Full-Stack (Vite/React no Frontend + Express/Node no Backend)**.
+O torqboss é um aplicativo **Full-Stack (Vite/React no Frontend + Express/Node no Backend)**.
 
 *   No **Navegador (Web)**: Ambas as partes funcionam juntas debaixo da mesma máquina ou contêiner.
 *   No **Celular (Híbrido)**: O React é compilado e encapsulado dentro do aplicativo utilizando um componente nativo chamado **WebView**. Ele roda de forma 100% offline e local no aparelho.
@@ -163,7 +163,7 @@ Para que o seu aplicativo tenha uma aparência profissional, vamos configurar a 
 
 ### 1. Localize a Imagem no seu Projeto
 A imagem que você deseja usar está localizada na seguinte pasta dentro do seu VS Code:
-`src/assets/images/fleetx_logo_strada.png`
+`src/assets/images/torqboss_logo_strada.png`
 
 *(Dica: Se você alterou o logotipo, use o arquivo que você colocou nesta pasta ou no diretório `public/`).*
 
@@ -176,7 +176,7 @@ Com o projeto aberto no Android Studio (Passo 5):
     *   **Icon Type**: Mantenha `Launcher Icons (Adaptive and Legacy)`.
     *   **Name**: Mantenha `ic_launcher`.
     *   **Tab "Foreground Layer"**:
-        *   Em **Path**, clique no ícone da pastinha e navegue até a pasta do seu projeto exportado. Selecione o arquivo `src/assets/images/fleetx_logo_strada.png`.
+        *   Em **Path**, clique no ícone da pastinha e navegue até a pasta do seu projeto exportado. Selecione o arquivo `src/assets/images/torqboss_logo_strada.png`.
         *   **Scaling**: Use o controle deslizante **Resize** para ajustar o tamanho do logotipo dentro do círculo de segurança (o logotipo não deve ultrapassar as bordas pretas).
     *   **Tab "Background Layer"**:
         *   **Asset Type**: Escolha `Color`.

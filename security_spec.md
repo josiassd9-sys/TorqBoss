@@ -1,4 +1,4 @@
-# Especificação de Segurança e Integridade - FleetX
+# Especificação de Segurança e Integridade - torqboss
 
 ## 1. Arquitetura de Dados e Invariantes
 - **Soberania do Usuário**: Fichas de veículos e históricos residem no `localStorage`. A segurança aqui é garantida pelo isolamento do navegador.
@@ -14,7 +14,7 @@
 4. **Envenenamento de Tipo**: Tentar enviar strings para campos numéricos de créditos.
 5. **Acesso Anônimo**: Tentativa de consumir recursos de IA sem estar autenticado no Firebase.
 6. **Estouro de Armazenamento Local**: Scripts maliciosos tentando lotar o `localStorage` com dados lixo.
-7. **Manipulação de Backup**: Edição manual de arquivos `.fleetx-backup` para injetar scripts XSS que seriam executados ao importar o backup.
+7. **Manipulação de Backup**: Edição manual de arquivos `.torqboss-backup` para injetar scripts XSS que seriam executados ao importar o backup.
 8. **Spoofing de Marca**: Alteração de nomes de agência no relatório PDF para simular certificados falsos.
 9. **Excesso de Requisições (DDoS Consultivo)**: Milhares de chamadas seguidas à API do Gemini para esgotar créditos.
 10. **Inconsistência de Moeda**: Tentar realizar cálculos financeiros misturando moedas diferentes no mesmo veículo.
@@ -27,4 +27,4 @@
 - **Isolamento de API Key**: Chaves de usuário PRO nunca são gravadas no Firestore, apenas consumidas em runtime ou armazenadas localmente se necessário.
 
 ---
-*FleetX Security Protocol - Version 1.1*
+*torqboss Security Protocol - Version 1.1*

@@ -1,6 +1,6 @@
 import React from 'react';
 import { getBrandLogo } from '../brandLogos';
-import fleetxLogo from '../assets/images/fleetx_logo_strada.png';
+import torqbossLogo from '../assets/images/torqboss_logo_strada.png';
 
 interface BrandLogoProps {
   vehicleName: string;
@@ -14,7 +14,7 @@ export const BrandLogo = ({ vehicleName, brandLogoUrl, className }: BrandLogoPro
   if (!logo) {
     return (
       <div className={`flex items-center justify-center bg-gray-55/40 text-brand-primary rounded-lg border border-white/5 ${className}`}>
-        <img src={fleetxLogo} alt="FleetX Logo" className="w-full h-full object-contain p-2" />
+        <img src={torqbossLogo} alt="torqboss Logo" className="w-full h-full object-contain p-2" />
       </div>
     );
   }

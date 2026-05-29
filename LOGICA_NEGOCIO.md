@@ -1,6 +1,6 @@
-# Lógica de Negócio e Mapa de Funcionalidades - FleetX
+# Lógica de Negócio e Mapa de Funcionalidades - torqboss
 
-Este documento serve como a "Bússola de Desenvolvimento" para o FleetX, detalhando cada engrenagem do sistema para garantir que a visão original seja preservada em futuras evoluções.
+Este documento serve como a "Bússola de Desenvolvimento" para o torqboss, detalhando cada engrenagem do sistema para garantir que a visão original seja preservada em futuras evoluções.
 
 ---
 
@@ -46,7 +46,7 @@ Este documento serve como a "Bússola de Desenvolvimento" para o FleetX, detalha
 - **Subtítulo Personalizável**: Permite ao dono da agência mudar a frase "Meu Carro Top" para algo como "— Gestão e Performance" ou "— Frota Segura", mantendo a flexibilidade da marca.
 
 ### ⚖️ Política de Naming e Marca
-- **FleetX**: Registrado como o nome oficial do motor do sistema. Não deve ser renomeado.
+- **torqboss**: Registrado como o nome oficial do motor do sistema. Não deve ser renomeado.
 - **Identidade Corporativa**: Cabeçalhos técnicos utilizam cinza escuro sólido para manter a seriedade, enquanto o banner da home permite ousadia estética.
 
 ### 🎨 Design System Profissional e Customização de Banner

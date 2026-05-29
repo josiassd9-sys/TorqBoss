@@ -1,4 +1,4 @@
-package com.fleetx.app;
+package com.torqboss.app;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;

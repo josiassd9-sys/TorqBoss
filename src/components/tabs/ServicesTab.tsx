@@ -24,7 +24,7 @@ export const ServicesTab: React.FC<ServicesTabProps> = ({
           <h3 className="text-xl font-black italic uppercase tracking-tighter text-brand-primary flex items-center gap-2">
             <Wrench size={24} className="text-brand-accent fill-brand-accent" /> Histórico Maintenance
           </h3>
-          <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">Registros oficiais de oficina e reparos FleetX</p>
+          <p className="text-[10px] text-zinc-500 font-black uppercase tracking-[0.2em]">Registros oficiais de oficina e reparos torqboss</p>
         </div>
         <button 
           onClick={onAddService}

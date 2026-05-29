@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">FleetX</string>
-    <string name="title_activity_main">FleetX</string>
-    <string name="package_name">com.fleetx.app</string>
-    <string name="custom_url_scheme">com.fleetx.app</string>
-    <string name="server_client_id">718759502049-crb938h7svtdcl205kfu7a5m04ngllpv.apps.googleusercontent.com</string>
+    <string name="app_name">TorqBoss</string>
+    <string name="title_activity_main">TorqBoss</string>
+    <string name="package_name">com.torqboss.app</string>
+    <string name="custom_url_scheme">com.torqboss.app</string>
+    <string name="server_client_id">456343787433-f6n6aa5i85o89rjbvvck9hurgtqi5o8f.apps.googleusercontent.com</string>
 </resources>

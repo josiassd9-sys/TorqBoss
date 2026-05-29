@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.fleetx.app',
-  appName: 'FleetX',
+  appId: 'com.torqboss.app',
+  appName: 'torqboss',
   webDir: 'dist',
   server: {
     androidScheme: 'https'
@@ -10,10 +10,10 @@ const config: CapacitorConfig = {
   plugins: {
     Filesystem: {},
     Share: {},
-    // 🛠️ Configuração obrigatória adicionada para o plugin do Google:
     GoogleAuth: {
       scopes: ['profile', 'email'],
-      serverClientId: '718759502049-crb938h7svtdcl205kfu7a5m04ngllpv.apps.googleusercontent.com',
+      androidClientId: '456343787433-vjh8tp1rn9q18fbaonhmk4tjgkc9pdjt.apps.googleusercontent.com',
+      serverClientId: '456343787433-f6n6aa5i85o89rjbvvck9hurgtqi5o8f.apps.googleusercontent.com',
       forceCodeForRefreshToken: true
     }
   }

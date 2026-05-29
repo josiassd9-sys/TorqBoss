@@ -85,7 +85,7 @@ export const StructuralDNATab: React.FC<StructuralDNATabProps> = ({ vehicle }) =
     },
     {
       id: 'assembly',
-      title: 'Fluxo de Montagem FleetX',
+      title: 'Fluxo de Montagem torqboss',
       icon: Construction,
       content: (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

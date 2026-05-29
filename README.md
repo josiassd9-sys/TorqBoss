@@ -1,7 +1,7 @@
-# FleetX - Guia de Engenharia e Operação (Master Documentation)
+# torqboss - Guia de Engenharia e Operação (Master Documentation)
 
 ## 📌 Visão Geral e Propósito
-O **FleetX** é um ecossistema de gestão automotiva de elite. Ele não é apenas um rastreador de despesas, mas um **Legado Técnico** para o veículo. Projetado para mecânicos e proprietários exigentes, o app transforma dados brutos em decisões inteligentes, preservando o valor de revenda e a segurança operacional.
+O **torqboss** é um ecossistema de gestão automotiva de elite. Ele não é apenas um rastreador de despesas, mas um **Legado Técnico** para o veículo. Projetado para mecânicos e proprietários exigentes, o app transforma dados brutos em decisões inteligentes, preservando o valor de revenda e a segurança operacional.
 
 ---
 
@@ -13,7 +13,7 @@ A privacidade é o pilar central. **Todos os dados de frota, fotos e históricos
 - **Integração Cloud**: O Firebase é usado estritamente para o que é global: **Autenticação, Gestão de Créditos IA e Status da Assinatura PRO**.
 
 ### 🧠 Inteligência Artificial (Gemini integration)
-O FleetX utiliza modelos de linguagem grande (LLM) para processar conhecimento técnico complexo:
+O torqboss utiliza modelos de linguagem grande (LLM) para processar conhecimento técnico complexo:
 - **Leitura de Manuais**: Processa PDFs técnicos e extrai especificações de óleo, planos de revisão, tabelas de fusíveis e significados de luzes de painel.
 - **Diagnóstico e Sugestão**: Baseado no histórico de manutenção, a IA sugere intervenções preditivas.
 - **Segurança de Chaves**: Usuários FREE usam créditos da plataforma. Usuários PRO podem inserir sua própria **API Key**, garantindo autonomia infinita.
@@ -53,7 +53,7 @@ O sistema é agnóstico em relação à localização:
 ### 6. DNA Estrutural (Visualização OEM e Componentes)
 - **Engenharia Reversa IA**: Esquemas OEM preditivos que mapeiam presilhas e pontos ocultos de fixação no chassi para desmontagens sem quebra ou danos.
 - **Buscador de DNA Técnico**: Base técnica integrada sobre materiais (polímeros), torque de especificação técnica e sequência lógica de logística reversa.
-- **Fluxo de Montagem FleetX**: Renderização conceitual do processo fabril (Body-in-White, Paint & Coat, Trim & Internals e Final Assembly).
+- **Fluxo de Montagem torqboss**: Renderização conceitual do processo fabril (Body-in-White, Paint & Coat, Trim & Internals e Final Assembly).
 - **Detlhamento Avançado**: Catalogação estrita de polímeros (ASTM D4000), fixações físicas (DIN 933) e aerodinâmica de vedação.
 
 ---
@@ -73,17 +73,17 @@ Agora que o projeto caminha para o desenvolvimento em **VS Code** e geração de
 ---
 
 ### ⚖️ Lógica de Marca (Naming Strategy)
-- **FleetX**: É um nome de marca e produto. Não deve ser traduzido ou alterado no código-fonte em favor de termos genéricos.
+- **torqboss**: É um nome de marca e produto. Não deve ser traduzido ou alterado no código-fonte em favor de termos genéricos.
 - **Meu Carro Top**: É o subtítulo comercial interpretativo. Ficou definido que pode ser traduzido ou customizado pelo usuário proprietário da agência via configurações.
 
 ### 🛡️ DIRETRIZES DE OURO PARA FUTUROS DESENVOLVEDORES
 1. **Nunca quebre o LocalFirst**: A sincronização forçada com nuvem destruiría a confiança do usuário.
-2. **Preserve a Estética FleetX**: Bordas `3xl`, fontes `JetBrains Mono`, ícones `Lucide` e tons sofisticados.
+2. **Preserve a Estética torqboss**: Bordas `3xl`, fontes `JetBrains Mono`, ícones `Lucide` e tons sofisticados.
 3. **Segurança de Créditos**: Toda interação de IA deve validar o saldo via `useFirebase`.
 4. **Respeite o Manual**: O manual em `AppManual.tsx` deve ser a fonte da verdade para o usuário final.
 5. **Dashboard Sandbox (Josias)**: Existe um painel de "Override Licença PRO" protegido por e-mail para testes rápidos de funcionalidades fechadas durante a geração de builds.
 6. **Ajuste de Banner Isolado**: Todo o ecossistema de "Configurações Finas do Banner" (opacidade, desfoque, altura, escala da pickup/logotipo e fundo customizado) se destina **única e exclusivamente** ao cabeçalho visual da **Página Inicial (`AppHeader.tsx`)**. Sob nenhuma hipótese essas configurações devem atingir ou sobresscrever o estilo dos cabeçalhos dos detalhes de veículos selecionados (`VehicleDetailHeader.tsx`) ou cards internos de garagem, que devem reter seu visual corporativo escuro sólido e layout de detalhes intocados.
 
 ---
-*Documento atualizado em 22 de Maio de 2026 - FleetX Engineering Team.*
+*Documento atualizado em 22 de Maio de 2026 - torqboss Engineering Team.*
 

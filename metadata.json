@@ -1,5 +1,5 @@
 {
-  "name": "FleetX - Meu Carro Top",
+  "name": "torqboss - Meu Carro Top",
   "description": "A plataforma definitiva para gestão de frotas e cuidados automotivos. Transforme seu veículo em um legado técnico com inteligência artificial e precisão profissional.",
   "requestFramePermissions": ["clipboard-read"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

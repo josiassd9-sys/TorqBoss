@@ -111,7 +111,7 @@ export const DevDocsTab: React.FC = () => {
                     <div>
                         <h4 className="text-[10px] font-black uppercase text-brand-primary mb-1 tracking-widest">Nota do Desenvolvedor</h4>
                         <p className="text-[11px] font-bold text-gray-600 leading-relaxed">
-                            Estes arquivos são a "Fonte da Verdade" do FleetX. Eles sincronizam as diretrizes de design, 
+                            Estes arquivos são a "Fonte da Verdade" do torqboss. Eles sincronizam as diretrizes de design, 
                             segurança e lógica de negócio que guiam o desenvolvimento do app.
                         </p>
                     </div>

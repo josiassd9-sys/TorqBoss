@@ -117,7 +117,7 @@ export const IntelligenceTab: React.FC<IntelligenceTabProps> = ({
             </div>
           </div>
           <p className="text-[10px] text-zinc-500 font-bold italic text-left">
-            * Baseado em {traveledKm.toLocaleString()} KM de telemetria FleetX.
+            * Baseado em {traveledKm.toLocaleString()} KM de telemetria torqboss.
           </p>
           <button 
             onClick={runTCOAnalysis}
@@ -132,7 +132,7 @@ export const IntelligenceTab: React.FC<IntelligenceTabProps> = ({
     },
     {
       id: 'score',
-      title: 'Score de Integridade FleetX',
+      title: 'Score de Integridade torqboss',
       icon: ShieldCheck,
       content: (
         <div className="bg-zinc-950 p-6 rounded-xl text-white space-y-6 relative overflow-hidden text-left border border-white/5">
