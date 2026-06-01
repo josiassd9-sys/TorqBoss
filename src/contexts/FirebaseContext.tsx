@@ -94,7 +94,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     clientId: '456343787433-f6n6aa5i85o89rjbvvck9hurgtqi5o8f.apps.googleusercontent.com',
     scopes: ['profile', 'email'],
     grantOfflineAccess: true,
-  }).catch(err => console.error('Erro na inicialização automática do Google Auth:', err));
+  }).catch((err: unknown) => console.error('Erro na inicialização automática do Google Auth:', err));
 
   const handleDevProChange = () => {
     try {
@@ -111,7 +111,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 }, []);
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (u: any) => {
       setUser(u);
       setLoading(false);
 
@@ -166,7 +166,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
 
           // Real-time listener for credits
-          const unsubscribeSnapshot = onSnapshot(userDocRef, async (snapshot) => {
+          const unsubscribeSnapshot = onSnapshot(userDocRef, async (snapshot: any) => {
             if (snapshot.exists()) {
               const data = snapshot.data();
               let snapshotCredits = data.aiCredits !== undefined ? data.aiCredits : 0;
@@ -187,7 +187,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               setCredits(snapshotCredits);
               setIsPro(checkDevOverride() ? true : snapshotIsPro);
             }
-          }, (error) => {
+          }, (error: any) => {
             handleFirestoreError(error, OperationType.GET, path);
           });
 

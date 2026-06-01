@@ -1,0 +1,9 @@
+export { PartsTab } from './PartsTab';
+export { ServicesTab } from './ServicesTab';
+export { TiresTab } from './TiresTab';
+export { FuelTab } from './FuelTab';
+export { IntelligenceTab } from './IntelligenceTab';
+export { ManualTab } from './ManualTab';
+export { RemindersTab } from './RemindersTab';
+export { AuditTab } from './AuditTab';
+export { StructuralDNATab } from './StructuralDNATab';

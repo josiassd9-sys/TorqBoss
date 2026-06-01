@@ -646,7 +646,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           { label: 'Fundo do Veículo', key: 'vehicleHeaderBg' as const, desc: 'Banner Interno' },
                           { label: 'Sub-cards', key: 'subCardBg' as const, desc: 'Cards de Métricas e Detalhes' },
                         ].map((color) => {
-                          const currentTheme = THEMES[settings.theme as keyof typeof THEMES];
+                          const currentTheme = THEMES.find(t => t.id === settings.theme) as any;
                           const currentColor = settings.customThemeColors?.[color.key] ||
                             (currentTheme?.[color.key as keyof typeof currentTheme] as string) ||
                             (color.key === 'primary' ? '#141414' :

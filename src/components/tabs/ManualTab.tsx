@@ -211,7 +211,7 @@ export const ManualTab: React.FC<ManualTabProps> = ({
                 )}
 
                 {/* 3. Especificações Técnicas */}
-                {Object.keys(vehicle.manual.technicalSections).some(k => (vehicle.manual?.technicalSections as any)[k]) && (
+                {Object.keys(vehicle.manual.technicalSections || {}).some(k => (vehicle.manual?.technicalSections as any)[k]) && (
                   <AccordionItem
                     id="technical"
                     title="Especificações de Fábrica"
@@ -220,7 +220,7 @@ export const ManualTab: React.FC<ManualTabProps> = ({
                     onToggle={() => handleToggle('technical')}
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {Object.entries(vehicle.manual.technicalSections).map(([key, value]) => {
+                      {Object.entries(vehicle.manual.technicalSections || {}).map(([key, value]) => {
                         if (!value) return null;
                         const labels: { [key: string]: string } = {
                           tirePressure: 'Pressão de Pneus',
@@ -248,7 +248,7 @@ export const ManualTab: React.FC<ManualTabProps> = ({
                 )}
 
                 {/* 4. Cronograma de Manutenção Programada */}
-                {vehicle.manual.maintenanceSchedule.length > 0 && (
+                {(vehicle.manual.maintenanceSchedule || []).length > 0 && (
                   <AccordionItem
                     id="schedule"
                     title="Plano de Revisão Automático"
@@ -258,13 +258,13 @@ export const ManualTab: React.FC<ManualTabProps> = ({
                     badge="KM"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {vehicle.manual.maintenanceSchedule.map((schedule, idx) => (
+                      {(vehicle.manual.maintenanceSchedule || []).map((schedule: any, idx: number) => (
                         <div key={idx} className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm transition-all hover:scale-[1.02] group">
                           <div className="font-black text-brand-primary text-lg mb-2 italic flex items-center gap-2">
                              {schedule.mileage.toLocaleString()} <span className="text-[10px] uppercase font-bold tracking-widest text-gray-300">km</span>
                           </div>
                           <ul className="text-xs text-gray-600 space-y-2 font-medium border-t border-gray-50 pt-3 mt-3">
-                            {schedule.items.map((item, i) => (
+                            {schedule.items?.map((item: any, i: number) => (
                               <li key={i} className="flex items-start gap-2">
                                 <span className="h-1 w-1 bg-brand-accent rounded-full mt-1.5 shrink-0" />
                                 {item}
@@ -278,7 +278,6 @@ export const ManualTab: React.FC<ManualTabProps> = ({
                 )}
               </>
             )}
-
             <div className="mt-6 flex justify-center">
               <button 
                 onClick={onGenerateManual}
@@ -290,8 +289,6 @@ export const ManualTab: React.FC<ManualTabProps> = ({
               </button>
             </div>
           </div>
-
-          {/* AI Chat Sidebar */}
           <div className="bg-brand-primary rounded-lg p-8 text-white shadow-2xl flex flex-col h-[680px] lg:h-auto border border-white/5 relative overflow-hidden group">
             <div className="absolute -top-10 -right-10 w-48 h-48 bg-brand-accent/10 rounded-lg blur-[60px] group-hover:bg-brand-accent/20 transition-all duration-1000" />
             

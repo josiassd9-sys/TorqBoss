@@ -20,6 +20,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 }) => {
   const { user, credits, isPro } = useFirebase();
   const { t } = useTranslation();
+  const headerConfig = data.settings?.headerConfig ?? {};
 
   return (
     <header className="flex flex-col gap-4 mb-6">
@@ -66,22 +67,22 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         <motion.div 
           whileHover={{ scale: 1.005 }}
           style={{ 
-            height: `${data.settings.headerConfig?.bannerHeight || 55}px`,
-            backgroundColor: data.settings.headerConfig?.bgColor || '#141414',
-            backgroundImage: data.settings.headerConfig?.bgImage ? `url(${data.settings.headerConfig.bgImage})` : 'none',
+            height: `${headerConfig.bannerHeight || 55}px`,
+            backgroundColor: headerConfig.bgColor || '#141414',
+            backgroundImage: headerConfig.bgImage ? `url(${headerConfig.bgImage})` : 'none',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: data.settings.headerConfig?.bgOpacity ?? 1,
-            backdropFilter: `blur(${data.settings.headerConfig?.bgBlur || 0}px)`,
+            opacity: headerConfig.bgOpacity ?? 1,
+            backdropFilter: `blur(${headerConfig.bgBlur || 0}px)`,
           }}
           className="w-full rounded-xl shadow-xl shadow-zinc-200/50 shrink-0 border-2 border-zinc-50 flex items-center justify-center overflow-hidden transition-all duration-300"
         >
-          {(data.settings.headerConfig?.showIcon ?? true) && (
+          {(headerConfig.showIcon ?? true) && (
             <motion.img 
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ 
                 opacity: 1, 
-                scale: (data.settings.headerConfig?.iconScale || 50) / 100 
+                scale: (headerConfig.iconScale || 50) / 100 
               }}
               src={torqbossLogo} 
               alt="torqboss Logo" 

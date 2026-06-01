@@ -37,6 +37,7 @@ export const AddServiceModal = ({
       name: newServicePart.name,
       quantity: Number(newServicePart.quantity) || 1,
       unitPrice: Number(newServicePart.unitPrice) || 0,
+      price: Number(newServicePart.unitPrice) || 0,
       observation: newServicePart.observation
     };
     setNewService((s: any) => ({...s, partsList: [...s.partsList, part]}));

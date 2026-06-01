@@ -203,7 +203,7 @@ export const VehicleTabs: React.FC<VehicleTabsProps> = ({
           <ServicesTab 
             services={selectedVehicle.services || []}
             onAddService={() => setIsAddingService(true)}
-            onDeleteItem={(id) => handleDeleteItem('service', id)}
+            onDeleteItem={(id: string) => handleDeleteItem('service', id)}
             formatCurrency={formatCurrency}
           />
         )}
@@ -212,7 +212,7 @@ export const VehicleTabs: React.FC<VehicleTabsProps> = ({
           <FuelTab 
             fuelLogs={selectedVehicle.fuelLogs || []}
             onAddFuel={() => setIsAddingFuel(true)}
-            onDeleteItem={(id) => handleDeleteItem('fuel', id)}
+            onDeleteItem={(id: string) => handleDeleteItem('fuel', id)}
             formatCurrency={formatCurrency}
           />
         )}
@@ -221,7 +221,7 @@ export const VehicleTabs: React.FC<VehicleTabsProps> = ({
           <RemindersTab 
             reminders={selectedVehicle.reminders || []}
             onAddReminder={() => setIsAddingReminder(true)}
-            onDeleteItem={(id) => handleDeleteItem('reminder', id)}
+            onDeleteItem={(id: string) => handleDeleteItem('reminder', id)}
             onToggleReminder={toggleReminder}
           />
         )}
@@ -237,7 +237,7 @@ export const VehicleTabs: React.FC<VehicleTabsProps> = ({
             runTCOAnalysis={handleTCOAnalysis}
             isAnalyzingTco={isAnalyzingTco}
             tcoAnalysis={tcoAnalysis}
-            createdAt={selectedVehicle.createdAt}
+            createdAt={selectedVehicle.createdAt || new Date().toISOString()}
             fuelAnalytics={fuelAnalytics}
           />
         )}

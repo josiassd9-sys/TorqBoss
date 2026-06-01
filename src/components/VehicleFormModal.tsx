@@ -546,7 +546,7 @@ export const VehicleFormModal: React.FC<VehicleFormModalProps> = ({
                       {searchLinks.map(link => (
                         <a 
                           key={link.id}
-                          href={link.url.includes('{placa}') ? link.url.replace('{placa}', newVehicle.plate || '') : link.url} 
+                          href={link.url ? (link.url.includes('{placa}') ? link.url.replace('{placa}', newVehicle.plate || '') : link.url) : '#'} 
                           target="_blank" 
                           rel="noreferrer"
                           className={`text-[10px] bg-white hover:bg-opacity-10 text-gray-600 px-2.5 py-1.5 rounded-lg font-bold transition-all border border-gray-200 shadow-sm`}

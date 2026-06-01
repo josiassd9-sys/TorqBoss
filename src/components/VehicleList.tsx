@@ -29,6 +29,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
   formatDistance
 }) => {
   const { user, credits, isPro } = useFirebase();
+  const vehicles = data.vehicles || [];
 
   return (
     <>
@@ -58,7 +59,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
           <Box size={12} className="text-brand-accent" />
           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mr-1">Peças</span>
           <span className="text-xs font-black text-brand-primary">
-            {data.vehicles.length > 0 ? (data.vehicles[0].parts?.length || 0) : 0}
+            {vehicles.length > 0 ? (vehicles[0].parts?.length || 0) : 0}
           </span>
         </div>
 
@@ -66,7 +67,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
           <Disc size={12} className="text-blue-500" />
           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mr-1">Pneus</span>
           <span className="text-xs font-black text-blue-600">
-            {data.vehicles.length > 0 ? (data.vehicles[0].tireSets?.[0]?.brand?.slice(0, 5) || 'OK') : '--'}
+            {vehicles.length > 0 ? (vehicles[0].tireSets?.[0]?.brand?.slice(0, 5) || 'OK') : '--'}
           </span>
         </div>
       </motion.div>
@@ -132,7 +133,7 @@ export const VehicleList: React.FC<VehicleListProps> = ({
                     </div>
                   )}
                   <div className="absolute right-0 flex items-center gap-1">
-                    {data.vehicles.indexOf(vehicle) !== 0 && (
+                    {vehicles.indexOf(vehicle) !== 0 && (
                       <motion.button 
                         whileHover={{ scale: 1.2, color: 'var(--color-brand-accent)' }}
                         onClick={(e: React.MouseEvent) => {
