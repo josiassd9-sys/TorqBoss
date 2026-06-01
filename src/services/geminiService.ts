@@ -15,6 +15,7 @@ const API_BASE = isNativeApp ? PRODUCAO_API_URL : '';
 let onCreditConsumed: (amount: number) => void = () => {};
 let currentCredits = 0;
 let usingCustomKey = false;
+let isProMember = false;
 
 export const geminiService = {
   setApiKey: (key: string) => {
@@ -30,6 +31,9 @@ export const geminiService = {
     if (settings.aiCredits !== undefined) {
       currentCredits = settings.aiCredits;
     }
+    if (settings.isProMember !== undefined) {
+      isProMember = !!settings.isProMember;
+    }
     fetch(`${API_BASE}/api/gemini/settings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,7 +48,8 @@ export const geminiService = {
   getCooldownRemaining: () => geminiService.call('getCooldownRemaining'),
 
   call: async (method: string, ...args: any[]): Promise<any> => {
-    if (!usingCustomKey && currentCredits <= 0 && method !== 'validateApiKey' && method !== 'getCooldownRemaining') {
+    const skipCheck = usingCustomKey || isProMember || method === 'validateApiKey' || method === 'getCooldownRemaining';
+    if (!skipCheck && currentCredits <= 0) {
       throw new Error("SALDO INSUFICIENTE: Seus créditos de IA acabaram. Recarregue na aba 'Carteira' ou adicione sua própria Chave API.");
     }
 
@@ -129,6 +134,7 @@ export const geminiService = {
   analyzeTireProfile: (brand: string, model: string, currentUsageProfile: string) => geminiService.call('analyzeTireProfile', brand, model, currentUsageProfile),
   getFuelInsight: (avgConsumption: string, vehicle: any) => geminiService.call('getFuelInsight', avgConsumption, vehicle),
   diagnoseSymptom: (vehicle: any, symptom: string) => geminiService.call('diagnoseSymptom', vehicle, symptom),
+  getVerificationGuide: (vehicle: any, symptom: string, causeName: string) => geminiService.call('getVerificationGuide', vehicle, symptom, causeName),
   fetchFipeValue: (vehicleName: string, model: string, year: string) => geminiService.call('fetchFipeValue', vehicleName, model, year),
   callAI: (prompt: string, jsonMode?: boolean, useGoogleSearch?: boolean, skipHistory?: boolean) => 
     geminiService.call('callAI', prompt, jsonMode, useGoogleSearch, skipHistory),

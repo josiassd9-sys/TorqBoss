@@ -34,6 +34,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Vehicle, AppData } from '../types';
 import { BrandLogo } from './BrandLogo';
 import { VehicleImage } from './VehicleImage';
+import { InteractiveDiagnosis } from './InteractiveDiagnosis';
 
 interface VehicleDetailHeaderProps {
   data: AppData;
@@ -308,8 +309,12 @@ export const VehicleDetailHeader: React.FC<VehicleDetailHeaderProps> = ({
               </button>
             </div>
             {diagnosisResult && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4 bg-zinc-950 p-6 rounded-lg border border-white/10">
-                <div className="markdown-body text-xs text-zinc-200 shadow-inner"><Markdown>{diagnosisResult}</Markdown></div>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-4">
+                <InteractiveDiagnosis 
+                  diagnosisResult={diagnosisResult} 
+                  vehicle={selectedVehicle} 
+                  symptomQuery={symptomQuery} 
+                />
               </motion.div>
             )}
           </div>

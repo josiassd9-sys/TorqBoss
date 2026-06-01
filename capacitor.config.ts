@@ -7,12 +7,15 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https'
   },
-  // O plugin @capacitor-firebase/authentication não precisa mais
-  // das configurações GoogleAuth. Ele lê tudo do google-services.json
-  // e do Firebase Console.
   plugins: {
     Filesystem: {},
-    Share: {}
+    Share: {},
+    GoogleAuth: {
+      scopes: ['profile', 'email'],
+      androidClientId: '456343787433-vjh8tp1rn9q18fbaonhmk4tjgkc9pdjt.apps.googleusercontent.com',
+      serverClientId: '456343787433-f6n6aa5i85o89rjbvvck9hurgtqi5o8f.apps.googleusercontent.com',
+      forceCodeForRefreshToken: true
+    }
   }
 };
 

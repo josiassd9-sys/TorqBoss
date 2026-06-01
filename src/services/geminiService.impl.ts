@@ -1306,18 +1306,60 @@ export const geminiService = {
       
       Histórico Recente: ${JSON.stringify(services.slice(-3))}
       
-      Com base nessas informações, forneça um diagnóstico preliminar estruturado em:
-      1. Causas prováveis (leve em conta se o estilo de direção agressivo ou passivo demais pode ter causado isso).
-      2. Nível de urgência (Baixo, Médio, Crítico).
-      3. O que o motorista deve verificar imediatamente.
-      4. Recomendação para o mecânico.
+      Com base nessas informações, forneça um diagnóstico preliminar estruturado.
+      Retorne um objeto JSON estritamente estruturado com os seguintes campos:
+      {
+        "markdown": "Texto explicativo completo em formato Markdown e português para o diagnóstico. Deve incluir uma justificativa das causas, o nível de urgência geral, e orientações amigáveis.",
+        "causes": [
+          {
+            "name": "Nome curto e direto da causa provável (ex: Motor de arranque danificado, Bateria descarregada, Fusível queimado)",
+            "description": "Uma frase resumindo por que isso causaria o sintoma.",
+            "severity": "Baixo" ou "Médio" ou "Crítico"
+          }
+        ]
+      }
       
-      Seja técnico mas acessível. Use Markdown.`;
+      Seja técnico mas acessível. Mantenha os nomes das causas bem diretos e realistas para o modelo do veículo. Use português do Brasil.`;
+
+      const payload = await geminiService.callAI(prompt, true);
+      return payload;
+    } catch (error) {
+      console.error("Diagnosis Error:", error);
+      return JSON.stringify({
+        markdown: "Erro ao conectar com o Mecânico IA. Tente descrever o sintoma novamente.",
+        causes: []
+      });
+    }
+  },
+
+  getVerificationGuide: async (vehicle: any, symptom: string, causeName: string): Promise<string> => {
+    try {
+      const prompt = `Você é um mecânico especialista e instrutor técnico de alta performance.
+      VEÍCULO: ${vehicle.name} ${vehicle.model} (${vehicle.year}) com ${vehicle.mileage} de uso.
+      SINTOMA INICIAL: "${symptom}"
+      CAUSA PROVÁVEL SELECIONADA: "${causeName}"
+
+      Forneça um guia prático, detalhado e passo a passo de como verificar ou diagnosticar especificamente esta causa provável em português brasileiro.
+      O guia deve incluir as seguintes seções bem estruturadas em Markdown:
+
+      ### 1. 🔍 O que verificar (Passo a Passo)
+      [Passos claros, sequenciais e fáceis de seguir para testar o componente ou circuito com segurança]
+
+      ### 2. 🛠️ Equipamento Necessário
+      [Qual ferramenta, multímetro, fios/cabos, adaptadores ou EPI utilizar e em qual escala/modo configurar se aplicável]
+
+      ### 3. 📈 Como Analisar o Resultado
+      [Como ler o teste e o que cada resultado significa: o que indica que a peça está perfeita vs. o que indica que está com defeito]
+
+      ### 4. 📍 Onde fica localizado este componente
+      [Explique exatamente onde fica essa peça ou componente sob o capô, na cabine ou no chassi deste veículo especificamente: ${vehicle.name} ${vehicle.model}]
+
+      Seja técnico, detalhado, focado em economizar tempo e dinheiro com segurança, mas use uma linguagem acessível para motoristas entusiastas ou mecânicos. Use Markdown com negritos e marcadores. Use português do Brasil.`;
 
       return await geminiService.callAI(prompt);
     } catch (error) {
-      console.error("Diagnosis Error:", error);
-      return "Erro ao conectar com o Mecânico IA. Tente descrever o sintoma novamente.";
+      console.error("Verification Guide Error:", error);
+      return "Erro ao gerar o guia de verificação. Tente novamente.";
     }
   },
 

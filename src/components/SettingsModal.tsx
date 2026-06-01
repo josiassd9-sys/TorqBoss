@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Settings, Palette, Search, Plus, Trash2, Shield, ShieldCheck, Globe, Database, BookOpen, Key, ExternalLink, Check, AlertCircle, Loader2, CheckCircle2, Wallet, Zap, History, TrendingUp, User as UserIcon, LogIn, LogOut, Download, Code } from 'lucide-react';
+import { X, Settings, Palette, Search, Plus, Trash2, Shield, ShieldCheck, Globe, Database, BookOpen, Key, ExternalLink, Check, AlertCircle, Loader2, CheckCircle2, Wallet, Zap, History, TrendingUp, User as UserIcon, LogIn, LogOut, Download, Code, Bug, Terminal, Cpu, Wifi, Copy, ShieldAlert } from 'lucide-react';
 import { AppData, VehicleSearchLink } from '../types';
 import { THEMES } from '../constants';
 import { AppManual } from './AppManual';
@@ -9,8 +9,11 @@ import { DevDocsTab } from './DevDocsTab';
 import { geminiService } from '../services/geminiService';
 import { useFirebase } from '../contexts/FirebaseContext';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
-import { auth } from '../lib/firebase';
+import { auth, db, doc, getDoc, setDoc } from '../lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { getDebugLogs, clearDebugLogs, toggleDebugOverlay, debugLog, debugError, getLocalStorageMetrics, StorageMetrics } from '../debug';
+import { Capacitor } from '@capacitor/core';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -28,9 +31,100 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onResetData
 }) => {
   const { user, loading, login, logout, loginWithEmailPassword, credits, isPro, addCredits, upgradeToPro } = useFirebase();  
-  const [activeSubTab, setActiveSubTab] = React.useState<'general' | 'theme' | 'appearance' | 'search' | 'privacy' | 'manual' | 'apiKey' | 'wallet' | 'account' | 'data' | 'devDocs'>('manual');
+  const [activeSubTab, setActiveSubTab] = React.useState<'general' | 'theme' | 'appearance' | 'search' | 'privacy' | 'manual' | 'apiKey' | 'wallet' | 'account' | 'data' | 'devDocs' | 'debug'>('manual');
   const [testStatus, setTestStatus] = React.useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [testMessage, setTestMessage] = React.useState('');
+
+  const [liveLogs, setLiveLogs] = React.useState<string[]>([]);
+  const [diagnosticPingStatus, setDiagnosticPingStatus] = React.useState<'idle' | 'running' | 'success' | 'error'>('idle');
+  const [diagnosticPingMessage, setDiagnosticPingMessage] = React.useState('');
+  const [batteryLevel, setBatteryLevel] = React.useState<string>('Carregando...');
+  const [storageMetrics, setStorageMetrics] = React.useState<StorageMetrics | null>(null);
+
+  const refreshStorageMetrics = () => {
+    setStorageMetrics(getLocalStorageMetrics());
+  };
+
+  React.useEffect(() => {
+    if (activeSubTab === 'debug') {
+      refreshStorageMetrics();
+    }
+  }, [activeSubTab]);
+
+  React.useEffect(() => {
+    if (!isOpen || activeSubTab !== 'debug') return;
+
+    // Inicializa com os logs atuais ao entrar na aba de debug
+    setLiveLogs(getDebugLogs());
+
+    let throttleTimeout: any = null;
+    const handleLogsUpdate = () => {
+      if (throttleTimeout) return;
+      throttleTimeout = setTimeout(() => {
+        setLiveLogs([...getDebugLogs()]);
+        throttleTimeout = null;
+      }, 500); // Limita atualizações a no máximo 1 vez a cada 500ms de forma assíncrona para evitar loop infinito
+    };
+
+    window.addEventListener('debug-logs-updated', handleLogsUpdate);
+    return () => {
+      window.removeEventListener('debug-logs-updated', handleLogsUpdate);
+      if (throttleTimeout) clearTimeout(throttleTimeout);
+    };
+  }, [isOpen, activeSubTab]);
+
+  React.useEffect(() => {
+    if ('getBattery' in navigator) {
+      (navigator as any).getBattery().then((battery: any) => {
+        setBatteryLevel(`${Math.round(battery.level * 100)}% ${battery.charging ? '(Carregando)' : '(Descarregando)'}`);
+        battery.addEventListener('levelchange', () => {
+          setBatteryLevel(`${Math.round(battery.level * 100)}% ${battery.charging ? '(Carregando)' : '(Descarregando)'}`);
+        });
+      }).catch(() => {
+        setBatteryLevel('Não disponível');
+      });
+    } else {
+      setBatteryLevel('Não suportado pelo navegador');
+    }
+  }, []);
+
+  const runFirebaseDiagnostic = async () => {
+    setDiagnosticPingStatus('running');
+    setDiagnosticPingMessage('Iniciando testes...');
+    try {
+      debugLog('DIAGNOSE: Iniciando teste de ping do Firebase');
+      const start = Date.now();
+      
+      // Test Auth
+      const currentUser = auth.currentUser;
+      debugLog(`DIAGNOSE: Usuário atual: ${currentUser ? currentUser.email : 'Nenhum usuário logado'}`);
+      
+      // Test Firestore writing connection under /users/UID/diagnostics/ping_test or diagnostics/test_ping
+      const path = currentUser ? `users/${currentUser.uid}/diagnostics/ping_test` : 'diagnostics/test_ping';
+      const diagnosticDocRef = doc(db, path);
+      
+      await setDoc(diagnosticDocRef, {
+        timestamp: Date.now(),
+        testBy: currentUser?.email || 'Anonymous/Diagnostic',
+        platform: Capacitor.getPlatform()
+      });
+      debugLog(`DIAGNOSE: Documento de teste escrito com sucesso no caminho: ${path}`);
+      
+      const snap = await getDoc(diagnosticDocRef);
+      debugLog(`DIAGNOSE: Documento lido com sucesso: ${snap.exists() ? 'Existe' : 'Não encontrado'}`);
+      
+      const duration = Date.now() - start;
+      const successMsg = `Sucesso! Ping concluído em ${duration}ms. Conexão com Firestore está ativa e autorizada.`;
+      setDiagnosticPingStatus('success');
+      setDiagnosticPingMessage(successMsg);
+      debugLog(`DIAGNOSE: ${successMsg}`);
+    } catch (err: any) {
+      const errMsg = `Erro no diagnóstico: ${err?.message || err}`;
+      setDiagnosticPingStatus('error');
+      setDiagnosticPingMessage(errMsg);
+      debugError(`DIAGNOSE ERROR: ${errMsg}`);
+    }
+  };
 
   // 🔍 ADICIONE AQUI O CONSOLE.LOG
   console.log('activeSubTab:', activeSubTab, 'user:', user);
@@ -313,6 +407,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <Code size={14} className="sm:w-4 sm:h-4 shrink-0" /> DevDocs
                   </button>
                 )}
+
+                <button
+                  onClick={() => setActiveSubTab('debug')}
+                  className={`flex items-center gap-1.5 sm:gap-3 px-3 py-2.5 sm:p-4 rounded-lg text-[9px] sm:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap sm:whitespace-normal flex-1 sm:flex-none justify-center sm:justify-start ${activeSubTab === 'debug' ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/25' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'}`}
+                >
+                  <Bug size={14} className="sm:w-4 sm:h-4 shrink-0" /> Debugs
+                </button>
 
                 <div className="hidden sm:flex mt-auto pt-6 border-t border-gray-100">
                   <button
@@ -1087,18 +1188,50 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {activeSubTab === 'wallet' && (
                   <div className="space-y-6 sm:space-y-8 text-left">
                     {!user ? (
-                      <div className="bg-gray-50 border border-gray-200 p-6 sm:p-8 rounded-lg text-center">
-                        <Shield size={48} className="mx-auto text-brand-primary mb-4" />
-                        <h3 className="text-xl font-black text-brand-primary uppercase italic mb-2 tracking-tighter">Sincronização em Nuvem</h3>
-                        <p className="text-xs text-gray-700 font-bold mb-6">
-                          Faça login para ativar sua carteira de créditos IA e sincronizar seu saldo entre dispositivos.
-                        </p>
-                        <button
-                          onClick={() => setActiveSubTab('account')}
-                          className="bg-brand-primary text-white px-8 py-4 rounded-lg text-xs font-black uppercase tracking-widest shadow-xl shadow-brand-primary/20 hover:scale-[1.02] transition-all"
-                        >
-                          Fazer Login Agora
-                        </button>
+                      <div className="space-y-6">
+                        <div className="bg-gray-850 border border-gray-900 p-6 sm:p-8 rounded-lg text-white relative overflow-hidden shadow-2xl">
+                          <div className="absolute -right-10 -bottom-10 opacity-10 rotate-12 text-brand-primary">
+                            <Wallet size={200} />
+                          </div>
+                          <div className="relative z-10">
+                            <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-2 text-brand-primary">Créditos IA Locais (Modo LocalFirst)</p>
+                            <div className="flex items-center gap-3">
+                              <h3 className="text-5xl font-mono font-black italic tracking-tighter text-white">
+                                {credits}
+                              </h3>
+                              <Zap size={32} className="text-brand-primary fill-brand-primary animate-pulse" />
+                            </div>
+                            <p className="text-xs font-bold mt-4 text-gray-400">
+                              Seus créditos locais permitem que a Inteligência Artificial e a consulta avançada funcionem sem conta.
+                            </p>
+                            
+                            <div className="mt-6">
+                              <button
+                                onClick={async () => {
+                                  await addCredits(100, 'Recarga de cortesia modo Offline');
+                                  alert('✅ +100 Créditos locais adicionados com sucesso ao seu navegador!');
+                                }}
+                                className="bg-brand-primary text-white px-5 py-3 rounded text-[10px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 cursor-pointer"
+                              >
+                                Ganhar +100 Créditos Grátis
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 border border-gray-200 p-6 sm:p-8 rounded-lg text-center">
+                          <Shield size={48} className="mx-auto text-brand-primary mb-4" />
+                          <h3 className="text-xl font-black text-brand-primary uppercase italic mb-2 tracking-tighter">Sincronização em Nuvem</h3>
+                          <p className="text-xs text-gray-700 font-bold mb-6">
+                            Faça login para ativar sua carteira de créditos sincronizada em nuvem e salvar seus dados de forma permanente.
+                          </p>
+                          <button
+                            onClick={() => setActiveSubTab('account')}
+                            className="bg-brand-primary text-white px-8 py-4 rounded-lg text-xs font-black uppercase tracking-widest shadow-xl shadow-brand-primary/20 hover:scale-[1.02] transition-all"
+                          >
+                            Fazer Login Agora
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <div className="bg-gray-850 border border-gray-900 p-6 sm:p-8 rounded-lg text-white relative overflow-hidden shadow-2xl">
@@ -1432,6 +1565,308 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <p className="text-[9px] sm:text-xs font-bold text-gray-505 uppercase tracking-widest">Domine todas as ferramentas</p>
                     </div>
                     <AppManual />
+                  </div>
+                )}
+
+                {activeSubTab === 'debug' && (
+                  <div className="space-y-8 text-left">
+                    {/* Header */}
+                    <div className="flex items-center gap-3.5 border-b border-gray-100 pb-5">
+                      <div className="bg-brand-primary p-3 rounded-xl text-white shadow-lg shrink-0">
+                        <Bug size={22} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-black uppercase italic tracking-tighter text-brand-primary leading-none">Diagnósticos & Debugs</h3>
+                        <p className="text-[9px] sm:text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Telemetria, logs de execução e status da integração Google / Firebase</p>
+                      </div>
+                    </div>
+
+                    {/* Section 1: Conectividade e Firebase */}
+                    <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 space-y-4">
+                      <div className="flex items-center gap-2.5 text-brand-primary">
+                        <Wifi size={18} />
+                        <h4 className="text-xs font-black uppercase tracking-wider">Conexão & Nuvem</h4>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="bg-white p-4 rounded-lg border border-gray-100 text-xs">
+                          <p className="font-bold text-gray-400 uppercase text-[8px] tracking-wider mb-1">Internet</p>
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-block w-2.5 h-2.5 rounded-full ${navigator.onLine ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                            <span className="font-bold text-gray-800">{navigator.onLine ? 'Dispositivo Online' : 'Dispositivo Offline'}</span>
+                          </div>
+                        </div>
+
+                        <div className="bg-white p-4 rounded-lg border border-gray-100 text-xs">
+                          <p className="font-bold text-gray-400 uppercase text-[8px] tracking-wider mb-1">Sessão Firebase</p>
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-block w-2.5 h-2.5 rounded-full ${user ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                            <span className="font-bold text-gray-800">
+                              {user ? `Logado: ${user.email}` : 'Nenhum usuário autenticado'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Test Connection Button */}
+                      <div className="bg-white p-4 rounded-lg border border-gray-100 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div>
+                            <p className="font-bold text-gray-800 text-xs">Teste de Latência do Banco de Dados</p>
+                            <p className="text-[10px] text-gray-400">Escreve, lê e verifica um documento de teste no Firestore para validar latência e permissões.</p>
+                          </div>
+                          <button
+                            onClick={runFirebaseDiagnostic}
+                            disabled={diagnosticPingStatus === 'running'}
+                            className="bg-brand-primary hover:bg-brand-primary/95 text-white disabled:bg-gray-300 font-black uppercase tracking-widest text-[9px] px-4 py-2.5 rounded transition-all shrink-0 active:scale-95 flex items-center gap-2"
+                          >
+                            {diagnosticPingStatus === 'running' && <Loader2 size={12} className="animate-spin" />}
+                            Testar Conexão Firebase
+                          </button>
+                        </div>
+
+                        {diagnosticPingStatus !== 'idle' && (
+                          <div className={`p-3 rounded text-[11px] font-mono whitespace-pre-wrap flex items-start gap-2 ${
+                            diagnosticPingStatus === 'running' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                            diagnosticPingStatus === 'success' ? 'bg-green-50 text-green-700 border border-green-100' :
+                            'bg-red-50 text-red-700 border border-red-100'
+                          }`}>
+                            {diagnosticPingStatus === 'success' && <CheckCircle2 size={14} className="shrink-0 mt-0.5" />}
+                            {diagnosticPingStatus === 'error' && <AlertCircle size={14} className="shrink-0 mt-0.5" />}
+                            <span className="break-all">{diagnosticPingMessage}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Section 2: Credenciais & Diagnóstico de Login do Google */}
+                    <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 space-y-4">
+                      <div className="flex items-center gap-2.5 text-indigo-600">
+                        <ShieldAlert size={18} />
+                        <h4 className="text-xs font-black uppercase tracking-wider text-indigo-950">Credenciais Google Auth (APK vs Web)</h4>
+                      </div>
+
+                      <div className="space-y-3 text-xs">
+                        <div className="bg-white p-4 rounded-lg border border-gray-100 space-y-2 font-mono">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 py-1.5 border-b border-gray-50">
+                            <span className="font-bold text-gray-500 uppercase text-[8px] tracking-wider">App Package ID:</span>
+                            <span className="font-bold text-gray-800 md:col-span-2 select-all">com.torqboss.app</span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 py-1.5 border-b border-gray-50">
+                            <span className="font-bold text-gray-500 uppercase text-[8px] tracking-wider">Android Client ID:</span>
+                            <span className="text-gray-700 md:col-span-2 text-[10px] break-all select-all">456343787433-vjh8tp1rn9q18fbaonhmk4tjgkc9pdjt.apps.googleusercontent.com</span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 py-1.5 border-b border-gray-50">
+                            <span className="font-bold text-gray-500 uppercase text-[8px] tracking-wider">Web/Server Client ID:</span>
+                            <span className="text-gray-700 md:col-span-2 text-[10px] break-all select-all">456343787433-f6n6aa5i85o89rjbvvck9hurgtqi5o8f.apps.googleusercontent.com</span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 py-1.5 border-b border-gray-50 bg-amber-50/50 p-2 rounded">
+                            <span className="font-black text-amber-800 uppercase text-[8px] tracking-wider">SHA-1 Keystore (Release):</span>
+                            <span className="font-bold text-amber-900 md:col-span-2 text-[10px] select-all">45:7B:E1:8C:DB:38:D0:DB:5B:57:7D:D4:48:1F:E9:19:A3:FB:5A:97</span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 py-1.5 border-b border-gray-50 bg-amber-50/50 p-2 rounded">
+                            <span className="font-black text-amber-800 uppercase text-[8px] tracking-wider">SHA-256 Keystore:</span>
+                            <span className="font-bold text-amber-950 md:col-span-2 text-[9px] break-all select-all">BE:07:BC:13:D7:33:DE:E1:E9:11:92:44:FF:7B:B7:47:BA:C9:AA:88:D6:6D:1E:11:3C:57:85:D4:0C:50:62:D7</span>
+                          </div>
+                        </div>
+
+                        <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4 font-bold text-indigo-905 text-[11px] leading-relaxed space-y-2">
+                          <p className="text-indigo-950 uppercase tracking-wider text-[9px] font-black flex items-center gap-1.5">
+                            <AlertCircle size={12} className="text-indigo-650" />
+                            Como resolver o erro Google Sign-In (Code 10 / DEVELOPER_ERROR):
+                          </p>
+                          <p>O Google Sign-In no Android exige que a assinatura do seu APK corresponda EXATAMENTE às impressões digitais cadastradas.</p>
+                          <ol className="list-decimal pl-4 space-y-1.5 mt-2">
+                            <li>Acesse o <strong>Firebase Console</strong> do seu projeto e vá em <strong>Configurações do Projeto &gt; Geral &gt; Seus Aplicativos (Android)</strong>.</li>
+                            <li>Clique em <strong>Adicionar impressão digital</strong> e insira a assinatura SHA-1 disponibilizada acima: <code className="bg-indigo-200/50 px-1 py-0.5 rounded select-all font-mono">45:7B:E1:8C:DB:38:D0:DB:5B:57:7D:D4:48:1F:E9:19:A3:FB:5A:97</code></li>
+                            <li>Faça o download do arquivo <code className="bg-indigo-200/50 px-1 py-0.5 rounded font-mono">google-services.json</code> atualizado e substitua o arquivo existente na pasta <code className="font-mono">android/app/</code> de seu aplicativo móvel.</li>
+                            <li><strong>Conselhos para Google Play Store:</strong> Se as chaves do APK final forem geradas pela Google Play ao compilar (App Signing), você precisará colar o SHA-1 que está lá nas credenciais do Firebase/Google Cloud Console!</li>
+                          </ol>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section 3: Telemetria Física & Navegador */}
+                    <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 space-y-4">
+                      <div className="flex items-center gap-2.5 text-gray-700">
+                        <Cpu size={18} />
+                        <h4 className="text-xs font-black uppercase tracking-wider">Hardware & Sistema</h4>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
+                        <div className="bg-white p-3.5 rounded-lg border border-gray-100">
+                          <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider mb-1">Ambiente</p>
+                          <p className="font-black text-gray-800">{Capacitor.isNativePlatform() ? 'Nativo (Capacitor)' : 'Navegador Web'}</p>
+                        </div>
+                        <div className="bg-white p-3.5 rounded-lg border border-gray-100">
+                          <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider mb-1">Plataforma</p>
+                          <p className="font-black text-gray-800 uppercase">{Capacitor.getPlatform()}</p>
+                        </div>
+                        <div className="bg-white p-3.5 rounded-lg border border-gray-100">
+                          <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nível de Bateria</p>
+                          <p className="font-black text-gray-800">{batteryLevel}</p>
+                        </div>
+                        <div className="bg-white p-3.5 rounded-lg border border-gray-100">
+                          <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider mb-1">Resolução de Tela</p>
+                          <p className="font-black text-gray-800">{window.screen.width}x{window.screen.height} px</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-4 rounded-lg border border-gray-100 space-y-3.5">
+                        <p className="font-bold text-gray-800 text-xs text-left">Ações de Controle do Overlay</p>
+                        
+                        <div className="pt-2 border-t border-gray-50 flex flex-wrap gap-2">
+                          <button
+                            onClick={() => toggleDebugOverlay(true)}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-[9px] font-black uppercase tracking-widest px-4 py-2.5 rounded transition-all active:scale-95 flex items-center gap-1.5"
+                          >
+                            <Terminal size={12} /> Exibir Overlay em Tela Cheia
+                          </button>
+                          <button
+                            onClick={() => {
+                              debugLog(`Log de teste disparado manualmente pelo usuário: ${new Date().toLocaleTimeString()}`);
+                            }}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-[9px] font-black uppercase tracking-widest px-4 py-2.5 rounded transition-all active:scale-95 flex items-center gap-1.5"
+                          >
+                            <Plus size={12} /> Adicionar Log de Teste
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section 4: Armazenamento Local (LocalFirst) */}
+                    <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5 text-brand-primary">
+                          <Database size={18} />
+                          <h4 className="text-xs font-black uppercase tracking-wider">Armazenamento Local (LocalFirst)</h4>
+                        </div>
+                        <button
+                          onClick={() => {
+                            refreshStorageMetrics();
+                            debugLog('DIAGNOSE: Métricas de localStorage atualizadas pelo usuário');
+                          }}
+                          className="text-[10px] text-brand-primary hover:underline font-black uppercase tracking-widest flex items-center gap-1"
+                        >
+                          Atualizar Métricas
+                        </button>
+                      </div>
+
+                      {storageMetrics && (
+                        <div className="space-y-4 text-xs font-medium">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-white p-3.5 rounded-lg border border-gray-100">
+                              <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total de Itens / Chaves</p>
+                              <p className="font-mono text-base font-black text-gray-800">{storageMetrics.totalItems}</p>
+                            </div>
+                            <div className="bg-white p-3.5 rounded-lg border border-gray-100">
+                              <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider mb-1">Bytes Totais Usados</p>
+                              <p className="font-mono text-base font-black text-gray-800">
+                                {storageMetrics.usedKB} <span className="text-[10px] text-gray-400 font-bold">KB</span>
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Barra de progresso baseada na cota padrão do localStorage que é de 5MB (5120KB) */}
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                              <span>Consumo da Cota de Armazenamento do Browser</span>
+                              <span>
+                                {((storageMetrics.usedBytes / (5 * 1024 * 1024)) * 100).toFixed(3)}% de 5MB
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                              <div
+                                className="bg-brand-primary h-full transition-all duration-300"
+                                style={{ width: `${Math.min(100, Math.max(1.5, (storageMetrics.usedBytes / (5 * 1024 * 1024)) * 100))}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* List of storage items */}
+                          <div className="bg-white rounded-lg border border-gray-150 overflow-hidden">
+                            <p className="font-bold text-gray-500 uppercase text-[8px] tracking-wider px-3.5 py-2.5 bg-gray-50 border-b border-gray-100">Detalhamento por Chave</p>
+                            <div className="max-h-44 overflow-y-auto divide-y divide-gray-100 font-mono text-[10px]">
+                              {storageMetrics.items.length === 0 ? (
+                                <div className="p-3.5 text-center text-gray-400 italic">O armazenamento está totalmente vazio.</div>
+                              ) : (
+                                storageMetrics.items.map((item) => (
+                                  <div key={item.key} className="p-3 flex items-center justify-between hover:bg-gray-50/50 transition-all">
+                                    <div className="truncate pr-4 flex-1 text-left">
+                                      <span className="font-black text-gray-700 break-all select-all" title={item.key}>{item.key}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3 shrink-0">
+                                      <span className="text-gray-450 font-bold">{item.kb} KB</span>
+                                      <button
+                                        onClick={() => {
+                                          if (confirm(`Tem certeza de que deseja apagar a chave "${item.key}" do seu dispositivo? Isso causará a perda desses dados.`)) {
+                                            localStorage.removeItem(item.key);
+                                            debugLog(`DIAGNOSE: Chave "${item.key}" foi apagada pelo usuário.`);
+                                            refreshStorageMetrics();
+                                          }
+                                        }}
+                                        className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-650 rounded transition-all active:scale-90"
+                                        title={`Excluir ${item.key}`}
+                                      >
+                                        <Trash2 size={11} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Section 5: Visualizador de Logs em Tempo Real */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Terminal size={17} className="text-brand-primary" />
+                          <h4 className="text-xs font-black uppercase tracking-widest text-brand-primary">Console de Logs em Tempo Real</h4>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(liveLogs.join('\n\n'));
+                                alert('Logs copiados!');
+                              } catch {
+                                alert('Erro ao copiar');
+                              }
+                            }}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded transition-all active:scale-95 cursor-pointer"
+                            title="Copiar logs"
+                          >
+                            <Copy size={13} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm('Limpar logs permanentemente?')) {
+                                clearDebugLogs();
+                              }
+                            }}
+                            className="bg-red-50 hover:bg-red-100 text-red-650 p-2 rounded transition-all active:scale-95 cursor-pointer"
+                            title="Limpar logs"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="bg-black text-green-400 p-4 rounded-xl font-mono text-[10px] leading-relaxed h-72 overflow-y-auto border border-zinc-800 flex flex-col-reverse shadow-inner selection:bg-green-800 selection:text-white">
+                        <div className="whitespace-pre-wrap break-all text-left">
+                          {liveLogs.length === 0 ? (
+                            <span className="text-zinc-650 italic">Sem logs registrados ainda...</span>
+                          ) : (
+                            liveLogs.slice().reverse().join('\n\n')
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider text-right italic">* Logs em tempo real ordenados do mais recente primeiro</p>
+                    </div>
                   </div>
                 )}
               </div>
