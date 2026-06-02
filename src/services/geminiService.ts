@@ -15,6 +15,24 @@ const API_BASE = isNativeApp ? PRODUCAO_API_URL : '';
 let onCreditConsumed: (amount: number) => void = () => {};
 let currentCredits = 0;
 let usingCustomKey = false;
+let _lastGlobalSettingsSerialized = '';
+let _lastSettingsCallTs = 0;
+let _syncLock = false;
+
+// Hash apenas os campos críticos que devem disparar sync
+const hashSettings = (settings: any) => {
+  try {
+    return JSON.stringify({
+      aiCredits: settings?.aiCredits,
+      isProMember: settings?.isProMember,
+      theme: settings?.theme,
+      language: settings?.language,
+      geminiApiKey: settings?.geminiApiKey
+    });
+  } catch (e) {
+    return '';
+  }
+};
 
 export const geminiService = {
   setApiKey: (key: string) => {
@@ -30,11 +48,40 @@ export const geminiService = {
     if (settings.aiCredits !== undefined) {
       currentCredits = settings.aiCredits;
     }
+
+    // Porta de Sincronização: evita loops e chamadas concorrentes
+    const hash = hashSettings(settings);
+    const now = Date.now();
+
+    // Proteger contra sincronizações idênticas ou muito próximas
+    if (hash === _lastGlobalSettingsSerialized && now - _lastSettingsCallTs < 2000) {
+      return;
+    }
+
+    // Proteger contra lock: uma única chamada por vez
+    if (_syncLock) {
+      return;
+    }
+
+    if (now - _lastSettingsCallTs < 300) {
+      // chamadas muito próximas — ignorar
+      return;
+    }
+
+    _syncLock = true;
+    _lastGlobalSettingsSerialized = hash;
+    _lastSettingsCallTs = now;
+
     fetch(`${API_BASE}/api/gemini/settings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ settings })
-    }).catch(console.error);
+    }).catch(console.error).finally(() => {
+      // Liberar lock após 800ms (tempo suficiente para backend processar)
+      setTimeout(() => {
+        _syncLock = false;
+      }, 800);
+    });
   },
 
   onCreditConsumed: (callback: (amount: number) => void) => {

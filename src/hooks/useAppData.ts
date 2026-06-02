@@ -37,21 +37,20 @@ export function useAppData() {
 
   // Sync Firebase credits to state for legacy compatibility if needed
   useEffect(() => {
-    setData(prev => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        aiCredits: credits,
-        isProMember: isPro
+    setData(prev => {
+      if (prev?.settings?.aiCredits === credits && prev?.settings?.isProMember === isPro) {
+        return prev;
       }
-    }));
-    
-    // Update gemini service internal state
-    geminiService.setGlobalSettings({
-      ...data.settings,
-      aiCredits: credits,
-      isProMember: isPro
+      return ({
+        ...prev,
+        settings: {
+          ...prev.settings,
+          aiCredits: credits,
+          isProMember: isPro
+        }
+      });
     });
+    // NÃO chamar geminiService.setGlobalSettings aqui — deixar para handleSave
   }, [credits, isPro]);
 
   const currentCountry = getCountryById(data.settings?.countryId || 'BR');
@@ -108,11 +107,7 @@ export function useAppData() {
     setData(merged as any);
     if (merged.settings) {
       geminiService.setApiKey(merged.settings.geminiApiKey || '');
-      geminiService.setGlobalSettings({
-        ...merged.settings,
-        aiCredits: credits,
-        isProMember: isPro
-      });
+      // Sincronização de settings será feita em handleSave quando houver mudanças
     }
 
     // Configura callback de consumo de créditos REAL via Firebase
@@ -183,12 +178,6 @@ export function useAppData() {
   const handleSave = (newData: AppData) => {
     setData(newData);
     storageService.saveData(newData);
-    
-    if (newData.settings) {
-      const apiKey = newData.settings.geminiApiKey || '';
-      geminiService.setApiKey(apiKey);
-      geminiService.setGlobalSettings(newData.settings);
-    }
   };
 
   return {

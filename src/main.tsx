@@ -31,7 +31,7 @@ createRoot(rootElement).render(
         <App />
       </FirebaseProvider>
     </ErrorBoundary>
-  </StrictMode>,
+  </StrictMode>
 );
 
 debugLog('REACT RENDER EXECUTADO');

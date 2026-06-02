@@ -66,7 +66,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             if (!confirm('ATENÇÃO: Restaurar um backup total substituirá TODOS os veículos e configurações atuais. Deseja continuar?')) return;
           }
 
-          onUpdateSettings(importedData.settings);
+          (importedData.settings);
           // Como onUpdateSettings só mexe em settings, vamos disparar um reload ou usar uma prop mais ampla se necessário
           // Mas para fins de simulação/MVP, vamos assumir que o usuário entende o risco
           // Na prática, precisaríamos de uma prop "onRestoreAll"
@@ -89,11 +89,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const settings = data.settings;
 
   const updateSettings = (updates: Partial<AppData['settings']>) => {
-    onUpdateSettings({
+    const mergedSettings = {
       ...settings,
       ...updates,
       language: updates?.language ?? settings.language ?? 'pt-BR',
-    });
+    };
+
+    onUpdateSettings(mergedSettings);
   };
 
   const addSearchLink = () => {

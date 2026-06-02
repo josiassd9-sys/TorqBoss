@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Plus, Settings, Car, Gauge, Activity, Box, Trash2, ArrowLeft, 
@@ -106,6 +106,57 @@ export default function App() {
     handleSave,
   } = useAppData();
 
+  const lastSaveRef = useRef('');
+  const lastSyncRef = useRef('');
+  const safeSaveTimeoutRef = useRef<number | null>(null);
+
+  const syncSettings = useCallback((newData: AppData) => {
+    const payload = JSON.stringify({
+      ...newData.settings,
+      aiCredits: newData.settings?.aiCredits,
+      isProMember: newData.settings?.isProMember
+    });
+
+    if (lastSyncRef.current === payload) {
+      return;
+    }
+
+    lastSyncRef.current = payload;
+
+    if (newData.settings?.geminiApiKey) {
+      geminiService.setApiKey(newData.settings.geminiApiKey);
+    }
+
+    geminiService.setGlobalSettings({
+      ...newData.settings,
+      aiCredits: newData.settings?.aiCredits ?? 0,
+      isProMember: newData.settings?.isProMember ?? false
+    });
+  }, []);
+
+  const safeHandleSave = useCallback((newData: AppData) => {
+    const serialized = JSON.stringify({
+      settings: newData.settings,
+      vehicles: newData.vehicles
+    });
+
+    if (lastSaveRef.current === serialized) {
+      return;
+    }
+
+    lastSaveRef.current = serialized;
+
+    if (safeSaveTimeoutRef.current) {
+      window.clearTimeout(safeSaveTimeoutRef.current);
+    }
+
+    safeSaveTimeoutRef.current = window.setTimeout(() => {
+      handleSave(newData);
+      syncSettings(newData);
+      safeSaveTimeoutRef.current = null;
+    }, 150);
+  }, [handleSave, syncSettings]);
+
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
   const {
@@ -121,7 +172,7 @@ export default function App() {
     moveVehicleToTop,
     openEditModal,
     updateSelectedVehicle
-  } = useVehicleActions(data, setData, handleSave, selectedVehicle, setSelectedVehicle);
+  } = useVehicleActions(data, setData, safeHandleSave, selectedVehicle, setSelectedVehicle);
 
   const {
     itemToDelete,
@@ -141,7 +192,7 @@ export default function App() {
     estimatePrice,
     isEstimatingPrice,
     updatePartPrice
-  } = useVehicleItems(data, handleSave, selectedVehicle, updateSelectedVehicle);
+  } = useVehicleItems(data, safeHandleSave, selectedVehicle, updateSelectedVehicle);
 
   const {
     maintenancePredictions,
@@ -169,7 +220,7 @@ export default function App() {
     handleTCOAnalysis,
     handleGeneratePassport,
     predictCurrentMileage,
-  } = useVehiclePredictions(selectedVehicle, data, handleSave);
+  } = useVehiclePredictions(selectedVehicle, data, safeHandleSave);
 
   const {
     addTireSet,
@@ -191,7 +242,7 @@ export default function App() {
     addFuel,
     addReminder,
     toggleReminder
-  } = useVehicleDetails(selectedVehicle, data, handleSave, setSelectedVehicle);
+  } = useVehicleDetails(selectedVehicle, data, safeHandleSave, setSelectedVehicle);
 
   const [simulationMileage, setSimulationMileage] = useState<number | ''>('');
   const [activeTab, setActiveTab] = useState('parts');
@@ -233,7 +284,7 @@ export default function App() {
     setManualChatResponse,
     generateManualInfo,
     chatWithManual
-  } = useVehicleManual(selectedVehicle, data, handleSave, setSelectedVehicle);
+  } = useVehicleManual(selectedVehicle, data, safeHandleSave, setSelectedVehicle);
 
   const {
     manualPDFInputRef,
@@ -249,7 +300,7 @@ export default function App() {
     handlePDFUpload,
     shareTechnicalReport
   } = useFileHandlers(
-    data, handleSave, selectedVehicle, updateSelectedVehicle, 
+    data, safeHandleSave, selectedVehicle, updateSelectedVehicle, 
     setNewVehicle, setSelectedVehicle, handleManualPDFUpload
   );
 
@@ -601,7 +652,12 @@ export default function App() {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         data={data}
-        onUpdateSettings={(settings) => handleSave({ ...data, settings })}
+        onUpdateSettings={(settings) => {
+          safeHandleSave({
+            ...data,
+            settings
+          });
+        }}
         onResetData={() => {
           if (confirm('Deseja realmente resetar todos os dados? Esta ação é irreversível.')) {
             storageService.clearData();
