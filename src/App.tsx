@@ -107,32 +107,7 @@ export default function App() {
   } = useAppData();
 
   const lastSaveRef = useRef('');
-  const lastSyncRef = useRef('');
   const safeSaveTimeoutRef = useRef<number | null>(null);
-
-  const syncSettings = useCallback((newData: AppData) => {
-    const payload = JSON.stringify({
-      ...newData.settings,
-      aiCredits: newData.settings?.aiCredits,
-      isProMember: newData.settings?.isProMember
-    });
-
-    if (lastSyncRef.current === payload) {
-      return;
-    }
-
-    lastSyncRef.current = payload;
-
-    if (newData.settings?.geminiApiKey) {
-      geminiService.setApiKey(newData.settings.geminiApiKey);
-    }
-
-    geminiService.setGlobalSettings({
-      ...newData.settings,
-      aiCredits: newData.settings?.aiCredits ?? 0,
-      isProMember: newData.settings?.isProMember ?? false
-    });
-  }, []);
 
   const safeHandleSave = useCallback((newData: AppData) => {
     const serialized = JSON.stringify({
@@ -152,10 +127,9 @@ export default function App() {
 
     safeSaveTimeoutRef.current = window.setTimeout(() => {
       handleSave(newData);
-      syncSettings(newData);
       safeSaveTimeoutRef.current = null;
     }, 150);
-  }, [handleSave, syncSettings]);
+  }, [handleSave]);
 
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
@@ -400,7 +374,7 @@ export default function App() {
           data={data}
           isDetectingRegion={isDetectingRegion}
           onClose={() => {
-            storageService.saveData(data);
+            safeHandleSave(data);
             setIsOnboarding(false);
           }}
           getCurrencySymbol={getCurrencySymbol}

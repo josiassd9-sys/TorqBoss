@@ -1,0 +1,92 @@
+Listagem de caminhos de pasta
+O número de série do volume é 6EF9-4D72
+C:\TORQBOSS\SRC
+|   App.tsx
+|   brandLogos.ts
+|   constants.ts
+|   debug.ts
+|   ErrorBoundary.tsx
+|   index.css
+|   main.tsx
+|   types.ts
+|   vite-env.d.ts
+|   
++---assets
+|   \---images
+|           torqboss_final_logo_1779384389550.png
+|           torqboss_logo_strada.png
+|           
++---components
+|   |   AddFuelModal.tsx
+|   |   AddPartModal.tsx
+|   |   AddReminderModal.tsx
+|   |   AddServiceModal.tsx
+|   |   AppHeader.tsx
+|   |   AppManual.tsx
+|   |   BrandLogo.tsx
+|   |   BudgetModal.tsx
+|   |   CustomIcons.tsx
+|   |   DashboardHome.tsx
+|   |   DeleteConfirmationModal.tsx
+|   |   DevDocsTab.tsx
+|   |   DictionaryModal.tsx
+|   |   HeaderLogo.tsx
+|   |   index.ts
+|   |   MaintenanceSimulationModal.tsx
+|   |   OnboardingModal.tsx
+|   |   RobotGalleryModal.tsx
+|   |   ServiceReportModal.tsx
+|   |   SettingsModal.tsx
+|   |   VehicleDetailHeader.tsx
+|   |   VehicleFormModal.tsx
+|   |   VehicleImage.tsx
+|   |   VehicleList.tsx
+|   |   VehicleTabs.tsx
+|   |   
+|   \---tabs
+|           AuditTab.tsx
+|           FuelTab.tsx
+|           index.ts
+|           IntelligenceTab.tsx
+|           ManualTab.tsx
+|           PartsTab.tsx
+|           RemindersTab.tsx
+|           ServicesTab.tsx
+|           StructuralDNATab.tsx
+|           TiresTab.tsx
+|           
++---config
+|       countryConfig.ts
+|       
++---contexts
+|       FirebaseContext.tsx
+|       
++---hooks
+|       index.ts
+|       useAppData.ts
+|       useFileHandlers.ts
+|       useRobotSearch.ts
+|       useVehicleActions.ts
+|       useVehicleDetails.ts
+|       useVehicleItems.ts
+|       useVehicleManual.ts
+|       useVehiclePredictions.ts
+|       useVehicles.ts
+|       
++---i18n
+|       config.ts
+|       
++---lib
+|       firebase.ts
+|       utils.ts
+|       vehicleUtils.ts
+|       
+\---services
+        buscaPlacasService.ts
+        geminiService.impl.ts
+        geminiService.ts
+        maintenance-pdf.ts
+        odometerScanner.ts
+        storageService.ts
+        webVehicleSearchService.ts
+        

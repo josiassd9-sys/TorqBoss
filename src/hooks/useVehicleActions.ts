@@ -103,18 +103,15 @@ export function useVehicleActions(
   };
 
   const moveVehicleToTop = (id: string) => {
-    setData(prev => {
-      const idx = prev.vehicles.findIndex(v => v.id === id);
-      if (idx <= 0) return prev;
-      
-      const newVehicles = [...prev.vehicles];
-      const [movedVehicle] = newVehicles.splice(idx, 1);
-      newVehicles.unshift(movedVehicle);
-      
-      const newData = { ...prev, vehicles: newVehicles };
-      storageService.saveData(newData);
-      return newData;
-    });
+    const idx = data.vehicles.findIndex(v => v.id === id);
+    if (idx <= 0) return;
+
+    const newVehicles = [...data.vehicles];
+    const [movedVehicle] = newVehicles.splice(idx, 1);
+    newVehicles.unshift(movedVehicle);
+
+    const newData = { ...data, vehicles: newVehicles };
+    handleSave(newData);
   };
 
   const openEditModal = () => {
@@ -143,14 +140,13 @@ export function useVehicleActions(
     if (!selectedVehicle) return;
     const updated = { ...selectedVehicle, ...updates };
     setSelectedVehicle(updated);
-    setData(prev => {
-      const updatedData = {
-        ...prev,
-        vehicles: prev.vehicles.map(v => v.id === selectedVehicle.id ? updated : v)
-      };
-      storageService.saveData(updatedData);
-      return updatedData;
-    });
+
+    const updatedData = {
+      ...data,
+      vehicles: data.vehicles.map(v => v.id === selectedVehicle.id ? updated : v)
+    };
+
+    handleSave(updatedData);
   };
 
   return {

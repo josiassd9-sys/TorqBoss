@@ -1,0 +1,44 @@
+ .../App.tsx"                                       | 750 ---------------------
+ .../images/torqboss_final_logo_1779384389550.png"  | Bin 290031 -> 0 bytes
+ .../assets/images/torqboss_logo_strada.png"        | Bin 454139 -> 0 bytes
+ .../components/InteractiveDiagnosis.tsx"           | 340 ++++++++++
+ .../components/SettingsModal.tsx"                  | 465 ++++++++++++-
+ .../components/VehicleDetailHeader.tsx"            |   9 +-
+ .../components/index.ts"                           |   1 +
+ .../components/tabs/IntelligenceTab.tsx"           |  13 +-
+ .../components/tabs/PartsTab.tsx"                  | 177 -----
+ .../components/tabs/RemindersTab.tsx"              |  98 ---
+ .../components/tabs/ServicesTab.tsx"               | 103 ---
+ .../components/tabs/StructuralDNATab.tsx"          | 192 ------
+ .../components/tabs/TiresTab.tsx"                  | 400 -----------
+ .../components/tabs/index.ts"                      |   9 -
+ .../config/countryConfig.ts"                       |  81 ---
+ .../constants.ts"                                  |  95 ---
+ .../contexts/FirebaseContext.tsx"                  |  80 ++-
+ .../debug.ts"                                      | 231 +++++--
+ .../hooks/index.ts"                                |   9 -
+ .../hooks/useAppData.ts"                           | 204 ------
+ .../hooks/useFileHandlers.ts"                      | 140 ----
+ .../hooks/useRobotSearch.ts"                       | 435 ------------
+ .../hooks/useVehicleActions.ts"                    | 170 -----
+ .../hooks/useVehicleDetails.ts"                    | 275 --------
+ .../hooks/useVehicleItems.ts"                      | 204 ------
+ .../hooks/useVehicleManual.ts"                     | 173 -----
+ .../hooks/useVehiclePredictions.ts"                | 202 ------
+ .../hooks/useVehicles.ts"                          |  98 ---
+ .../i18n/config.ts"                                | 253 -------
+ .../index.css"                                     | 154 -----
+ .../lib/firebase.ts"                               |  68 --
+ .../lib/utils.ts"                                  |  72 --
+ .../lib/vehicleUtils.ts"                           |  64 --
+ .../main.tsx"                                      |  37 -
+ .../services/buscaPlacasService.ts"                |  37 -
+ .../services/geminiService.impl.ts"                |  58 +-
+ .../services/geminiService.ts"                     |   8 +-
+ .../services/maintenance-pdf.ts"                   | 139 ----
+ .../services/odometerScanner.ts"                   |  33 -
+ .../services/storageService.ts"                    |  63 --
+ .../services/webVehicleSearchService.ts"           | 148 ----
+ .../types.ts"                                      | 232 -------
+ .../vite-env.d.ts"                                 |  21 -
+ 43 files changed, 1105 insertions(+), 5236 deletions(-)

@@ -1,6 +1,3 @@
-import { Directory, Filesystem } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
-import { Capacitor } from '@capacitor/core';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -28,7 +25,7 @@ export async function generateMaintenancePdf({
   simulationMileage,
   recommendations,
   totalEstimatedCost,
-}: MaintenancePdfParams): Promise<'native' | 'web'> {
+}: MaintenancePdfParams): Promise<'web'> {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -97,43 +94,28 @@ export async function generateMaintenancePdf({
 
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text(`TOTAL ESTIMADO: R$ ${totalEstimatedCost.toLocaleString()}`, 190, finalY, { align: 'right' });
+  doc.text(
+    `TOTAL ESTIMADO: R$ ${totalEstimatedCost.toLocaleString()}`,
+    190,
+    finalY,
+    { align: 'right' }
+  );
 
   // Footer
   doc.setFontSize(8);
   doc.setFont('helvetica', 'italic');
-  doc.text('* Valores estimados baseados no mercado brasileiro. Consulte um profissional para orçamento preciso.', 20, 280);
+  doc.text(
+    '* Valores estimados baseados no mercado brasileiro. Consulte um profissional para orçamento preciso.',
+    20,
+    280
+  );
 
   // File name
   const timestamp = now.toISOString().slice(0, 16).replace(/[-:]/g, '');
   const fileName = `plano_manutencao_${vehicleName}_${simulationMileage}km_${timestamp}.pdf`;
 
-  if (Capacitor.isNativePlatform()) {
-    // Save to device and share
-    const dataUri = doc.output('datauristring');
-    const commaIndex = dataUri.indexOf(',');
-    if (commaIndex === -1) {
-      throw new Error('Erro ao gerar PDF');
-    }
-    const pdfBase64 = dataUri.slice(commaIndex + 1);
-
-    const writeResult = await Filesystem.writeFile({
-      path: fileName,
-      data: pdfBase64,
-      directory: Directory.Documents,
-    });
-
-    await Share.share({
-      title: `Plano de Manutenção - ${vehicleName}`,
-      text: `Plano de manutenção preventiva para ${simulationMileage.toLocaleString()} km`,
-      url: writeResult.uri,
-      dialogTitle: 'Compartilhar plano de manutenção',
-    });
-
-    return 'native';
-  }
-
-  // Web: download directly
+  // 🌐 WEB ONLY (fallback seguro)
   doc.save(fileName);
+
   return 'web';
 }

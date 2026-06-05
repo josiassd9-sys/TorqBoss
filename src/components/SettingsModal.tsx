@@ -8,9 +8,11 @@ import { AppManual } from './AppManual';
 import { DevDocsTab } from './DevDocsTab';
 import { geminiService } from '../services/geminiService';
 import { useFirebase } from '../contexts/FirebaseContext';
-import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
+
 import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { DebugCenter } from './DebugCenter';
+import { DevOpsHub } from './devops/DevOpsHub';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -27,10 +29,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onUpdateSettings,
   onResetData
 }) => {
-  const { user, loading, login, logout, loginWithEmailPassword, credits, isPro, addCredits, upgradeToPro } = useFirebase();  
-  const [activeSubTab, setActiveSubTab] = React.useState<'general' | 'theme' | 'appearance' | 'search' | 'privacy' | 'manual' | 'apiKey' | 'wallet' | 'account' | 'data' | 'devDocs'>('manual');
+  const { user, loading, login, logout, loginWithEmailPassword, credits, isPro, addCredits, upgradeToPro } = useFirebase();
+  const [activeSubTab, setActiveSubTab] = React.useState<
+    'general'
+    | 'theme'
+    | 'appearance'
+    | 'search'
+    | 'privacy'
+    | 'manual'
+    | 'apiKey'
+    | 'wallet'
+    | 'account'
+    | 'data'
+    | 'devDocs'
+    | 'debugs'
+    | 'devops'
+  >('manual');
   const [testStatus, setTestStatus] = React.useState<'idle' | 'testing' | 'success' | 'error'>('idle');
+  
+  const loginInProgressRef = { current: false };
+
   const [testMessage, setTestMessage] = React.useState('');
+
+  
 
   // 🔍 ADICIONE AQUI O CONSOLE.LOG
   console.log('activeSubTab:', activeSubTab, 'user:', user);
@@ -128,7 +149,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const limparSessaoGoogle = async () => {
     try {
-      await GoogleAuth.signOut();
+      
       await auth.signOut();
 
       alert('Sessão Google/Firebase removida.');
@@ -145,7 +166,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       await auth.signOut();
 
       // Google
-      await GoogleAuth.signOut();
+      
 
       // Storage Web
       localStorage.clear();
@@ -172,7 +193,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     try {
 
       // Logout completo
-      await GoogleAuth.signOut();
+      
       await auth.signOut();
 
       // Storage
@@ -307,6 +328,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <Database size={14} className="sm:w-4 sm:h-4 shrink-0" /> Backup
                 </button>
 
+                <button
+                  onClick={() => setActiveSubTab('debugs')}
+                  className={`flex items-center gap-1.5 sm:gap-3 px-3 py-2.5 sm:p-4 rounded-lg text-[9px] sm:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap sm:whitespace-normal flex-1 sm:flex-none justify-center sm:justify-start ${activeSubTab === 'debugs'
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/25'
+                      : 'text-red-500 hover:bg-red-50'
+                    }`}
+                >
+                  <AlertCircle size={14} className="sm:w-4 sm:h-4 shrink-0" />
+                  DEBUGS
+                </button>
+
+                <button
+                  onClick={() => setActiveSubTab('devops')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-black uppercase ${activeSubTab === 'devops'
+                      ? 'bg-black text-white'
+                      : 'text-gray-500 hover:bg-gray-100'
+                    }`}
+                >
+                  🔥 DevOps
+                </button>
+
                 {user?.email === 'josias.sd9@gmail.com' && (
                   <button
                     onClick={() => setActiveSubTab('devDocs')}
@@ -331,6 +373,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {activeSubTab === 'devDocs' && (
                   <DevDocsTab />
                 )}
+
+                {activeSubTab === 'debugs' && (
+                  <DebugCenter />
+                )}
+
+                {activeSubTab === 'devops' && <DevOpsHub />}
 
                 {activeSubTab === 'general' && (
                   <div className="space-y-8">

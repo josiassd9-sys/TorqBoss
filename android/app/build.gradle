@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.torqboss.app"
-    compileSdk = rootProject.ext.compileSdkVersion
+    namespace "com.torqboss.app"
+    compileSdk rootProject.ext.compileSdkVersion
 
     defaultConfig {
         applicationId "com.torqboss.app"
@@ -16,37 +16,38 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         aaptOptions {
-            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
 
-    // ==================== CONFIGURAÇÃO DE ASSINATURA (ADICIONADO) ====================
+    // ==================== JAVA 17 (OBRIGATÓRIO PRO AGP 8+) ====================
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // ==================== ASSINATURA RELEASE APK ====================
     signingConfigs {
         release {
-            // O arquivo .keystore deve estar dentro da pasta 'app'
             storeFile file("torqboss-release.keystore")
-            // ⚠️ SUBSTITUA AS SENHAS PELAS QUE VOCÊ DEFINIU AO CRIAR O KEYSTORE
             storePassword "TorqBoss-0007"
             keyAlias "torqboss"
-            keyPassword "TorqBoss-0007"   // geralmente a mesma do storePassword
+            keyPassword "TorqBoss-0007"
         }
     }
 
     buildTypes {
         release {
-            // 🔐 Usa a configuração de assinatura definida acima
             signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
-    // ==================== RENOMEIA O APK ====================
-    applicationVariants.all { variant ->
-        variant.outputs.all { output ->
-            if (output.outputFileName.endsWith(".apk")) {
-                output.outputFileName = "TorqBoss.apk"
-            }
+    // ==================== RENOMEAR APK (GRADLE 8 + AGP 8 CORRETO) ====================
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
+            output.outputFileName = "TorqBoss-${variant.versionName}.apk"
         }
     }
 }

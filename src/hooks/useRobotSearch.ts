@@ -3,7 +3,7 @@ import { Vehicle, Country, AppData } from '../types';
 import { buscaPlacasService } from '../services/buscaPlacasService';
 import { webVehicleSearchService } from '../services/webVehicleSearchService';
 import { geminiService } from '../services/geminiService';
-import { removeBackground } from "@imgly/background-removal";
+
 import { formatCurrency } from '../lib/utils';
 
 export function useRobotSearch(
@@ -44,8 +44,8 @@ export function useRobotSearch(
     };
 
     checkCooldown();
-    const interval = setInterval(checkCooldown, 4000);
-    return () => clearInterval(interval);
+  //  const interval = setInterval(checkCooldown, 4000);
+  //  return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

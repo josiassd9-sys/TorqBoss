@@ -25,13 +25,11 @@ if (!rootElement) {
 debugLog('ROOT ENCONTRADO');
 
 createRoot(rootElement).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <FirebaseProvider>
-        <App />
-      </FirebaseProvider>
-    </ErrorBoundary>
-  </StrictMode>
+  <ErrorBoundary>
+    <FirebaseProvider>
+      <App />
+    </FirebaseProvider>
+  </ErrorBoundary>
 );
 
 debugLog('REACT RENDER EXECUTADO');

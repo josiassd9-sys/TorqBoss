@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { Vehicle, AppData } from '../types';
-import { storageService } from '../services/storageService';
 import { DEFAULT_VEHICLE_STATE } from '../constants';
 
-export function useVehicles(data: AppData, setData: React.Dispatch<React.SetStateAction<AppData>>, setSelectedVehicle: React.Dispatch<React.SetStateAction<Vehicle | null>>) {
+export function useVehicles(
+  data: AppData,
+  setData: React.Dispatch<React.SetStateAction<AppData>>,
+  setSelectedVehicle: React.Dispatch<React.SetStateAction<Vehicle | null>>,
+  handleSave: (newData: AppData) => void
+) {
   const [isAddingVehicle, setIsAddingVehicle] = useState(false);
   const [isEditingVehicle, setIsEditingVehicle] = useState(false);
   const [newVehicle, setNewVehicle] = useState(DEFAULT_VEHICLE_STATE);
@@ -27,8 +31,7 @@ export function useVehicles(data: AppData, setData: React.Dispatch<React.SetStat
       vehicles: [...data.vehicles, vehicleToAdd]
     };
 
-    setData(newData);
-    storageService.saveData(newData);
+    handleSave(newData);
     setIsAddingVehicle(false);
     setNewVehicle(DEFAULT_VEHICLE_STATE);
   };
@@ -38,8 +41,7 @@ export function useVehicles(data: AppData, setData: React.Dispatch<React.SetStat
       ...data,
       vehicles: data.vehicles.map(v => v.id === (newVehicle as any).id ? { ...v, ...newVehicle } : v)
     };
-    setData(newData);
-    storageService.saveData(newData);
+    handleSave(newData);
     setIsEditingVehicle(false);
     setNewVehicle(DEFAULT_VEHICLE_STATE);
   };
@@ -57,13 +59,8 @@ export function useVehicles(data: AppData, setData: React.Dispatch<React.SetStat
         ...data,
         vehicles: data.vehicles.filter(v => v.id !== itemToDelete.id)
       };
-      setData(newData);
-      storageService.saveData(newData);
-      // If the deleted vehicle was selected, clear selection
-      // Note: We'll handle this in the main App or by returning a function
+      handleSave(newData);
     }
-    
-    setItemToDelete(null);
   };
 
   const moveVehicleToTop = (id: string, e: React.MouseEvent) => {
@@ -76,8 +73,7 @@ export function useVehicles(data: AppData, setData: React.Dispatch<React.SetStat
     newVehicles.unshift(movedVehicle);
     
     const newData = { ...data, vehicles: newVehicles };
-    setData(newData);
-    storageService.saveData(newData);
+    handleSave(newData);
   };
 
   return {

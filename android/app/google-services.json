@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "456343787433-q3vi86nnspfoiitn3ntsp48aadcn692a.apps.googleusercontent.com",
+          "client_id": "456343787433-l3ol4epvtv5oo7v2p2gaq0idec95fcb1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.torqboss.app",
@@ -22,15 +22,7 @@
           }
         },
         {
-          "client_id": "456343787433-vjh8tp1rn9q18fbaonhmk4tjgkc9pdjt.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.torqboss.app",
-            "certificate_hash": "457be18cdb38d0db5b577dd4481fe919a3fb5a97"
-          }
-        },
-        {
-          "client_id": "456343787433-f6n6aa5i85o89rjbvvck9hurgtqi5o8f.apps.googleusercontent.com",
+          "client_id": "456343787433-bl4ee0bb3b5snacsgu47i3ok94gbgg2s.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -43,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "456343787433-f6n6aa5i85o89rjbvvck9hurgtqi5o8f.apps.googleusercontent.com",
+              "client_id": "456343787433-bl4ee0bb3b5snacsgu47i3ok94gbgg2s.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

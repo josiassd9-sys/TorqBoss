@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AppData, Vehicle } from '../types';
 import { storageService } from '../services/storageService';
 import { geminiService } from '../services/geminiService';
@@ -69,6 +69,8 @@ export function useAppData() {
   };
 
   const marketRef = data.settings?.marketReferenceName || 'Valor de Mercado';
+
+  const lastSettingsPayloadRef = useRef('');
 
   useEffect(() => {
     const loadedData = storageService.loadData();
@@ -178,6 +180,26 @@ export function useAppData() {
   const handleSave = (newData: AppData) => {
     setData(newData);
     storageService.saveData(newData);
+
+    const settingsPayload = JSON.stringify({
+      ...newData.settings,
+      aiCredits: newData.settings?.aiCredits ?? 0,
+      isProMember: newData.settings?.isProMember ?? false
+    });
+
+    if (lastSettingsPayloadRef.current !== settingsPayload) {
+      lastSettingsPayloadRef.current = settingsPayload;
+
+      if (newData.settings?.geminiApiKey) {
+        geminiService.setApiKey(newData.settings.geminiApiKey);
+      }
+
+      geminiService.setGlobalSettings({
+        ...newData.settings,
+        aiCredits: newData.settings?.aiCredits ?? 0,
+        isProMember: newData.settings?.isProMember ?? false
+      });
+    }
   };
 
   return {

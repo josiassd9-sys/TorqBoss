@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Cpu, Zap, RefreshCw, TrendingUp, ShieldCheck, ChevronDown } from 'lucide-react';
 import Markdown from 'react-markdown';
+import { InteractiveDiagnosis } from '../InteractiveDiagnosis';
 import { Vehicle } from '../../types';
 
 interface IntelligenceTabProps {
@@ -76,17 +77,12 @@ export const IntelligenceTab: React.FC<IntelligenceTabProps> = ({
           </div>
 
           {diagnosisResult && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white p-6 rounded-lg border border-brand-primary/10 shadow-xl relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-1 bg-brand-accent"></div>
-              <div className="markdown-body text-xs leading-relaxed">
-                <Markdown>{diagnosisResult}</Markdown>
-              </div>
-            </motion.div>
-          )}
+  <InteractiveDiagnosis
+    diagnosisResult={diagnosisResult}
+    vehicle={vehicle}
+    symptomQuery={symptomQuery}
+  />
+)}
         </div>
       )
     },
