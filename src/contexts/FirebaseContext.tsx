@@ -1,9 +1,13 @@
-import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Importação direta dos recursos do pacote oficial do Firebase Auth:
-import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+// Recursos do Firebase Auth (Web SDK) usados pela arquitetura GIS:
+import {
+  GoogleAuthProvider,
+  signInWithCredential,
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence
+} from 'firebase/auth';
 import { debugLog, debugError } from '../debug';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 
 import {
   auth,
@@ -17,6 +21,12 @@ import {
   increment,
   arrayUnion
 } from '../lib/firebase';
+
+// ⚠️ Client ID OAuth do tipo "Web" (Google Identity Services).
+// DEVE pertencer ao MESMO projeto Firebase (gen-lang-client-0227808879 / 794498953463).
+// Se o login falhar com auth/invalid-credential, troque por um Web Client ID desse projeto.
+const GIS_WEB_CLIENT_ID =
+  '456343787433-bl4ee0bb3b5snacsgu47i3ok94gbgg2s.apps.googleusercontent.com';
 
 enum OperationType {
   CREATE = 'create',
@@ -89,12 +99,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   });
 
   useEffect(() => {
-  // 🛠️ INICIALIZAÇÃO CORRIGIDA: Agora com o ID Web Client real obtido do Google Cloud
-  GoogleAuth.initialize({
-    clientId: '456343787433-f6n6aa5i85o89rjbvvck9hurgtqi5o8f.apps.googleusercontent.com',
-    scopes: ['profile', 'email'],
-    grantOfflineAccess: true,
-  }).catch(err => console.error('Erro na inicialização automática do Google Auth:', err));
+  // Persistência automática do Firebase: mantém o usuário logado após fechar o app.
+  setPersistence(auth, browserLocalPersistence).catch(console.error);
 
   const handleDevProChange = () => {
     try {
@@ -213,28 +219,47 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const login = async () => {
   try {
-    debugLog('INICIANDO LOGIN GOOGLE');
-    await GoogleAuth.signOut().catch(() => { });
-    debugLog('GOOGLE SIGNOUT OK');
-    const googleUser: any = await GoogleAuth.signIn();
-    debugLog('GOOGLE SIGNIN OK');
-    console.log('GOOGLE USER:', googleUser);
-    const idToken = googleUser.authentication?.idToken || googleUser.idToken;
-    debugLog('TOKEN RECEBIDO');
-    if (!idToken) {
-      debugError('ID TOKEN NÃO ENCONTRADO');
-      throw new Error('ID TOKEN NÃO ENCONTRADO');
+    debugLog('INICIANDO LOGIN GOOGLE (GIS)');
+
+    const google = (window as any).google;
+    console.log('window.google =', google);
+
+    if (!google || !google.accounts || !google.accounts.id) {
+      debugError('GIS NAO CARREGADO');
+      throw new Error('GIS NAO CARREGADO');
     }
+
+    // Fluxo GIS: obtém o ID Token (JWT) do Google via callback.
+    const idToken: string = await new Promise<string>((resolve, reject) => {
+      try {
+        google.accounts.id.initialize({
+          client_id: GIS_WEB_CLIENT_ID,
+          callback: (response: any) => {
+            if (response && response.credential) {
+              resolve(response.credential);
+            } else {
+              reject(new Error('CREDENCIAL GIS VAZIA'));
+            }
+          },
+        });
+        google.accounts.id.prompt();
+      } catch (e) {
+        reject(e);
+      }
+    });
+
+    debugLog('ID TOKEN GIS RECEBIDO');
+
+    // Troca o ID Token do Google por uma sessão Firebase.
     const credential = GoogleAuthProvider.credential(idToken);
-    debugLog('CREDENCIAL FIREBASE OK');
     const userCredential = await signInWithCredential(auth, credential);
     debugLog('LOGIN FIREBASE OK');
     console.log('Firebase login OK:', userCredential.user);
-    alert('LOGIN GOOGLE REALIZADO COM SUCESSO');
+    // onAuthStateChanged cuida do estado/persistência a partir daqui.
   } catch (error: any) {
     console.error('ERRO GOOGLE LOGIN:', error);
     debugError('ERRO LOGIN GOOGLE:\n' + JSON.stringify(error, null, 2));
-    alert('ERRO GOOGLE:\n\n' + JSON.stringify(error, null, 2));
+    alert('ERRO GOOGLE:\n\n' + (error?.message || JSON.stringify(error, null, 2)));
   }
 };
 
@@ -262,7 +287,8 @@ const loginWithEmailPassword = async (email: string, password: string) => {
 
 const logout = async () => {
   try {
-    await GoogleAuth.signOut();
+    const google = (window as any).google;
+    google?.accounts?.id?.disableAutoSelect?.();
     await auth.signOut();
   } catch (error) {
     console.error('Logout error:', error);

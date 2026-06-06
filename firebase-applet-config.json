@@ -1,10 +1,9 @@
 {
-  "projectId": "gen-lang-client-0227808879",
-  "appId": "1:794498953463:web:b08ad707d2678c2272e3f2",
-  "apiKey": "AIzaSyDLuUdsT9SaBjSODtFN57zor86hoguMH6Q",
-  "authDomain": "gen-lang-client-0227808879.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-4351645f-02b6-4794-af48-1330ca7f76b8",
-  "storageBucket": "gen-lang-client-0227808879.firebasestorage.app",
-  "messagingSenderId": "794498953463",
+  "apiKey": "AIzaSyDOauEGv0us8I2NKdT3h6e_uYvMusEfTuE",
+  "authDomain": "torqboss.firebaseapp.com",
+  "projectId": "torqboss",
+  "storageBucket": "torqboss.firebasestorage.app",
+  "messagingSenderId": "456343787433",
+  "appId": "",
   "measurementId": ""
 }

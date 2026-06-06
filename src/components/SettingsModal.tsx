@@ -8,7 +8,7 @@ import { AppManual } from './AppManual';
 import { DevDocsTab } from './DevDocsTab';
 import { geminiService } from '../services/geminiService';
 import { useFirebase } from '../contexts/FirebaseContext';
-import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
+import { DebugCenter } from './DebugCenter';
 import { auth, db, doc, getDoc, setDoc } from '../lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
@@ -220,7 +220,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const limparSessaoGoogle = async () => {
     try {
-      await GoogleAuth.signOut();
+      (window as any).google?.accounts?.id?.disableAutoSelect?.();
       await auth.signOut();
 
       alert('Sessão Google/Firebase removida.');
@@ -236,8 +236,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       // Firebase
       await auth.signOut();
 
-      // Google
-      await GoogleAuth.signOut();
+      // Google (GIS) — desativa seleção automática
+      (window as any).google?.accounts?.id?.disableAutoSelect?.();
 
       // Storage Web
       localStorage.clear();
@@ -264,7 +264,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     try {
 
       // Logout completo
-      await GoogleAuth.signOut();
+      (window as any).google?.accounts?.id?.disableAutoSelect?.();
       await auth.signOut();
 
       // Storage
@@ -1580,6 +1580,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         <p className="text-[9px] sm:text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">Telemetria, logs de execução e status da integração Google / Firebase</p>
                       </div>
                     </div>
+
+                    {/* Caixa-preta do APK: diagnóstico GIS / Firebase / WebView */}
+                    <DebugCenter />
 
                     {/* Section 1: Conectividade e Firebase */}
                     <div className="bg-gray-50 border border-gray-100 rounded-xl p-5 space-y-4">
