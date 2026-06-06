@@ -9,7 +9,11 @@ const config: CapacitorConfig = {
   },
   plugins: {
     Filesystem: {},
-    Share: {}
+    Share: {},
+    FirebaseAuthentication: {
+      skipNativeAuth: true,
+      providers: ['google.com']
+    }
   }
 };
 

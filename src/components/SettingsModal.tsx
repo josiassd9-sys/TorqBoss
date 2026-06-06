@@ -8,6 +8,7 @@ import { AppManual } from './AppManual';
 import { DevDocsTab } from './DevDocsTab';
 import { geminiService } from '../services/geminiService';
 import { useFirebase } from '../contexts/FirebaseContext';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { DebugCenter } from './DebugCenter';
 import { auth, db, doc, getDoc, setDoc } from '../lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -220,7 +221,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const limparSessaoGoogle = async () => {
     try {
-      (window as any).google?.accounts?.id?.disableAutoSelect?.();
+      await FirebaseAuthentication.signOut().catch(() => { });
       await auth.signOut();
 
       alert('Sessão Google/Firebase removida.');
@@ -236,8 +237,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       // Firebase
       await auth.signOut();
 
-      // Google (GIS) — desativa seleção automática
-      (window as any).google?.accounts?.id?.disableAutoSelect?.();
+      // Google (nativo)
+      await FirebaseAuthentication.signOut().catch(() => { });
 
       // Storage Web
       localStorage.clear();
@@ -264,7 +265,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     try {
 
       // Logout completo
-      (window as any).google?.accounts?.id?.disableAutoSelect?.();
+      await FirebaseAuthentication.signOut().catch(() => { });
       await auth.signOut();
 
       // Storage

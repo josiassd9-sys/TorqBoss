@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-// Recursos do Firebase Auth (Web SDK) usados pela arquitetura GIS:
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+// Recursos do Firebase Auth (Web SDK):
 import {
   GoogleAuthProvider,
   signInWithCredential,
@@ -21,12 +22,6 @@ import {
   increment,
   arrayUnion
 } from '../lib/firebase';
-
-// ⚠️ Client ID OAuth do tipo "Web" (Google Identity Services).
-// DEVE pertencer ao MESMO projeto Firebase (gen-lang-client-0227808879 / 794498953463).
-// Se o login falhar com auth/invalid-credential, troque por um Web Client ID desse projeto.
-const GIS_WEB_CLIENT_ID =
-  '456343787433-bl4ee0bb3b5snacsgu47i3ok94gbgg2s.apps.googleusercontent.com';
 
 enum OperationType {
   CREATE = 'create',
@@ -219,38 +214,21 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const login = async () => {
   try {
-    debugLog('INICIANDO LOGIN GOOGLE (GIS)');
+    debugLog('INICIANDO LOGIN GOOGLE (NATIVO)');
 
-    const google = (window as any).google;
-    console.log('window.google =', google);
+    // Login Google NATIVO via plugin Capacitor (funciona dentro da WebView,
+    // ao contrário do GIS web que o Android bloqueia).
+    // skipNativeAuth: true -> o plugin só obtém a credencial; quem autentica é o JS SDK abaixo.
+    const result = await FirebaseAuthentication.signInWithGoogle({ skipNativeAuth: true });
+    debugLog('GOOGLE NATIVO OK');
 
-    if (!google || !google.accounts || !google.accounts.id) {
-      debugError('GIS NAO CARREGADO');
-      throw new Error('GIS NAO CARREGADO');
+    const idToken = result.credential?.idToken;
+    if (!idToken) {
+      debugError('ID TOKEN GOOGLE AUSENTE');
+      throw new Error('ID TOKEN GOOGLE AUSENTE');
     }
 
-    // Fluxo GIS: obtém o ID Token (JWT) do Google via callback.
-    const idToken: string = await new Promise<string>((resolve, reject) => {
-      try {
-        google.accounts.id.initialize({
-          client_id: GIS_WEB_CLIENT_ID,
-          callback: (response: any) => {
-            if (response && response.credential) {
-              resolve(response.credential);
-            } else {
-              reject(new Error('CREDENCIAL GIS VAZIA'));
-            }
-          },
-        });
-        google.accounts.id.prompt();
-      } catch (e) {
-        reject(e);
-      }
-    });
-
-    debugLog('ID TOKEN GIS RECEBIDO');
-
-    // Troca o ID Token do Google por uma sessão Firebase.
+    // Troca o ID Token do Google por uma sessão no Firebase Web SDK.
     const credential = GoogleAuthProvider.credential(idToken);
     const userCredential = await signInWithCredential(auth, credential);
     debugLog('LOGIN FIREBASE OK');
@@ -287,8 +265,7 @@ const loginWithEmailPassword = async (email: string, password: string) => {
 
 const logout = async () => {
   try {
-    const google = (window as any).google;
-    google?.accounts?.id?.disableAutoSelect?.();
+    await FirebaseAuthentication.signOut().catch(() => { });
     await auth.signOut();
   } catch (error) {
     console.error('Logout error:', error);

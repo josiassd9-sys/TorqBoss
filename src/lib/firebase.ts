@@ -8,7 +8,7 @@ import {
 import type { User } from 'firebase/auth';
 
 import {
-  getFirestore,
+  initializeFirestore,
   doc,
   getDoc,
   setDoc,
@@ -39,7 +39,11 @@ try {
   throw err;
 }
 
-export const db = getFirestore(app);
+// experimentalForceLongPolling: o WebChannel/streaming padrão do Firestore costuma
+// ser bloqueado dentro da WebView do Android ("client is offline"); long-polling resolve.
+export const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+});
 
 export const auth = getAuth(app);
 
