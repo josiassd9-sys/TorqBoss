@@ -47,7 +47,7 @@ android {
     // ==================== RENOMEAR APK (GRADLE 8 + AGP 8 CORRETO) ====================
     applicationVariants.configureEach { variant ->
         variant.outputs.configureEach { output ->
-            output.outputFileName = "TorqBoss-${variant.versionName}.apk"
+            output.outputFileName = "TorqBossGIS-${variant.versionName}.apk"
         }
     }
 }

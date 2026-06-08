@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { debugLog, debugError } from '../debug';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { loginWithGoogle } from "../services/authService";
+
 import { devopsBus } from '../components/devops/eventBus';
 import { setPersistence, browserLocalPersistence } from "firebase/auth";
 import {
@@ -183,7 +183,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       debugLog("INICIANDO LOGIN GOOGLE (GIS)");
 
-      const google = window.google;
+      const google = (window as any).google;
 
       if (!google) {
         throw new Error("GIS NAO CARREGADO");
@@ -198,13 +198,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             callback: resolve,
           });
 
-          google.accounts.id.prompt((notification: any) => {
-            // usuário fechou popup
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-              debugError("LOGIN CANCELADO PELO USUARIO");
-              reject(new Error("LOGIN CANCELADO"));
-            }
-          });
+          google.accounts.id.prompt();
         } catch (err) {
           reject(err);
         }
@@ -233,21 +227,21 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       alert("LOGIN GOOGLE REALIZADO COM SUCESSO");
     } catch (error: any) {
 
-  console.error('ERRO GOOGLE LOGIN:', error);
+      console.error('ERRO GOOGLE LOGIN:', error);
 
-  console.error('ERROR NAME:', error?.name);
-  console.error('ERROR MESSAGE:', error?.message);
-  console.error('ERROR STACK:', error?.stack);
+      console.error('ERROR NAME:', error?.name);
+      console.error('ERROR MESSAGE:', error?.message);
+      console.error('ERROR STACK:', error?.stack);
 
-  alert(
-    'ERRO GOOGLE\n\n' +
-    'NAME: ' + (error?.name || 'SEM NAME') + '\n\n' +
-    'MESSAGE: ' + (error?.message || 'SEM MESSAGE')
-  );
+      alert(
+        'ERRO GOOGLE\n\n' +
+        'NAME: ' + (error?.name || 'SEM NAME') + '\n\n' +
+        'MESSAGE: ' + (error?.message || 'SEM MESSAGE')
+      );
 
-} finally {
-  loginInProgressRef.current = false;
-}
+    } finally {
+      loginInProgressRef.current = false;
+    }
   };
 
   // ==================== NOVA FUNÇÃO PARA LOGIN COM EMAIL/SENHA ====================
