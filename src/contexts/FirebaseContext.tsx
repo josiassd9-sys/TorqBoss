@@ -136,21 +136,21 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           const userDoc = await getDoc(userDocRef);
 
           if (!userDoc.exists()) {
-            const initialCredits = u.email === 'josias.sd9@gmail.com' ? 500 : 100;
+            const initialCredits = u.email === 'josias@torqboss.com' ? 500 : 100;
             await setDoc(userDocRef, {
               uid: u.uid,
               aiCredits: initialCredits,
-              isProMember: u.email === 'josias.sd9@gmail.com' ? true : false,
+              isProMember: u.email === 'josias@torqboss.com' ? true : false,
               transactionHistory: [{ id: 'init-' + Date.now(), date: new Date().toISOString(), amount: initialCredits, description: 'Bônus de Instalação (Cloud)', type: 'credit' }]
             });
             setCredits(initialCredits);
-            setIsPro(u.email === 'josias.sd9@gmail.com' ? true : (checkDevOverride() ? true : false));
+            setIsPro(u.email === 'josias@torqboss.com' ? true : (checkDevOverride() ? true : false));
           } else {
             const data = userDoc.data();
             let userCredits = data.aiCredits !== undefined ? data.aiCredits : 0;
             let userIsPro = data.isProMember || false;
 
-            if (u.email === 'josias.sd9@gmail.com') {
+            if (u.email === 'josias@torqboss.com') {
               userIsPro = true;
               if (userCredits <= 5) {
                 userCredits = 500;
@@ -173,7 +173,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               let snapshotCredits = data.aiCredits !== undefined ? data.aiCredits : 0;
               let snapshotIsPro = data.isProMember || false;
 
-              if (u.email === 'josias.sd9@gmail.com') {
+              if (u.email === 'josias@torqboss.com') {
                 snapshotIsPro = true;
                 if (snapshotCredits <= 5) {
                   snapshotCredits = 500;
