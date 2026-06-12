@@ -222,6 +222,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const result = await FirebaseAuthentication.signInWithGoogle({ skipNativeAuth: true });
     debugLog('GOOGLE NATIVO OK');
 
+    console.log('GOOGLE RESULT:', JSON.stringify(result, null, 2));
+
     const idToken = result.credential?.idToken;
     if (!idToken) {
       debugError('ID TOKEN GOOGLE AUSENTE');

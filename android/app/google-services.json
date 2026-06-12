@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "456343787433",
-    "project_id": "torqboss",
-    "storage_bucket": "torqboss.firebasestorage.app"
+    "project_number": "140585498523",
+    "project_id": "torqbosspro",
+    "storage_bucket": "torqbosspro.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:456343787433:android:14b63c398476d440f596b8",
+        "mobilesdk_app_id": "1:140585498523:android:d2ee7cb415e9863cae133e",
         "android_client_info": {
           "package_name": "com.torqboss.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "140585498523-bv37c8hopupnve569mpteap3hhmvhrnb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.torqboss.app",
+            "certificate_hash": "6150903f4c286e486e4efd6e581c073d37f12684"
+          }
+        },
+        {
+          "client_id": "140585498523-1a9f6osp6bhit998ib1i1a6e7tspl52i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyCZ4mN85epY1o8phi3PA_BGuDDf9JUHe80"
+          "current_key": "AIzaSyC6mJzIv98DwuLC4VFpFGFyBEtwommYgZU"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140585498523-1a9f6osp6bhit998ib1i1a6e7tspl52i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
