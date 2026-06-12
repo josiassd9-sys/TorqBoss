@@ -10,7 +10,7 @@ import torqbossLogo from '../assets/images/torqboss_logo_strada.png';
 
 export function useAppData() {
   const { credits, isPro, consumeCredit } = useFirebase();
-  const [data, setData] = useState<AppData>({ 
+  const [data, setData] = useState<AppData>({
     vehicles: [],
     settings: {
       language: 'pt-BR',
@@ -23,7 +23,7 @@ export function useAppData() {
       vehicleIdentifierLabel: 'Placa',
       vehicleIdentifierPlaceholder: 'AAA-0000',
       aiCredits: 0,
-      isProMember: false
+      
     }
   });
 
@@ -41,18 +41,15 @@ export function useAppData() {
       ...prev,
       settings: {
         ...prev.settings,
-        aiCredits: credits,
-        isProMember: isPro
+        aiCredits: credits
       }
     }));
-    
-    // Update gemini service internal state
+
     geminiService.setGlobalSettings({
       ...data.settings,
-      aiCredits: credits,
-      isProMember: isPro
+      aiCredits: credits
     });
-  }, [credits, isPro]);
+  }, [credits]);
 
   const currentCountry = getCountryById(data.settings?.countryId || 'BR');
 
@@ -73,7 +70,7 @@ export function useAppData() {
 
   useEffect(() => {
     const loadedData = storageService.loadData();
-    
+
     let vehicles = loadedData.vehicles || [];
 
     const loadedSettings = (loadedData.settings || {}) as any;
@@ -106,14 +103,17 @@ export function useAppData() {
       } as any
     };
     setData(merged as any);
-    if (merged.settings) {
-      geminiService.setApiKey(merged.settings.geminiApiKey || '');
-      geminiService.setGlobalSettings({
-        ...merged.settings,
-        aiCredits: credits,
-        isProMember: isPro
-      });
-    }
+
+if (merged.settings) {
+  geminiService.setApiKey(
+    merged.settings.geminiApiKey || ''
+  );
+
+  geminiService.setGlobalSettings({
+    ...merged.settings,
+    aiCredits: credits
+  });
+}
 
     // Configura callback de consumo de créditos REAL via Firebase
     geminiService.onCreditConsumed((amount) => {
@@ -150,7 +150,7 @@ export function useAppData() {
 
     const styleId = 'theme-overrides';
     let styleTag = document.getElementById(styleId);
-    
+
     if (!styleTag) {
       styleTag = document.createElement('style');
       styleTag.id = styleId;
@@ -183,7 +183,7 @@ export function useAppData() {
   const handleSave = (newData: AppData) => {
     setData(newData);
     storageService.saveData(newData);
-    
+
     if (newData.settings) {
       const apiKey = newData.settings.geminiApiKey || '';
       geminiService.setApiKey(apiKey);

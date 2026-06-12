@@ -31,7 +31,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onUpdateSettings,
   onResetData
 }) => {
-  const { user, loading, login, logout, loginWithEmailPassword, credits, isPro, addCredits, upgradeToPro } = useFirebase();  
+  const { user, loading, login, logout, loginWithEmailPassword, credits, isPro, addCredits, upgradeToPro } = useFirebase();
   const [activeSubTab, setActiveSubTab] = React.useState<'general' | 'theme' | 'appearance' | 'search' | 'privacy' | 'manual' | 'apiKey' | 'wallet' | 'account' | 'data' | 'devDocs' | 'debug'>('manual');
   const [testStatus, setTestStatus] = React.useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [testMessage, setTestMessage] = React.useState('');
@@ -95,25 +95,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     try {
       debugLog('DIAGNOSE: Iniciando teste de ping do Firebase');
       const start = Date.now();
-      
+
       // Test Auth
       const currentUser = auth.currentUser;
       debugLog(`DIAGNOSE: Usuário atual: ${currentUser ? currentUser.email : 'Nenhum usuário logado'}`);
-      
+
       // Test Firestore writing connection under /users/UID/diagnostics/ping_test or diagnostics/test_ping
       const path = currentUser ? `users/${currentUser.uid}/diagnostics/ping_test` : 'diagnostics/test_ping';
       const diagnosticDocRef = doc(db, path);
-      
+
       await setDoc(diagnosticDocRef, {
         timestamp: Date.now(),
         testBy: currentUser?.email || 'Anonymous/Diagnostic',
         platform: Capacitor.getPlatform()
       });
       debugLog(`DIAGNOSE: Documento de teste escrito com sucesso no caminho: ${path}`);
-      
+
       const snap = await getDoc(diagnosticDocRef);
       debugLog(`DIAGNOSE: Documento lido com sucesso: ${snap.exists() ? 'Existe' : 'Não encontrado'}`);
-      
+
       const duration = Date.now() - start;
       const successMsg = `Sucesso! Ping concluído em ${duration}ms. Conexão com Firestore está ativa e autorizada.`;
       setDiagnosticPingStatus('success');
@@ -1061,12 +1061,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         </div>
                         <input
                           type="password"
-                          placeholder={data.settings.isProMember ? "Cole sua Chave API aqui..." : "Chave bloqueada - Requer Plano PRO"}
-                          disabled={!data.settings.isProMember}
-                          className={`w-full border rounded-lg py-5 pl-14 pr-6 font-mono text-sm outline-none transition-all shadow-sm ${!data.settings.isProMember
-                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed select-none'
-                            : 'bg-white text-yellow-600 border-gray-200 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15'
-                            }`}
+                          placeholder="Cole sua Chave API aqui..."
+
+                          className="w-full border rounded-lg py-5 pl-14 pr-6 font-mono text-sm outline-none transition-all shadow-sm bg-white text-yellow-600 border-gray-200 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15"
+                          
                           value={data.settings.geminiApiKey || ''}
                           onChange={(e) => {
                             updateSettings({ geminiApiKey: e.target.value });
@@ -1205,7 +1203,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             <p className="text-xs font-bold mt-4 text-gray-400">
                               Seus créditos locais permitem que a Inteligência Artificial e a consulta avançada funcionem sem conta.
                             </p>
-                            
+
                             <div className="mt-6">
                               <button
                                 onClick={async () => {
@@ -1591,7 +1589,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         <Wifi size={18} />
                         <h4 className="text-xs font-black uppercase tracking-wider">Conexão & Nuvem</h4>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="bg-white p-4 rounded-lg border border-gray-100 text-xs">
                           <p className="font-bold text-gray-400 uppercase text-[8px] tracking-wider mb-1">Internet</p>
@@ -1630,11 +1628,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         </div>
 
                         {diagnosticPingStatus !== 'idle' && (
-                          <div className={`p-3 rounded text-[11px] font-mono whitespace-pre-wrap flex items-start gap-2 ${
-                            diagnosticPingStatus === 'running' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                          <div className={`p-3 rounded text-[11px] font-mono whitespace-pre-wrap flex items-start gap-2 ${diagnosticPingStatus === 'running' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
                             diagnosticPingStatus === 'success' ? 'bg-green-50 text-green-700 border border-green-100' :
-                            'bg-red-50 text-red-700 border border-red-100'
-                          }`}>
+                              'bg-red-50 text-red-700 border border-red-100'
+                            }`}>
                             {diagnosticPingStatus === 'success' && <CheckCircle2 size={14} className="shrink-0 mt-0.5" />}
                             {diagnosticPingStatus === 'error' && <AlertCircle size={14} className="shrink-0 mt-0.5" />}
                             <span className="break-all">{diagnosticPingMessage}</span>
@@ -1718,7 +1715,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                       <div className="bg-white p-4 rounded-lg border border-gray-100 space-y-3.5">
                         <p className="font-bold text-gray-800 text-xs text-left">Ações de Controle do Overlay</p>
-                        
+
                         <div className="pt-2 border-t border-gray-50 flex flex-wrap gap-2">
                           <button
                             onClick={() => toggleDebugOverlay(true)}
