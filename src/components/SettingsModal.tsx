@@ -400,7 +400,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <Database size={14} className="sm:w-4 sm:h-4 shrink-0" /> Backup
                 </button>
 
-                {user?.email === 'josias@torqboss.com' && (
+                {user?.email === 'torqboss@gmail.com' && (
                   <button
                     onClick={() => setActiveSubTab('devDocs')}
                     className={`flex items-center gap-1.5 sm:gap-3 px-3 py-2.5 sm:p-4 rounded-lg text-[9px] sm:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap sm:whitespace-normal flex-1 sm:flex-none justify-center sm:justify-start ${activeSubTab === 'devDocs' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25' : 'text-indigo-500 hover:bg-indigo-50'}`}
@@ -533,7 +533,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </div>
                     </div>
 
-                    {user?.email === 'josias@torqboss.com' && (
+                    {user?.email === 'torqboss@gmail.com' && (
                       <div className="pt-6 border-t border-gray-100 flex flex-col gap-4">
                         <div className="flex flex-col gap-1">
                           <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Painel Sandbox (Desenvolvedor)</h4>
@@ -1406,7 +1406,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                         {/* BOTÃO DE TESTE - EMAIL/SENHA */}
                         <button
-                          onClick={() => loginWithEmailPassword('Josias@torqboss.com', 'torqboss-0007')}
+                          onClick={() => loginWithEmailPassword('torqboss@gmail.com', 'torqboss-0007')}
                           className="mb-4 w-full bg-orange-500 text-white px-10 py-3 rounded-lg text-xs font-black uppercase tracking-widest shadow-lg hover:bg-orange-600 transition-all flex items-center justify-center gap-2"
                         >
                           🔧 TESTAR LOGIN (Email/Senha)
