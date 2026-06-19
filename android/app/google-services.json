@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "140585498523-7blbes239odmgevrptqmov8ihlmkutf2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.torqboss.app",
+            "certificate_hash": "457be18cdb38d0db5b577dd4481fe919a3fb5a97"
+          }
+        },
+        {
+          "client_id": "140585498523-b2kruok8h1j8ukho76en3avd2lkuiman.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.torqboss.app",
+            "certificate_hash": "ba65d17b3ba0ed546691f89e385bc1131488d788"
+          }
+        },
+        {
           "client_id": "140585498523-bv37c8hopupnve569mpteap3hhmvhrnb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

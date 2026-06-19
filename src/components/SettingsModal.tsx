@@ -127,9 +127,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
-  // 🔍 ADICIONE AQUI O CONSOLE.LOG
-  console.log('activeSubTab:', activeSubTab, 'user:', user);
-
   const handleFullBackup = () => {
     const backupContent = JSON.stringify({ ...data, exportType: 'full_backup', version: '2.0' }, null, 2);
     const blob = new Blob([backupContent], { type: 'application/json' });
@@ -1082,13 +1079,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             setTestStatus('testing');
                             try {
                               const result = await geminiService.validateApiKey(settings.geminiApiKey);
+                              console.log(`[IA] validateApiKey | ok=${!!result?.success}${result?.message ? ` | ${result.message}` : ''}`);
                               if (result.success) {
                                 setTestStatus('success');
                               } else {
                                 setTestStatus('error');
                                 setTestMessage(result.message);
                               }
-                            } catch (e) {
+                            } catch (error: any) {
+                              console.log(`[IA] validateApiKey | erro=${error?.message || String(error)}`);
                               setTestStatus('error');
                               setTestMessage('Erro inesperado ao testar conexão.');
                             }
@@ -1149,7 +1148,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           <span className="text-[10px] font-black uppercase tracking-widest text-brand-primary">Manual do Mecânico: Gerar Chave Grátis</span>
                         </div>
                         <a
-                          href="https://aistudio.google.com/app/apikey"
+                          href="https://accounts.google.com/AccountChooser?continue=https://aistudio.google.com/app/apikey"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-[10px] font-black uppercase tracking-widest text-white bg-brand-primary hover:bg-brand-accent px-4 py-2.5 rounded-full transition-all flex items-center gap-2 group-hover:translate-x-1"

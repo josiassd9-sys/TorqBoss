@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 // Recursos do Firebase Auth (Web SDK):
 import {
@@ -8,7 +8,7 @@ import {
   setPersistence,
   browserLocalPersistence
 } from 'firebase/auth';
-import { debugLog, debugError } from '../debug';
+import { debugError } from '../debug';
 
 import {
   auth,
@@ -62,18 +62,10 @@ interface FirebaseContextType {
 const FirebaseContext = createContext<FirebaseContextType | undefined>(undefined);
 
 function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
-  const errInfo = {
-    error: error instanceof Error ? error.message : String(error),
-    authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-    },
-    operationType,
-    path
-  };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+  const message = error instanceof Error ? error.message : String(error);
+  const compact = `[FIREBASE] ERRO: ${message.replace(/\s+/g, ' ').trim()} | op=${operationType}${path ? ` | path=${path}` : ''}`;
+  console.error(compact);
+  throw new Error(compact);
 }
 
 export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -92,6 +84,14 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch (_) { }
     return false;
   });
+  const lastAuthSummaryRef = useRef('');
+
+  const logAuthSummary = (label: 'login OK' | 'snapshot' | 'logout', nextIsPro: boolean, nextCredits: number) => {
+    const summary = `${label}|${nextIsPro}|${nextCredits}`;
+    if (summary === lastAuthSummaryRef.current) return;
+    lastAuthSummaryRef.current = summary;
+    console.log(`[AUTH] ${label} | PRO=${nextIsPro} | créditos=${nextCredits}`);
+  };
 
   useEffect(() => {
   // Persistência automática do Firebase: mantém o usuário logado após fechar o app.
@@ -144,7 +144,9 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               transactionHistory: [{ id: 'init-' + Date.now(), date: new Date().toISOString(), amount: initialCredits, description: 'Bônus de Instalação (Cloud)', type: 'credit' }]
             });
             setCredits(initialCredits);
-            setIsPro(u.email === 'torqboss@gmail.com' ? true : (checkDevOverride() ? true : false));
+            const nextIsPro = u.email === 'torqboss@gmail.com' ? true : (checkDevOverride() ? true : false);
+            setIsPro(nextIsPro);
+            logAuthSummary('login OK', nextIsPro, initialCredits);
           } else {
             const data = userDoc.data();
             let userCredits = data.aiCredits !== undefined ? data.aiCredits : 0;
@@ -163,7 +165,9 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             }
 
             setCredits(userCredits);
-            setIsPro(userIsPro || checkDevOverride());
+            const nextIsPro = userIsPro || checkDevOverride();
+            setIsPro(nextIsPro);
+            logAuthSummary('login OK', nextIsPro, userCredits);
           }
 
           // Real-time listener for credits
@@ -186,7 +190,9 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               }
 
               setCredits(snapshotCredits);
-              setIsPro(snapshotIsPro || checkDevOverride());
+              const nextIsPro = snapshotIsPro || checkDevOverride();
+              setIsPro(nextIsPro);
+              logAuthSummary('snapshot', nextIsPro, snapshotCredits);
             }
           }, (error) => {
             handleFirestoreError(error, OperationType.GET, path);
@@ -206,6 +212,8 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           setCredits(parseInt(localCreditsStr, 10) || 0);
         }
         setIsPro(checkDevOverride() ? true : false);
+        lastAuthSummaryRef.current = '';
+        console.log('[AUTH] logout');
       }
     });
 
@@ -214,15 +222,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const login = async () => {
   try {
-    debugLog('INICIANDO LOGIN GOOGLE (NATIVO)');
-
     // Login Google NATIVO via plugin Capacitor (funciona dentro da WebView,
     // ao contrário do GIS web que o Android bloqueia).
     // skipNativeAuth: true -> o plugin só obtém a credencial; quem autentica é o JS SDK abaixo.
     const result = await FirebaseAuthentication.signInWithGoogle({ skipNativeAuth: true });
-    debugLog('GOOGLE NATIVO OK');
-
-    console.log('GOOGLE RESULT:', JSON.stringify(result, null, 2));
 
     const idToken = result.credential?.idToken;
     if (!idToken) {
@@ -232,32 +235,24 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     // Troca o ID Token do Google por uma sessão no Firebase Web SDK.
     const credential = GoogleAuthProvider.credential(idToken);
-    const userCredential = await signInWithCredential(auth, credential);
-    debugLog('LOGIN FIREBASE OK');
-    console.log('Firebase login OK:', userCredential.user);
+    await signInWithCredential(auth, credential);
     // onAuthStateChanged cuida do estado/persistência a partir daqui.
   } catch (error: any) {
-    console.error('ERRO GOOGLE LOGIN:', error);
-    debugError('ERRO LOGIN GOOGLE:\n' + JSON.stringify(error, null, 2));
+    console.error(`[AUTH] ERRO: ${error?.message || String(error)}`);
+    debugError(`[AUTH] ERRO: ${error?.message || String(error)}`);
     alert('ERRO GOOGLE:\n\n' + (error?.message || JSON.stringify(error, null, 2)));
   }
 };
 
 // ==================== NOVA FUNÇÃO PARA LOGIN COM EMAIL/SENHA ====================
 const loginWithEmailPassword = async (email: string, password: string) => {
-
-  console.log('BOTAO EMAIL CLICADO');
-
   try {
-    debugLog(`TENTANDO LOGIN EMAIL/SENHA para: ${email}`);
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    debugLog('LOGIN EMAIL/SENHA OK');
-    console.log('Usuário logado com email/senha:', userCredential.user);
     alert(`✅ Login realizado com sucesso como: ${userCredential.user.email}`);
     // Opcional: forçar atualização do estado do usuário (se o auth state listener já estiver configurado)
   } catch (error: any) {
-    console.error('ERRO EMAIL/SENHA:', error);
-    debugError(`ERRO LOGIN EMAIL/SENHA:\nCódigo: ${error.code}\nMensagem: ${error.message}`);
+    console.error(`[AUTH] ERRO: ${error.code || 'login'} ${error.message || String(error)}`);
+    debugError(`[AUTH] ERRO: ${error.code || 'login'} ${error.message || String(error)}`);
     alert(`❌ Falha no login com email/senha:\n\n${error.code}\n${error.message}`);
     // Propaga o erro para quem chamou a função, se necessário
     throw error;
@@ -270,7 +265,7 @@ const logout = async () => {
     await FirebaseAuthentication.signOut().catch(() => { });
     await auth.signOut();
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error(`[AUTH] ERRO: ${error instanceof Error ? error.message : String(error)}`);
   }
 };
 
@@ -281,7 +276,6 @@ const consumeCredit = async () => {
     const newVal = Math.max(0, localCredits - 1);
     localStorage.setItem('torqboss-local-credits', String(newVal));
     setCredits(newVal);
-    debugLog(`Crédito consumido offline. Novo saldo local: ${newVal}`);
     return;
   }
   const path = `users/${user.uid}`;
@@ -303,7 +297,6 @@ const addCredits = async (amount: number, description: string) => {
     const newVal = localCredits + amount;
     localStorage.setItem('torqboss-local-credits', String(newVal));
     setCredits(newVal);
-    debugLog(`Crédito local recarregado (${amount}). Novo saldo local: ${newVal}`);
     return;
   }
   const path = `users/${user.uid}`;

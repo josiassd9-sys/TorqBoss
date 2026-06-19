@@ -187,6 +187,19 @@ export function useAppData() {
     if (newData.settings) {
       const apiKey = newData.settings.geminiApiKey || '';
       geminiService.setApiKey(apiKey);
+      console.log('[API] Chave Gemini presente:', !!apiKey);
+      console.log('[API] Tamanho da chave:', apiKey.length);
+
+      if (apiKey) {
+        console.log('[API] Prefixo da chave:', apiKey.slice(0, 6) + '...');
+      }
+
+      console.log(
+        '[API] IA habilitada:',
+        !!apiKey && !!newData.settings.isProMember
+      );
+
+      console.log('[API] Modelo ativo: Gemini 2.0 Flash');
       geminiService.setGlobalSettings(newData.settings);
     }
   };

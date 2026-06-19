@@ -1,26 +1,71 @@
 // src/services/geminiService.ts
 // Proxy service that calls the server-side Gemini API
 
+import { Capacitor } from '@capacitor/core';
+
 // ===================== CONFIGURAÇÃO PARA APP HÍBRIDO =====================
 
 // Detecta se está rodando no Capacitor (app nativo Android)
-const isNativeApp = window.location.protocol === 'capacitor:';
+const isNativeApp = Capacitor.isNativePlatform();
 
 // URL de Produção (Backend na nuvem)
 const PRODUCAO_API_URL = 'https://ais-dev-exgrcbouh4ydginh4gncxc-510605507081.us-west2.run.app';
 
-// Base URL dinâmica
-const API_BASE = isNativeApp ? PRODUCAO_API_URL : '';
+const reactAppApiBase = typeof process !== 'undefined' ? process.env.REACT_APP_API_BASE : undefined;
+
+// Base URL dinâmica com fallback obrigatório
+const API_BASE =
+  (isNativeApp ? PRODUCAO_API_URL : import.meta.env.VITE_API_BASE) ||
+  reactAppApiBase ||
+  window.location.origin;
+
+console.log(`[IA] init | native=${isNativeApp} | origin=${window.location.origin} | api=${API_BASE}`);
+
+const getApiUrl = (endpoint: string): string => {
+  if (!API_BASE || API_BASE.includes('undefined')) {
+    throw new Error('[IA] API_BASE inválido - request abortado');
+  }
+  return `${API_BASE}${endpoint}`;
+};
 
 let onCreditConsumed: (amount: number) => void = () => {};
 let currentCredits = 0;
 let usingCustomKey = false;
 let isProMember = false;
+let currentApiKey = '';
+let lastAiContext = '';
+let lastUrlDebugSignature = '';
+
+const formatAiContext = (method: string, credits: number): string => {
+  const details = [
+    `key=${usingCustomKey}`,
+    `pro=${isProMember}`,
+    `creditos=${credits}`
+  ].join(' | ');
+
+  if (details === lastAiContext) {
+    return `[IA] ${method}`;
+  }
+
+  lastAiContext = details;
+  return `[IA] ${method} | ${details}`;
+};
+
+const summarizeAiError = (error: any): string => {
+  const message = String(error?.message || error || 'Erro desconhecido');
+  if (message.includes('HTML em vez de JSON') || message.includes("Unexpected token '<'")) {
+    return "Unexpected token '<' (HTML recebido)";
+  }
+  return message.replace(/\s+/g, ' ').trim();
+};
 
 export const geminiService = {
   setApiKey: (key: string) => {
+    currentApiKey = key || '';
     usingCustomKey = !!key;
-    fetch(`${API_BASE}/api/gemini/settings`, {
+    lastAiContext = '';
+    console.log(`[IA] chave API | ativa=${usingCustomKey}`);
+    fetch(getApiUrl('/api/gemini/settings'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ apiKey: key })
@@ -34,7 +79,8 @@ export const geminiService = {
     if (settings.isProMember !== undefined) {
       isProMember = !!settings.isProMember;
     }
-    fetch(`${API_BASE}/api/gemini/settings`, {
+    lastAiContext = '';
+    fetch(getApiUrl('/api/gemini/settings'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ settings })
@@ -48,10 +94,14 @@ export const geminiService = {
   getCooldownRemaining: () => geminiService.call('getCooldownRemaining'),
 
   call: async (method: string, ...args: any[]): Promise<any> => {
+    const credits = currentCredits;
+
     const skipCheck = usingCustomKey || isProMember || method === 'validateApiKey' || method === 'getCooldownRemaining';
-    if (!skipCheck && currentCredits <= 0) {
+    if (!skipCheck && credits <= 0) {
       throw new Error("SALDO INSUFICIENTE: Seus créditos de IA acabaram. Recarregue na aba 'Carteira' ou adicione sua própria Chave API.");
     }
+
+    console.log(formatAiContext(method, credits));
 
     let body;
     
@@ -92,22 +142,68 @@ export const geminiService = {
       body = JSON.stringify({ method, args: ['[Serialization Error]'] });
     }
 
-    const response = await fetch(`${API_BASE}/api/gemini/call`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body
-    });
+    try {
+      const finalUrl = `${API_BASE}/api/gemini/call`;
+      const urlDebugSignature = `${isNativeApp}|${window.location.origin}|${API_BASE}|${finalUrl}`;
+      if (urlDebugSignature !== lastUrlDebugSignature) {
+        lastUrlDebugSignature = urlDebugSignature;
+        console.log(`[IA URL] native=${isNativeApp} | origin=${window.location.origin} | base=${API_BASE}`);
+        console.log(`[IA URL] final=${finalUrl}`);
+      }
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown API error' }));
-      throw new Error(error.error || `API error: ${response.status}`);
+      console.log('[IA FETCH] iniciando');
+      const response = await fetch(getApiUrl('/api/gemini/call'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        redirect: 'manual'
+      });
+
+      console.log('[IA HTTP] status=', response.status);
+      console.log('[IA HTTP] ok=', response.ok);
+      console.log('[IA HTTP] redirected=', response.redirected);
+      console.log('[IA HTTP] type=', response.type);
+      console.log('[IA HTTP] url=', response.url);
+      console.log('[IA HTTP] content-type=', response.headers.get('content-type'));
+
+      const bodyText = await response.clone().text();
+      console.log('[IA HTTP] body=', bodyText.substring(0, 200));
+
+      const contentType = response.headers.get('content-type');
+
+      if (!response.ok) {
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Backend retornou HTML em vez de JSON');
+        }
+        const error = await response.json().catch(() => ({ error: 'Unknown API error' }));
+        throw new Error(error.error || `API error: ${response.status}`);
+      }
+
+      if (!usingCustomKey && method !== 'validateApiKey' && method !== 'getCooldownRemaining') {
+        onCreditConsumed(1);
+      }
+
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Backend retornou HTML em vez de JSON');
+      }
+      let result: any;
+      try {
+        const text = await response.text();
+        result = JSON.parse(text);
+      } catch (error) {
+        console.log('[IA] ERRO JSON (HTML recebido)');
+        throw error;
+      }
+      console.log('[IA] OK');
+      return result;
+    } catch (error: any) {
+      console.log('[IA FETCH ERROR NAME]', error?.name);
+      console.log('[IA FETCH ERROR MESSAGE]', error?.message);
+      console.log('[IA FETCH ERROR CAUSE]', error?.cause);
+      console.log('[IA FETCH ERROR STACK]', error?.stack?.split('\n')[0]);
+      console.log(`[IA] ERRO: ${summarizeAiError(error)}`);
+      throw error;
     }
-
-    if (!usingCustomKey && method !== 'validateApiKey' && method !== 'getCooldownRemaining') {
-      onCreditConsumed(1);
-    }
-
-    return response.json();
   },
 
   // === Facade methods (não mexer) ===

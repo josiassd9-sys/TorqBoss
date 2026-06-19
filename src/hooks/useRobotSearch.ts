@@ -31,16 +31,27 @@ export function useRobotSearch(
   
   const robotPopupRef = useRef<Window | null>(null);
   const robotLogsEndRef = useRef<HTMLDivElement>(null);
+  const isRequestingCooldownRef = useRef(false);
+  const lastCooldownRequestAtRef = useRef(0);
 
   // Poll for cooldown status
   useEffect(() => {
     const checkCooldown = async () => {
+      const now = Date.now();
+      if (isRequestingCooldownRef.current) return;
+      if (now - lastCooldownRequestAtRef.current < 2000) return;
+
+      isRequestingCooldownRef.current = true;
+      lastCooldownRequestAtRef.current = now;
       try {
         const remaining = await geminiService.getCooldownRemaining();
         if (typeof remaining === 'number') {
           setCooldownRemaining(remaining);
         }
-      } catch (e) {}
+      } catch (e) {
+      } finally {
+        isRequestingCooldownRef.current = false;
+      }
     };
 
     checkCooldown();

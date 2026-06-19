@@ -24,6 +24,26 @@ if (!rootElement) {
 
 debugLog('ROOT ENCONTRADO');
 
+async function testConnectivity() {
+  try {
+    console.log('[NET TEST] google');
+    const r1 = await fetch('https://www.google.com');
+    console.log('[NET TEST GOOGLE]', r1.status);
+  } catch (e: any) {
+    console.log('[NET TEST GOOGLE ERROR]', e?.message);
+  }
+
+  try {
+    console.log('[NET TEST] cloudrun');
+    const r2 = await fetch('https://ais-dev-exgrcbouh4ydginh4gncxc-510605507081.us-west2.run.app');
+    console.log('[NET TEST CLOUDRUN]', r2.status);
+  } catch (e: any) {
+    console.log('[NET TEST CLOUDRUN ERROR]', e?.message);
+  }
+}
+
+void testConnectivity();
+
 createRoot(rootElement).render(
   <StrictMode>
     <ErrorBoundary>

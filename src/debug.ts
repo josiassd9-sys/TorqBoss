@@ -1,5 +1,7 @@
 let logs: string[] = [];
 let isIntercepting = false;
+let lastNormalizedMessage = '';
+let lastDuplicateCount = 1;
 
 // Salva refs originais para depuração limpa e prevenção de recursão infinita
 const originalLog = console.log;
@@ -9,11 +11,20 @@ const originalInfo = console.info;
 
 function addLog(type: string, message: string) {
   const time = new Date().toLocaleTimeString();
-  const line = `[${time}] [${type}] ${message}`;
+  const normalizedMessage = message.replace(/\s+/g, ' ').trim().slice(0, 220);
+  const line = `[${time}] [${type}] ${normalizedMessage}`;
+
+  if (normalizedMessage === lastNormalizedMessage && logs.length > 0) {
+    lastDuplicateCount += 1;
+    logs[logs.length - 1] = `${line} x${lastDuplicateCount}`;
+  } else {
+    lastNormalizedMessage = normalizedMessage;
+    lastDuplicateCount = 1;
+    logs.push(line);
+  }
   
-  // Limita o armazenamento em memória na fila para no máximo 800 itens
-  logs.push(line);
-  if (logs.length > 800) {
+  // Limita o armazenamento em memória na fila para no máximo 250 itens
+  if (logs.length > 250) {
     logs.shift();
   }
 
@@ -88,7 +99,7 @@ export function setupConsoleInterceptors() {
   isIntercepting = true;
 
   console.log = function (...args: any[]) {
-    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    const message = args.map(arg => typeof arg === 'object' ? '[obj]' : String(arg)).join(' ');
     // Ignora pings barulhentos do Vite HMR ou conexões WebSocket locais
     if (message.includes('[vite]') || message.includes('WebSocket')) {
       originalLog.apply(console, args);
@@ -99,7 +110,7 @@ export function setupConsoleInterceptors() {
   };
 
   console.warn = function (...args: any[]) {
-    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    const message = args.map(arg => typeof arg === 'object' ? '[obj]' : String(arg)).join(' ');
     if (message.toLowerCase().includes('[vite]') || message.toLowerCase().includes('websocket')) {
       originalWarn.apply(console, args);
       return;
@@ -109,7 +120,7 @@ export function setupConsoleInterceptors() {
   };
 
   console.error = function (...args: any[]) {
-    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    const message = args.map(arg => typeof arg === 'object' ? '[obj]' : String(arg)).join(' ');
     // Ignora erros barulhentos do Vite HMR ou conexões WebSocket locais que falham por estarem desativadas
     if (message.toLowerCase().includes('[vite]') || message.toLowerCase().includes('websocket')) {
       originalError.apply(console, args);
@@ -120,7 +131,7 @@ export function setupConsoleInterceptors() {
   };
 
   console.info = function (...args: any[]) {
-    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    const message = args.map(arg => typeof arg === 'object' ? '[obj]' : String(arg)).join(' ');
     originalInfo.apply(console, args);
     addLog('INFO', message);
   };
@@ -210,7 +221,7 @@ Inicializando logs interceptados...
   window.onerror = function (message, source, lineno, colno, error) {
     addLog(
       'WINDOW_ERROR',
-      `${String(message)}\n${source}:${lineno}:${colno}\n${error?.stack || 'Sem stack'}`
+      `${String(message)} | ${source}:${lineno}:${colno}`
     );
     return false;
   };
@@ -233,7 +244,7 @@ Inicializando logs interceptados...
 
     addLog(
       'PROMISE_ERROR',
-      `${reasonStr}\n${stackStr || 'Sem stack'}`
+      reasonStr || stackStr || 'Promise rejection sem detalhe'
     );
   });
 
@@ -245,7 +256,7 @@ export function debugLog(message: any) {
     'LOG',
     typeof message === 'string'
       ? message
-      : JSON.stringify(message)
+      : '[obj]'
   );
 }
 
@@ -254,6 +265,6 @@ export function debugError(message: any) {
     'ERROR',
     typeof message === 'string'
       ? message
-      : JSON.stringify(message)
+      : '[obj]'
   );
 }

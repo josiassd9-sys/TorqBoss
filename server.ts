@@ -14,6 +14,29 @@ async function startServer() {
 
   app.use(express.json({ limit: '50mb' }));
 
+  // CORS — permite Capacitor, localhost e origens externas para requests machine-to-machine
+  const ALLOWED_ORIGINS = new Set([
+    'capacitor://localhost',
+    'http://localhost',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'ionic://localhost',
+    'https://localhost',
+  ]);
+
+  app.use((req, res, next) => {
+    const origin = req.headers.origin || '';
+    const isAllowed = ALLOWED_ORIGINS.has(origin) || !origin; // sem origin = requisição direta (curl, APK)
+    res.setHeader('Access-Control-Allow-Origin', isAllowed ? (origin || '*') : '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(204);
+      return;
+    }
+    next();
+  });
+
   // Middleware for basic logging
   app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
@@ -45,6 +68,11 @@ async function startServer() {
     res.json({ status: "ok", time: new Date().toISOString() });
   });
 
+  app.use('/api/gemini', (req, res, next) => {
+    res.setHeader('Content-Type', 'application/json');
+    next();
+  });
+
   // AI API Endpoints
   app.post("/api/gemini/settings", (req, res) => {
     const { apiKey, settings } = req.body;
@@ -68,6 +96,10 @@ async function startServer() {
       console.error(`Error calling ${method}:`, error);
       res.status(500).json({ error: error.message || "Internal AI Error" });
     }
+  });
+
+  app.use('/api/gemini', (req, res) => {
+    res.status(404).json({ error: 'Gemini endpoint not found' });
   });
 
   // Vite middleware for development
