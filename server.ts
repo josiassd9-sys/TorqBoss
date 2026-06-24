@@ -22,6 +22,8 @@ async function startServer() {
     'http://localhost:5173',
     'ionic://localhost',
     'https://localhost',
+    'https://torqboss.com',       // Adicione o seu domínio
+    'https://www.torqboss.com',   // Adicione com www também
   ]);
 
   app.use((req, res, next) => {

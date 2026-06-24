@@ -11,13 +11,16 @@ const isNativeApp = Capacitor.isNativePlatform();
 // URL de Produção (Backend na nuvem)
 const PRODUCAO_API_URL = 'https://ais-dev-exgrcbouh4ydginh4gncxc-510605507081.us-west2.run.app';
 
+const viteApiBase = import.meta.env.VITE_API_BASE;
 const reactAppApiBase = typeof process !== 'undefined' ? process.env.REACT_APP_API_BASE : undefined;
 
 // Base URL dinâmica com fallback obrigatório
-const API_BASE =
-  (isNativeApp ? PRODUCAO_API_URL : import.meta.env.VITE_API_BASE) ||
+const API_BASE_RAW =
+  viteApiBase ||
   reactAppApiBase ||
-  window.location.origin;
+  (isNativeApp ? PRODUCAO_API_URL : window.location.origin);
+
+const API_BASE = API_BASE_RAW.replace(/\/+$/, '');
 
 console.log(`[IA] init | native=${isNativeApp} | origin=${window.location.origin} | api=${API_BASE}`);
 
@@ -53,8 +56,14 @@ const formatAiContext = (method: string, credits: number): string => {
 
 const summarizeAiError = (error: any): string => {
   const message = String(error?.message || error || 'Erro desconhecido');
+  if (message.includes('REDIRECT_BLOQUEADO')) {
+    return 'Redirect bloqueado (possivel cookie-check/IAP no Cloud Run)';
+  }
   if (message.includes('HTML em vez de JSON') || message.includes("Unexpected token '<'")) {
     return "Unexpected token '<' (HTML recebido)";
+  }
+  if (message.includes('Failed to fetch')) {
+    return 'Failed to fetch (rede/CORS/autenticacao do endpoint)';
   }
   return message.replace(/\s+/g, ' ').trim();
 };
@@ -165,9 +174,21 @@ export const geminiService = {
       console.log('[IA HTTP] type=', response.type);
       console.log('[IA HTTP] url=', response.url);
       console.log('[IA HTTP] content-type=', response.headers.get('content-type'));
+      console.log('[IA HTTP] location=', response.headers.get('location'));
 
-      const bodyText = await response.clone().text();
-      console.log('[IA HTTP] body=', bodyText.substring(0, 200));
+      try {
+        const bodyText = await response.clone().text();
+        console.log('[IA HTTP] body=', bodyText.substring(0, 200));
+      } catch {
+        console.log('[IA HTTP] body= [indisponivel para este tipo de resposta]');
+      }
+
+      const isRedirectStatus = response.status >= 300 && response.status < 400;
+      if (response.type === 'opaqueredirect' || isRedirectStatus || response.redirected) {
+        throw new Error(
+          'REDIRECT_BLOQUEADO: Backend respondeu com redirect em vez de JSON. Verifique Cloud Run (IAP/cookie-check/autenticacao) e mantenha o endpoint /api/gemini/call sem redirecionamento.'
+        );
+      }
 
       const contentType = response.headers.get('content-type');
 
