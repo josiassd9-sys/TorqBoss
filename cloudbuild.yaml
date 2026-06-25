@@ -1,18 +1,11 @@
 steps:
-  # 1. Instalar dependências
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['ci']
-
-  # 2. Build do Vite com a URL da API injetada via substituição do trigger
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['run', 'build']
-    env:
-      - 'VITE_API_BASE=${_VITE_API_BASE}'
-
-  # 3. Build da imagem Docker
+  # 1. Build da imagem Docker — VITE_API_BASE é passada como build-arg
+  #    para que o `npm run build` interno do Dockerfile a receba corretamente
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
+      - '--build-arg'
+      - 'VITE_API_BASE=${_VITE_API_BASE}'
       - '-t'
       - 'gcr.io/$PROJECT_ID/torqboss:$COMMIT_SHA'
       - '.'

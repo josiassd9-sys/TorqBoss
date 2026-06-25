@@ -8,19 +8,14 @@ import { Capacitor } from '@capacitor/core';
 // Detecta se está rodando no Capacitor (app nativo Android)
 const isNativeApp = Capacitor.isNativePlatform();
 
-// URL de Produção (Backend na nuvem)
-const PRODUCAO_API_URL = 'https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app';
-
-const viteApiBase = import.meta.env.VITE_API_BASE;
-const reactAppApiBase = typeof process !== 'undefined' ? process.env.REACT_APP_API_BASE : undefined;
-
-// Base URL dinâmica com fallback obrigatório
-const API_BASE_RAW =
-  viteApiBase ||
-  reactAppApiBase ||
-  (isNativeApp ? PRODUCAO_API_URL : window.location.origin);
-
-const API_BASE = API_BASE_RAW.replace(/\/+$/, '');
+// URL base — prioriza variável de ambiente injetada no build (VITE_API_BASE),
+// fallback para a URL de produção hardcoded (app nativo) ou origem atual (web dev).
+const API_BASE = (
+  import.meta.env.VITE_API_BASE ||
+  (isNativeApp
+    ? 'https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app'
+    : window.location.origin)
+).replace(/\/+$/, '');
 
 console.log(`[IA] init | native=${isNativeApp} | origin=${window.location.origin} | api=${API_BASE}`);
 
