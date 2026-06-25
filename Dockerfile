@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package*.json tsconfig.json ./
 
 # 4. Instala todas as dependências (inclusive as de desenvolvimento para compilar o TypeScript)
-RUN npm install
+# Usa --legacy-peer-deps para resolver conflito entre onnxruntime-web@1.26.0 e @imgly/background-removal que quer @1.21.0
+RUN npm install --legacy-peer-deps
 
 # 5. Copia o restante do código do projeto para o container
 COPY . .
