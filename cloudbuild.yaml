@@ -1,0 +1,48 @@
+steps:
+  # 1. Instalar dependências
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['ci']
+
+  # 2. Build do Vite com a URL da API injetada via substituição do trigger
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+    env:
+      - 'VITE_API_BASE=${_VITE_API_BASE}'
+
+  # 3. Build da imagem Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/torqboss:$COMMIT_SHA'
+      - '.'
+
+  # 4. Push da imagem para o Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/torqboss:$COMMIT_SHA'
+
+  # 5. Deploy no Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'torqboss'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/torqboss:$COMMIT_SHA'
+      - '--region'
+      - 'southamerica-east1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'VITE_API_BASE=${_VITE_API_BASE}'
+
+# Valores padrão das substituições (podem ser sobrescritos no trigger do Cloud Build)
+substitutions:
+  _VITE_API_BASE: 'https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
