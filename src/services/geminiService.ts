@@ -13,7 +13,7 @@ const isNativeApp = Capacitor.isNativePlatform();
 const API_BASE = (
   import.meta.env.VITE_API_BASE ||
   (isNativeApp
-    ? 'https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app'
+    ? 'https://torqboss-3lnra6fkbq-rj.a.run.app'
     : window.location.origin)
 ).replace(/\/+$/, '');
 

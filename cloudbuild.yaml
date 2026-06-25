@@ -35,7 +35,7 @@ steps:
 
 # Valores padrão das substituições (podem ser sobrescritos no trigger do Cloud Build)
 substitutions:
-  _VITE_API_BASE: 'https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app'
+  _VITE_API_BASE: 'https://torqboss-3lnra6fkbq-rj.a.run.app'
 
 options:
   logging: CLOUD_LOGGING_ONLY
