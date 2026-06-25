@@ -279,7 +279,7 @@ export const DebugCenter: React.FC = () => {
   };
 
   const runConnectivityProbe = async () => {
-    const cloudRunUrl = 'https://ais-dev-exgrcbouh4ydginh4gncxc-510605507081.us-west2.run.app/api/gemini/call';
+    const cloudRunUrl = 'https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app/api/gemini/call';
     
     setIsTestingConnectivity(true);
     const startedAt = Date.now();

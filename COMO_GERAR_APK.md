@@ -44,7 +44,7 @@ Como as APIs do Gemini dependem do backend de forma segura, você precisará ins
 
 ### 1. Copie a URL de Produção do Aplicativo
 Utilize a URL de desenvolvimento ou homologação da nuvem gerada para o seu aplicativo no AI Studio (exemplo que está no cabeçalho do seu chat):
-`https://ais-pre-exgrcbouh4ydginh4gncxc-510605507081.us-west2.run.app`
+`https://ais-pre-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app`
 
 ### 2. Configure a URL Dinâmica
 Abra o arquivo `src/services/geminiService.ts` no seu VS Code. Note que os `fetch()` de chamada da IA batem de forma relativa, exemplo:

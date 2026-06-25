@@ -35,7 +35,7 @@ async function testConnectivity() {
 
   try {
     console.log('[NET TEST] cloudrun');
-    const r2 = await fetch('https://ais-dev-exgrcbouh4ydginh4gncxc-510605507081.us-west2.run.app');
+    const r2 = await fetch('https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app');
     console.log('[NET TEST CLOUDRUN]', r2.status);
   } catch (e: any) {
     console.log('[NET TEST CLOUDRUN ERROR]', e?.message);

@@ -9,7 +9,7 @@ import { Capacitor } from '@capacitor/core';
 const isNativeApp = Capacitor.isNativePlatform();
 
 // URL de Produção (Backend na nuvem)
-const PRODUCAO_API_URL = 'https://ais-dev-exgrcbouh4ydginh4gncxc-510605507081.us-west2.run.app';
+const PRODUCAO_API_URL = 'https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app';
 
 const viteApiBase = import.meta.env.VITE_API_BASE;
 const reactAppApiBase = typeof process !== 'undefined' ? process.env.REACT_APP_API_BASE : undefined;
