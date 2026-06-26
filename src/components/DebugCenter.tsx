@@ -2,6 +2,7 @@ import React from 'react';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { Capacitor } from '@capacitor/core';
+import { getGeminiApiBase, performGeminiRequest } from '../services/geminiService';
 
 /**
  * DebugCenter — "caixa-preta" embutida no APK.
@@ -91,6 +92,9 @@ type ConnectivityEntry = {
   responseType?: string;
   finalUrl?: string;
   statusOk?: boolean;
+  requestMethod?: string;
+  requestHeadersPreview?: string;
+  requestBodyPreview?: string;
   headersPreview?: string;
   bodyPreview?: string;
 };
@@ -279,22 +283,23 @@ export const DebugCenter: React.FC = () => {
   };
 
   const runConnectivityProbe = async () => {
-    const cloudRunUrl = 'https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app/api/gemini/call';
-    
     setIsTestingConnectivity(true);
     const startedAt = Date.now();
     const controller = new AbortController();
     const timeoutHandle = setTimeout(() => controller.abort(), 10000);
+    const diagnosticMethod = 'getCooldownRemaining';
+    const requestUrl = `${getGeminiApiBase()}/api/gemini/call`;
+    const requestMethod = 'POST';
+    const requestHeaders = { 'Content-Type': 'application/json' };
+    const requestBody = JSON.stringify({ method: diagnosticMethod, args: [] });
 
     try {
-      console.log(`[CLOUD_RUN_TEST] Iniciando teste do endpoint: ${cloudRunUrl}`);
-      
-      const response = await fetch(cloudRunUrl, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-store',
-        signal: controller.signal,
-      });
+      console.log(`[CLOUD_RUN_TEST] Iniciando teste do endpoint: ${requestUrl}`);
+      console.log(`[CLOUD_RUN_TEST] Request method: ${requestMethod}`);
+      console.log(`[CLOUD_RUN_TEST] Request headers: ${JSON.stringify(requestHeaders)}`);
+      console.log(`[CLOUD_RUN_TEST] Request body: ${requestBody}`);
+
+      const { response } = await performGeminiRequest(diagnosticMethod, [], { signal: controller.signal });
 
       const elapsed = Date.now() - startedAt;
       console.log(`[CLOUD_RUN_TEST] Resposta recebida em ${elapsed}ms`);
@@ -328,7 +333,7 @@ export const DebugCenter: React.FC = () => {
         {
           time: new Date().toISOString().substring(11, 19),
           label: 'Cloud Run /api/gemini/call',
-          target: cloudRunUrl,
+          target: requestUrl,
           ok: true,
           status: response.status,
           statusOk: response.ok,
@@ -337,6 +342,9 @@ export const DebugCenter: React.FC = () => {
           detail: `HTTP ${response.status}`,
           responseType: response.type,
           finalUrl: response.url,
+          requestMethod,
+          requestHeadersPreview: JSON.stringify(requestHeaders),
+          requestBodyPreview: requestBody.substring(0, 300),
           headersPreview,
           bodyPreview,
         },
@@ -362,14 +370,17 @@ export const DebugCenter: React.FC = () => {
         {
           time: new Date().toISOString().substring(11, 19),
           label: 'Cloud Run /api/gemini/call',
-          target: cloudRunUrl,
+          target: requestUrl,
           ok: false,
           status: null,
           latencyMs: elapsed,
           classification,
           detail: `${errorName}: ${message}`,
           statusOk: false,
-          finalUrl: cloudRunUrl,
+          requestMethod,
+          requestHeadersPreview: JSON.stringify(requestHeaders),
+          requestBodyPreview: requestBody.substring(0, 300),
+          finalUrl: requestUrl,
         },
         ...prev.slice(0, 99),
       ]);
@@ -554,6 +565,7 @@ export const DebugCenter: React.FC = () => {
         <div className="text-[10px] font-mono space-y-1 mb-3 border border-gray-700 rounded p-2 bg-gray-950">
           <div className="text-cyan-300 font-bold">Ambiente WebView / Segurança</div>
           <div className="text-gray-300">[{envSnapshot.time}] Capacitor.getPlatform() = {envSnapshot.platform}</div>
+          <div className="text-gray-300 break-all">Gemini API base = {getGeminiApiBase()}</div>
           <div className="text-gray-300 break-all">navigator.userAgent = {envSnapshot.userAgent}</div>
           <div className="text-gray-300 break-all">window.location.origin = {envSnapshot.origin}</div>
           <div className={envSnapshot.onLine ? 'text-emerald-300' : 'text-red-300'}>navigator.onLine = {String(envSnapshot.onLine)}</div>

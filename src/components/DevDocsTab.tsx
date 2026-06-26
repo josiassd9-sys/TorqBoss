@@ -2,6 +2,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { FileText, Loader2, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
+import { getGeminiApiUrl } from '../services/geminiService';
 
 type DocFile = 'README.md' | 'LOGICA_NEGOCIO.md' | 'security_spec.md' | 'MONETIZACAO_PLATAFORMA.md' | 'MARKETING_PLAYSTORE.md' | 'COMO_GERAR_APK.md';
 
@@ -15,8 +16,13 @@ export const DevDocsTab: React.FC = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`/api/dev/docs/${filename}`);
-            if (!response.ok) throw new Error('Falha ao carregar documento');
+            const endpoint = getGeminiApiUrl(`/api/dev/docs/${filename}`);
+            const response = await fetch(endpoint, { method: 'GET' });
+            if (!response.ok) {
+                const raw = await response.text().catch(() => '');
+                const compactRaw = raw.replace(/\s+/g, ' ').trim().substring(0, 240);
+                throw new Error(`Falha ao carregar documento (HTTP ${response.status})${compactRaw ? `: ${compactRaw}` : ''}`);
+            }
             const data = await response.json();
             setContent(data.content);
         } catch (err: any) {

@@ -178,6 +178,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     return null;
   }
 
+  const isOwnerUser = user?.email?.toLowerCase() === 'torqboss@gmail.com';
+
   const settings = data.settings;
 
   const updateSettings = (updates: Partial<AppData['settings']>) => {
@@ -397,7 +399,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <Database size={14} className="sm:w-4 sm:h-4 shrink-0" /> Backup
                 </button>
 
-                {user?.email === 'torqboss@gmail.com' && (
+                {isOwnerUser && (
                   <button
                     onClick={() => setActiveSubTab('devDocs')}
                     className={`flex items-center gap-1.5 sm:gap-3 px-3 py-2.5 sm:p-4 rounded-lg text-[9px] sm:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap sm:whitespace-normal flex-1 sm:flex-none justify-center sm:justify-start ${activeSubTab === 'devDocs' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25' : 'text-indigo-500 hover:bg-indigo-50'}`}
@@ -426,7 +428,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {/* Content Area */}
               <div className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar bg-white text-left">
                 {activeSubTab === 'devDocs' && (
-                  <DevDocsTab />
+                  isOwnerUser ? (
+                    <DevDocsTab />
+                  ) : (
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 text-xs font-bold uppercase tracking-wider">
+                      Acesso restrito: a aba DEVDOCS é exclusiva do usuário proprietário.
+                    </div>
+                  )
                 )}
 
                 {activeSubTab === 'general' && (

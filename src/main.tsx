@@ -9,6 +9,7 @@ import './i18n/config';
 import { FirebaseProvider } from './contexts/FirebaseContext';
 
 import { initDebugOverlay, debugLog } from './debug';
+import { getGeminiApiBase } from './services/geminiService';
 
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -25,6 +26,8 @@ if (!rootElement) {
 debugLog('ROOT ENCONTRADO');
 
 async function testConnectivity() {
+  const cloudRunBase = getGeminiApiBase();
+
   try {
     console.log('[NET TEST] google');
     const r1 = await fetch('https://www.google.com');
@@ -35,7 +38,7 @@ async function testConnectivity() {
 
   try {
     console.log('[NET TEST] cloudrun');
-    const r2 = await fetch('https://ais-dev-exgrcbouh4ydginh4gncxc-140585498523.us-west2.run.app');
+    const r2 = await fetch(cloudRunBase);
     console.log('[NET TEST CLOUDRUN]', r2.status);
   } catch (e: any) {
     console.log('[NET TEST CLOUDRUN ERROR]', e?.message);

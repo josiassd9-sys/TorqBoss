@@ -10,20 +10,95 @@ const isNativeApp = Capacitor.isNativePlatform();
 
 // URL base — prioriza variável de ambiente injetada no build (VITE_API_BASE),
 // fallback para a URL de produção hardcoded (app nativo) ou origem atual (web dev).
-const API_BASE = (
+export const getGeminiApiBase = (): string => (
   import.meta.env.VITE_API_BASE ||
   (isNativeApp
     ? 'https://torqboss-140585498523.southamerica-east1.run.app'
     : window.location.origin)
 ).replace(/\/+$/, '');
 
+const API_BASE = getGeminiApiBase();
+
 console.log(`[IA] init | native=${isNativeApp} | origin=${window.location.origin} | api=${API_BASE}`);
 
-const getApiUrl = (endpoint: string): string => {
+export const getGeminiApiUrl = (endpoint: string): string => {
   if (!API_BASE || API_BASE.includes('undefined')) {
     throw new Error('[IA] API_BASE inválido - request abortado');
   }
   return `${API_BASE}${endpoint}`;
+};
+
+export type GeminiRequestResult = {
+  response: Response;
+  requestUrl: string;
+  requestMethod: 'POST';
+  requestHeaders: Record<string, string>;
+  requestBody: string;
+};
+
+const sanitizeRequestValue = (value: any, seen: WeakSet<object>): any => {
+  if (value === null || value === undefined) return value;
+  if (typeof value !== 'object') return value;
+
+  if (seen.has(value)) return '[Circular]';
+  seen.add(value);
+
+  if (value instanceof Error) return { message: value.message, name: value.name };
+  if (value instanceof HTMLElement || (value.constructor && value.constructor.name.includes('Element'))) {
+    return `[DOM: ${value.tagName || 'Node'}]`;
+  }
+  if (value.nativeEvent || (value.constructor && value.constructor.name === 'SyntheticBaseEvent')) {
+    return '[React Event]';
+  }
+
+  if (Array.isArray(value)) return value.map((item) => sanitizeRequestValue(item, seen));
+
+  const result: any = {};
+  for (const key of Object.keys(value)) {
+    if (key.startsWith('__react') || key === '$$typeof' || key === '_owner') continue;
+    try {
+      result[key] = sanitizeRequestValue(value[key], seen);
+    } catch {
+      result[key] = '[Inaccessible]';
+    }
+  }
+  return result;
+};
+
+const buildGeminiRequestBody = (method: string, args: any[]): string => {
+  try {
+    const sanitizedArgs = args.map((arg) => sanitizeRequestValue(arg, new WeakSet<object>()));
+    return JSON.stringify({ method, args: sanitizedArgs });
+  } catch {
+    return JSON.stringify({ method, args: ['[Serialization Error]'] });
+  }
+};
+
+export const performGeminiRequest = async (
+  method: string,
+  args: any[] = [],
+  options: { signal?: AbortSignal } = {},
+): Promise<GeminiRequestResult> => {
+  const requestUrl = getGeminiApiUrl('/api/gemini/call');
+  const requestMethod: 'POST' = 'POST';
+  const requestHeaders = { 'Content-Type': 'application/json' };
+  const requestBody = buildGeminiRequestBody(method, args);
+
+  const response = await fetch(requestUrl, {
+    method: requestMethod,
+    headers: requestHeaders,
+    body: requestBody,
+    redirect: 'manual',
+    signal: options.signal,
+  });
+
+  return {
+    response,
+    requestUrl,
+    requestMethod,
+    requestHeaders,
+    requestBody,
+  };
 };
 
 let onCreditConsumed: (amount: number) => void = () => {};
@@ -69,7 +144,7 @@ export const geminiService = {
     usingCustomKey = !!key;
     lastAiContext = '';
     console.log(`[IA] chave API | ativa=${usingCustomKey}`);
-    fetch(getApiUrl('/api/gemini/settings'), {
+    fetch(getGeminiApiUrl('/api/gemini/settings'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ apiKey: key })
@@ -84,7 +159,7 @@ export const geminiService = {
       isProMember = !!settings.isProMember;
     }
     lastAiContext = '';
-    fetch(getApiUrl('/api/gemini/settings'), {
+    fetch(getGeminiApiUrl('/api/gemini/settings'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ settings })
@@ -107,45 +182,6 @@ export const geminiService = {
 
     console.log(formatAiContext(method, credits));
 
-    let body;
-    
-    const sanitize = (val: any): any => {
-      if (val === null || val === undefined) return val;
-      if (typeof val !== 'object') return val;
-      
-      const seen = new WeakSet();
-      const clean = (obj: any): any => {
-        if (obj === null || typeof obj !== 'object') return obj;
-        if (seen.has(obj)) return '[Circular]';
-        seen.add(obj);
-
-        if (obj instanceof Error) return { message: obj.message, name: obj.name };
-        if (obj instanceof HTMLElement || (obj.constructor && obj.constructor.name.includes('Element'))) return `[DOM: ${obj.tagName || 'Node'}]`;
-        if (obj.nativeEvent || (obj.constructor && obj.constructor.name === 'SyntheticBaseEvent')) return '[React Event]';
-        
-        if (Array.isArray(obj)) return obj.map(clean);
-        
-        const result: any = {};
-        for (const key of Object.keys(obj)) {
-          if (key.startsWith('__react') || key === '$$typeof' || key === '_owner') continue;
-          try {
-            result[key] = clean(obj[key]);
-          } catch (e) {
-            result[key] = '[Inaccessible]';
-          }
-        }
-        return result;
-      };
-      return clean(val);
-    };
-
-    try {
-      const sanitizedArgs = args.map(sanitize);
-      body = JSON.stringify({ method, args: sanitizedArgs });
-    } catch (e) {
-      body = JSON.stringify({ method, args: ['[Serialization Error]'] });
-    }
-
     try {
       const finalUrl = `${API_BASE}/api/gemini/call`;
       const urlDebugSignature = `${isNativeApp}|${window.location.origin}|${API_BASE}|${finalUrl}`;
@@ -156,12 +192,7 @@ export const geminiService = {
       }
 
       console.log('[IA FETCH] iniciando');
-      const response = await fetch(getApiUrl('/api/gemini/call'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body,
-        redirect: 'manual'
-      });
+  const { response } = await performGeminiRequest(method, args);
 
       console.log('[IA HTTP] status=', response.status);
       console.log('[IA HTTP] ok=', response.ok);

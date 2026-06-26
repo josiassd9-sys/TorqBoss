@@ -37,6 +37,48 @@ const getErrorMessage = (error: unknown): string => {
   return 'Erro desconhecido';
 };
 
+const extractGeminiRawError = async (error: unknown): Promise<{
+  status: number | null;
+  rawBody: string;
+  errorDump: string;
+}> => {
+  const err: any = error as any;
+  const statusCandidate = err?.status ?? err?.statusCode ?? err?.code ?? err?.response?.status;
+  const status = typeof statusCandidate === 'number' ? statusCandidate : null;
+
+  let rawBody = '';
+  const responseLike = err?.response;
+
+  try {
+    if (typeof responseLike?.text === 'function') {
+      rawBody = await responseLike.text();
+    } else if (typeof responseLike?.data === 'string') {
+      rawBody = responseLike.data;
+    } else if (responseLike?.data && typeof responseLike.data === 'object') {
+      rawBody = JSON.stringify(responseLike.data);
+    } else if (typeof err?.body === 'string') {
+      rawBody = err.body;
+    } else if (err?.body && typeof err.body === 'object') {
+      rawBody = JSON.stringify(err.body);
+    }
+  } catch (readError: any) {
+    rawBody = `[falha ao ler corpo bruto: ${readError?.message || String(readError)}]`;
+  }
+
+  let errorDump = '';
+  try {
+    errorDump = JSON.stringify(err);
+  } catch {
+    errorDump = String(err);
+  }
+
+  return {
+    status,
+    rawBody: rawBody || '[indisponivel no objeto de erro da SDK]',
+    errorDump: errorDump || '[indisponivel]',
+  };
+};
+
 const getGlobalContextPrompt = () => {
   const fullRef = referenceMap[globalSettings.marketReferenceName] || globalSettings.marketReferenceName;
   return `[CONTEXTO DE OPERAÇÃO:
@@ -1417,6 +1459,10 @@ export const geminiService = {
       return { success: false, message: 'A IA respondeu, mas de forma inesperada. Verifique se é a chave correta.' };
     } catch (error: any) {
       console.error('API Key Validation Error:', error);
+      const raw = await extractGeminiRawError(error);
+      console.error(`[GEMINI RAW][validateApiKey] status=${raw.status ?? 'n/a'}`);
+      console.error(`[GEMINI RAW][validateApiKey] body=${raw.rawBody.substring(0, 2000)}`);
+      console.error(`[GEMINI RAW][validateApiKey] error=${raw.errorDump.substring(0, 2000)}`);
       currentApiKey = previousKey;
       isUsingCustomKey = wasUsingCustom;
       const msg = getErrorMessage(error);
