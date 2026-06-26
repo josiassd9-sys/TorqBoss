@@ -1086,6 +1086,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             if (!settings.geminiApiKey) return;
                             setTestStatus('testing');
                             try {
+                              console.log('[SETTINGS] chamando validateApiKey');
                               const result = await geminiService.validateApiKey(settings.geminiApiKey);
                               console.log(`[IA] validateApiKey | ok=${!!result?.success}${result?.message ? ` | ${result.message}` : ''}`);
                               if (result.success) {

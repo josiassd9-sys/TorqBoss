@@ -1433,6 +1433,7 @@ export const geminiService = {
   },
 
   validateApiKey: async (key: string): Promise<{ success: boolean; message: string }> => {
+    console.log('[VALIDATE API KEY] iniciado');
     if (!key || key.trim().length < 20) {
       return { success: false, message: 'Chave API muito curta ou inválida.' };
     }
